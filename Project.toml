@@ -1,6 +1,7 @@
 name = "CellMLToolkit"
 uuid = "03cb29e0-1ef4-4721-aa24-cf58a006576f"
 authors = ["Shahriar Iravanian <siravan@emory.edu>"]
+contributers = ["Shahriar Iravanian <siravan@emory.edu>"]
 version = "0.1.0"
 
 [deps]
