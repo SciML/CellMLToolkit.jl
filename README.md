@@ -60,7 +60,7 @@ The rest remains the same. For the last example, we chose a complex model to str
 ```Julia
   ml = CellModel("models/ohara_rudy_cipa_v1_2017.cellml.xml")
   tspan = (0, 5000.0)
-  prob = ODEProblem(m, tspan);
+  prob = ODEProblem(ml, tspan);
   sol = solve(prob, CVODE_BDF(), dtmax=0.5)
   V = map(x -> x[1], sol.u)
   plot(sol.t, V)
