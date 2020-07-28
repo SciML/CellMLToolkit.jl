@@ -17,5 +17,5 @@ julia:
 notifications:
   email: false
 
-coveralls: true
-codecov: true
+coveralls: false
+codecov: false
