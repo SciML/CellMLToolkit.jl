@@ -120,10 +120,7 @@ end
 ################################# Tree Traversal ##############################
 
 """
-    the entry point
-
-    If Istim is not given, a default value will be calculated by write_all
-    Make sure to check this value!
+    the entry point    
 """
 function process_doc(doc; dependency=true)
     ml = CellModel()

@@ -2,7 +2,8 @@ using Test
 using CellMLToolkit
 using OrdinaryDiffEq
 
-ml = CellModel("../models/beeler_reuter_1977.cellml.xml")
+path = @__DIR__
+ml = CellModel(path * "/../models/beeler_reuter_1977.cellml.xml")
 
 @test length(ml.eqs) == 8
 @test ml.iv.op.name == :time
