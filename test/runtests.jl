@@ -31,3 +31,6 @@ p = list_params(ml)
 update_list!(p, "IstimPeriod", 280.0)
 prob = ODEProblem(ml, (0,10000.0); jac=false, p=p)
 sol4 = solve(prob, TRBDF2(), dtmax=0.5, saveat=1.0)
+V4 = map(x -> x[1], sol2.u)
+err = sum(abs.(V1[1:250] .- V4[1:250])) / 250
+@test err < 0.1
