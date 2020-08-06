@@ -1,8 +1,9 @@
 module CellMLToolkit
 
-export CellModel
-export parse_file, process_doc, ODEProblem
+export CellModel, ODEProblem
+export parse_file, process_doc
 export find_adjacency_matrix, find_V
+export list_params, list_initial_conditions, list_states, update_list!
 
 using LightXML
 using ModelingToolkit
@@ -120,7 +121,7 @@ end
 ################################# Tree Traversal ##############################
 
 """
-    the entry point    
+    the entry point
 """
 function process_doc(doc; dependency=true)
     ml = CellModel()
@@ -383,7 +384,7 @@ end
 const constants = Dict(
     "pi" => T(π),
     "exponentiale" => T(ℯ),
-    "nonanumber" => NaN,
+    "notanumber" => NaN,
     "infinity" => Inf,
     "true" => true,
     "false" => false
@@ -437,6 +438,10 @@ end
 
 #############################################################################
 
+"""
+    flat_equations flattens the equation list by substituting algebraic
+    equations in the differential equations
+"""
 function flat_equations(ml::CellModel; level=1)
     alg = [a.lhs => a.rhs for a in ml.alg]
     for i = 1:level
@@ -447,30 +452,70 @@ function flat_equations(ml::CellModel; level=1)
     return eqs, vs
 end
 
-function get_init_lists(ml::CellModel)
-    var_inits = Pair{Operation,T}[]
-    param_inits = Pair{Operation,T}[]
+"""
+    get_init_list returns a list of variable => initial value pairs
+
+    ml is a CellModel
+    if select_params == true, it returns a list of parameters (p in ODEProblem)
+    if select_params == false, it returns a list of state variables (u0 in ODEProblem)
+"""
+function get_init_list(ml::CellModel, select_params=false)
+    l = Pair{Operation,T}[]
     states = list_states(ml)
 
     for v in values(ml.vars)
         s = repr(v.op)
-        if haskey(ml.inits, s)
-            if v ∈ states
-                push!(var_inits, v => ml.inits[s])
-            else
-                push!(param_inits, Variable(Symbol(s))() => ml.inits[s])
-            end
+        if haskey(ml.inits, s) && (v ∈ states) != select_params
+            push!(l, v => ml.inits[s])
         end
     end
 
-    return var_inits, param_inits
+    return l
 end
+
+"""
+    list_initial_conditions returns a list of state variable => initial value pairs
+    u0 in ODEProblem
+"""
+list_initial_conditions(ml::CellModel) = get_init_list(ml, false)
+
+"""
+    list_params returns a list of params => initial value pairs
+    p in ODEProblem
+"""
+list_params(ml::CellModel) = get_init_list(ml, true)
+
+"""
+    update_list! updates the value of an item in an initial value list (either p or u0)
+    l is the list
+    sym is a Symbol pointing to the variable (we also pass a string or a ModelingToolkit.Operation)
+    val is the new value
+"""
+function update_list!(l::Array{Pair{Operation,Float64}}, sym::Symbol, val)
+    for (i,x) in enumerate(l)
+        if first(x).op.name == sym
+            l[i] = first(x) => T(val)
+            return
+        end
+    end
+    error("param not found: $name")
+end
+
+update_list!(l::Array{Pair{Operation,Float64}}, name::AbstractString, val) =
+        update_list!(l, Symbol(name), val)
+
+update_list!(l::Array{Pair{Operation,Float64}}, v::Operation, val) =
+        update_list!(l, v.op, val)
 
 import ModelingToolkit.ODEProblem
 
-function ODEProblem(ml::CellModel, tspan; jac=false, level=1)
+"""
+    ODEProblem constructs an ODEProblem from a CellModel
+"""
+function ODEProblem(ml::CellModel, tspan;
+        jac=false, level=1, p=list_params(ml), u0=list_initial_conditions(ml))
     eqs, vs = flat_equations(ml; level=level)
-    u0, p = get_init_lists(ml)
+    # u0, p = get_init_lists(ml)
     ps = map(first, p)
     sys = ODESystem(eqs, ml.iv, vs, ps)
     prob = ODEProblem(sys, u0, tspan, p; jac=jac)
