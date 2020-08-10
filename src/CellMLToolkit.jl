@@ -1,4 +1,4 @@
-module CellMLToolkit
+# module CellMLToolkit
 
 export CellModel, ODEProblem
 export parse_file, process_doc
@@ -522,4 +522,6 @@ function ODEProblem(ml::CellModel, tspan;
     return prob
 end
 
-end # module
+include("generator.jl")
+
+# end # module
