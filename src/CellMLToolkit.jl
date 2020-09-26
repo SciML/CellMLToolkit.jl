@@ -23,8 +23,42 @@ ModelingToolkit.@register ceil(x)
 ModelingToolkit.derivative(::typeof(floor), args::NTuple{1,Any}, ::Val{1}) = zero(args[1])
 ModelingToolkit.derivative(::typeof(ceil), args::NTuple{1,Any}, ::Val{1}) = zero(args[1])
 
-children(c) = collect(child_elements(c))
-first_child(c) = first(child_elements(c))
+# children(c) = collect(child_elements(c))
+# first_child(c) = first(child_elements(c))
+
+parent = Dict{XMLElement, XMLElement}()
+
+function children(e)
+    l = collect(child_elements(e))
+    for c in l
+        parent[c] = e
+    end
+    return l
+end
+
+function first_child(e)
+    c = first(child_elements(e))
+    parent[c] = e
+    return c
+end
+
+function print_history(e)
+    println("XML context")
+    level = 1
+    while haskey(parent, e) && level < 3
+        println(level, ": ----------------------------------------------")
+        println(e)
+        e = parent[e]
+        level += 1
+    end
+end
+
+function parse_error(e, msg)
+    print_history(e)
+    error(msg)
+end
+
+#############################################################################
 
 mutable struct CellModel
     vars::Dict{String, Operation}   # the list of model variables
@@ -173,13 +207,13 @@ end
 
 function process_math_element(ml::CellModel, e)
     if name(e) != "apply"
-        error("a math clause should be a list of applies")
+        parse_error(e, "a math clause should be a list of applies")
     end
 
     l = children(e)
 
     if name(l[1]) != "eq"
-        error("a math clause should be an assignment")
+        parse_error(e, "a math clause should be an assignment")
     end
 
     if name(l[2]) == "ci"
@@ -190,30 +224,32 @@ function process_math_element(ml::CellModel, e)
         push!(ml.alg, eq)
     elseif name(l[2]) == "apply"
         h = children(l[2])
+
         if name(h[1]) != "diff"
-            error("expected diff")
-        else
-            if name(h[2]) == "bvar"
-                x_tag = strip(content(first_child(h[2])))
-            else
-                x_tag = strip(content(h[2]))
-            end
-            y_tag = strip(content(h[3]))
-            X = Variable(Symbol(x_tag))()
-            if ml.iv == nothing
-                ml.iv = X
-            elseif ml.iv.op !== X.op
-                error("only can define one independent variable")
-            end
-            Y = get_var(ml, y_tag)
-            D = Differential(X)
-            lhs = D(Y)
-            rhs = convert_term(ml, l[3])
-            eq = lhs ~ rhs
-            push!(ml.eqs, eq)
+            parse_error(e, "expected diff")
         end
+
+        if name(h[2]) == "bvar"
+            x_tag = strip(content(first_child(h[2])))
+        else
+            x_tag = strip(content(h[2]))
+        end
+
+        y_tag = strip(content(h[3]))
+        X = Variable(Symbol(x_tag))()
+        if ml.iv == nothing
+            ml.iv = X
+        elseif ml.iv.op !== X.op
+            parse_error(e, "only can define one independent variable")
+        end
+        Y = get_var(ml, y_tag)
+        D = Differential(X)
+        lhs = D(Y)
+        rhs = convert_term(ml, l[3])
+        eq = lhs ~ rhs
+        push!(ml.eqs, eq)
     else
-        error("expected an arithmetic or differential assignment")
+        parse_error(e, "expected an arithmetic or differential assignment")
     end
 end
 
@@ -229,11 +265,12 @@ function convert_term(ml::CellModel, e)
         return process_cn(e)
     elseif s == "piecewise"
         return convert_piecewise(ml, e)
+    elseif s == "bvar"
+        parse_error(e, "derivatives are unsupported on the right hand side of equations, please use algebraic equations instead: $e")
     else
         x = convert_math_constants(e)
         if x == nothing
-            println(e)
-            error("unrecongnized term $s")
+            parse_error(e, "unrecognized term $s: $e")
         end
         return x
     end
@@ -301,7 +338,7 @@ function convert_unary_apply(ml::CellModel, e)
     elseif s == "not"
         return one(t) - t
     else
-        error("unrecongnized unary operator: $s")
+        parse_error(e, "unrecognized unary operator: $s")
     end
 end
 
@@ -350,11 +387,11 @@ function convert_binary_apply(ml::CellModel, e)
     elseif s == "neq"
         return 1 - H(t1 - t2) * H(t2 - t1)
     else
-        error("unrecongnized binary operator: $s")
+        parse_error(e, "unrecognized binary operator: $s")
     end
 end
 
-function apply_nary_boolean(s, ts)
+function apply_nary_boolean(s, ts, e)
     if length(ts) == 1
         return ts[1]
     elseif s == "and"
@@ -363,7 +400,7 @@ function apply_nary_boolean(s, ts)
         tail = apply_nary_boolean(s, ts[2:end])
         return ts[1] + tail - ts[1] * tail
     else
-        error("unrecongnized nary operator: $s")
+        parse_error(e, "unrecognized nary operator: $s")
     end
 end
 
@@ -377,7 +414,7 @@ function convert_nary_apply(ml::CellModel, e)
     elseif s == "times"
         return Operation(*, ts)
     else
-        return apply_nary_boolean(s, ts)
+        return apply_nary_boolean(s, ts, e)
     end
 end
 
@@ -402,7 +439,7 @@ function process_cn(e)
     if has_attribute(e, "type")
         l = collect(child_nodes(e))
         if name(l[2]) != "sep"
-            error("An e-notation number should have <sep>")
+            parse_error(e, "An e-notation number should have <sep>")
         end
         s = strip(content(l[1])) * "e" * strip(content(l[3]))
     else
@@ -498,7 +535,7 @@ function update_list!(l::Array{Pair{Operation,Float64}}, sym::Symbol, val)
             return
         end
     end
-    error("param not found: $name")
+    parse_error(e, "param not found: $name")
 end
 
 update_list!(l::Array{Pair{Operation,Float64}}, name::AbstractString, val) =
