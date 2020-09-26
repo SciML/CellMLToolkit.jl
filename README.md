@@ -143,3 +143,93 @@ We need to pass the new `p` to `ODEProblem` constructor as a keyword parameter. 
 ![](figures/ten_400.png)
 
 `ODEProblem` also accepts a `u0` parameter to change the initial conditions (remember `u0 = list_initial_conditions(ml)`).
+
+## Source Generation
+
+In many applications, it is easier if we have a standalone Julia file defining our model instead of regenerating the model on the fly each time. `CellMLToolkit.generate_files` compiles a `CellML` model into a Julia file that can be used independent of CellMLToolkit.jl and ModelingToolkit.jl. For example, we can convert the Lorenz model by running the following code:
+
+```julia
+  using CellMLToolkit
+
+  ml = CellModel("models/lorenz.cellml.xml"; dependency=false)
+  CellMLToolkit.generate_functions("lorenz.jl", ml)
+```
+
+Note, `dependency=false` is needed here. This function generates a Julia source code named `lorenz.jl` that contains two functions `f!` (derivatives) and `J!` (the Jacobian). Passing `false` as the third argument of `generate_functions` suppresses Jacobian generation. Also, the initial condition (`u0`) and parameters (`p`) are exported.
+
+```julia
+H(x) = (x >= zero(x) ? one(x) : zero(x))
+
+# initial conditions
+u0 = [1.0, 1.0, 1.0]
+
+# parameters
+p = [10.0, 2.66667, 28.0]
+
+function f!(duₚ, uₚ, pₚ, tₚ)
+	t = tₚ
+
+	# state variables:
+	x = uₚ[1]
+	z = uₚ[2]
+	y = uₚ[3]
+
+	# parameters:
+	sigma = pₚ[1]
+	beta = pₚ[2]
+	rho = pₚ[3]
+
+	# algebraic equations:
+
+	# system of ODEs:
+	∂x = sigma * (y - x)
+	∂y = x * (rho - z) - y
+	∂z = x * y - beta * z
+
+	# state variables:
+	duₚ[1] = ∂x
+	duₚ[2] = ∂z
+	duₚ[3] = ∂y
+	nothing
+end
+
+function J!(J, uₚ, pₚ, tₚ)
+	t = tₚ
+
+	# state variables:
+	x = uₚ[1]
+	z = uₚ[2]
+	y = uₚ[3]
+
+	# parameters:
+	sigma = pₚ[1]
+	beta = pₚ[2]
+	rho = pₚ[3]
+
+	# Jacobian:
+	J[1,1] = -sigma
+	J[1,2] = sigma
+	J[2,1] = -z + rho
+	J[2,2] = -1
+	J[2,3] = -x
+	J[3,1] = y
+	J[3,2] = x
+	J[3,3] = -beta
+	nothing
+end
+```
+
+We can run this file, independent of CellMLToolkit, as
+
+```julia
+  using DifferentialEquations, Plots
+
+  include("lorenz.jl")
+
+  prob = ODEProblem(f!, u0, tspan, p)
+  sol = solve(prob, Tsit5(), dtmax=0.01)
+  sol = Array(sol)
+  plot(sol[1,:], sol[3,:])
+```
+
+The main benefit of this method is the ability to edit and modify the source code instead of the XML tree describing a CellML model.

@@ -1,4 +1,4 @@
-# module CellMLToolkit
+module CellMLToolkit
 
 export CellModel, ODEProblem
 export parse_file, process_doc
@@ -159,6 +159,7 @@ end
 """
 function process_doc(doc; dependency=true)
     ml = CellModel()
+    empty!(parent)
 
     for e in get_elements_by_tagname(root(doc), "component")
         process_component(ml, e)
@@ -395,9 +396,9 @@ function apply_nary_boolean(s, ts, e)
     if length(ts) == 1
         return ts[1]
     elseif s == "and"
-        return ts[1] * apply_nary_boolean(s, ts[2:end])
+        return ts[1] * apply_nary_boolean(s, ts[2:end], e)
     elseif s == "or"
-        tail = apply_nary_boolean(s, ts[2:end])
+        tail = apply_nary_boolean(s, ts[2:end], e)
         return ts[1] + tail - ts[1] * tail
     else
         parse_error(e, "unrecognized nary operator: $s")
@@ -561,4 +562,4 @@ end
 
 include("generator.jl")
 
-# end # module
+end # module
