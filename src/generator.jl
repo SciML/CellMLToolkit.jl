@@ -41,17 +41,44 @@ function generate_lists(io, p, u0)
     write(io, "p = [" * join(last.(p), ", ") * "]\n\n")
 end
 
+function generate_algebraics(io, ml::CellModel)
+    write(io, "\t# algebraic equations:\n")
+
+    # topolical sorting of the algebraic equations
+    s = Set{Operation}(values(ml.vars))
+    setdiff!(s, [x.lhs for x in  ml.alg])
+    algs = copy(ml.alg)
+    k = 0
+
+    while !isempty(algs)
+        a = algs[1]
+
+        if prerequisite(s, a.rhs)
+            # the prerequisites of a.rhs are satisfied
+            # output the code for a and remote it from the queue
+            eq = simplify(a.rhs)
+            write(io, "\t$(a.lhs) = $eq\n")
+            push!(s, a.lhs)
+            algs = algs[2:end]
+            k = 0
+        else
+            # at least one prerequisites of a.rhs is not satisfied
+            # move a to the end of the queue
+            algs = [algs[2:end]; a]
+            k += 1
+            if k > length(algs)
+                error("a circular relationship in the algebraic equations detected")
+            end
+        end
+    end
+end
+
 function generate_f(io, ml::CellModel, p, u0)
     write(io, "function f!(duₚ, uₚ, pₚ, tₚ)\n")
 
     generate_preabmle(io, ml.iv, p, u0)
 
-    write(io, "\t# algebraic equations:\n")
-
-    for a in ml.alg
-        eq = simplify(a.rhs)
-        write(io, "\t$(a.lhs) = $eq\n")
-    end
+    generate_algebraics(io, ml)
 
     write(io, "\n\t# system of ODEs:\n")
 
@@ -152,8 +179,6 @@ function simplify(op::Operation)
         return simplify_binary(op)
     else
         return simplify_nary(op)
-        # l = map(simplify, op.args)
-        # return Operation(op.op, l)
     end
 end
 
@@ -260,5 +285,18 @@ function simplify_nary(op::Operation)
         end
     else
         return Operation(op.op, [x,y])
+    end
+end
+
+##############################################################################
+
+prerequisite(::Set{Operation}, x::ModelingToolkit.Constant) = true
+prerequisite(s::Set{Operation}, x::Equation) = prerequisite(s, x.rhs)
+
+function prerequisite(s::Set{Operation}, op::Operation)
+    if length(op.args) == 0
+        return !(op.op isa Variable) || op ∈ s
+    else
+        return all(map(x -> prerequisite(s,x), op.args))
     end
 end
