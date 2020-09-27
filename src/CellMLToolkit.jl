@@ -13,10 +13,10 @@ import Base.floor, Base.ceil
 const T = Float64
 
 # The Heavide function
-H(x) = (x >= zero(x) ? one(x) : zero(x))    # 1 / (1 + exp(-10000*x))
-ModelingToolkit.@register H(x)
+𝐻(x) = (x >= zero(x) ? one(x) : zero(x))    # 1 / (1 + exp(-10000*x))
+ModelingToolkit.@register 𝐻(x)
 const σ = T(1e-4)
-ModelingToolkit.derivative(::typeof(H), args::NTuple{1,Any}, ::Val{1}) = 1/(sqrt(2π)*σ)*exp(-args[1]^2/(2σ)^2)  # Dirac δ
+ModelingToolkit.derivative(::typeof(𝐻), args::NTuple{1,Any}, ::Val{1}) = 1/(sqrt(2π)*σ)*exp(-args[1]^2/(2σ)^2)  # Dirac δ
 
 ModelingToolkit.@register floor(x)
 ModelingToolkit.@register ceil(x)
@@ -376,17 +376,17 @@ function convert_binary_apply(ml::CellModel, e)
     elseif s == "xor"
         return abs(t1 - t2)
     elseif s == "leq"
-        return H(t2 - t1)
+        return 𝐻(t2 - t1)
     elseif s == "geq"
-        return H(t1 - t2)
+        return 𝐻(t1 - t2)
     elseif s == "lt"
-        return H(t2 - t1 - eps(T))
+        return 𝐻(t2 - t1 - eps(T))
     elseif s == "gt"
-        return H(t1 - t2 - eps(T))
+        return 𝐻(t1 - t2 - eps(T))
     elseif s == "eq"
-        return H(t1 - t2) * H(t2 - t1)
+        return 𝐻(t1 - t2) * 𝐻(t2 - t1)
     elseif s == "neq"
-        return 1 - H(t1 - t2) * H(t2 - t1)
+        return 1 - 𝐻(t1 - t2) * 𝐻(t2 - t1)
     else
         parse_error(e, "unrecognized binary operator: $s")
     end
