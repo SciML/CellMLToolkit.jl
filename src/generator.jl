@@ -45,7 +45,7 @@ function generate_algebraics(io, ml::CellModel)
     write(io, "\t# algebraic equations:\n")
 
     # topolical sorting of the algebraic equations
-    s = Set{Operation}(values(ml.vars))
+    s = Set{Any}(values(ml.vars))
     setdiff!(s, [x.lhs for x in  ml.alg])
     algs = copy(ml.alg)
     k = 0
@@ -125,13 +125,14 @@ end
 
 #############################################################################
 
-function derivate(op::Operation, v::Operation)
+function derivate(op::Symbolic, v::Symbolic)
     n = length(op.args)
 
-    if typeof(op.op) == Variable && op.op == v.op
+    iseq = isequal(op, v)
+    if op isa Sym && iseq
         return 1
     elseif n == 0
-        if op.op == v.op
+        if iseq
             return 1
         else
             return 0
@@ -141,37 +142,26 @@ function derivate(op::Operation, v::Operation)
         δa = ModelingToolkit.derivative(op, 1)
         return a * δa
     elseif n >= 2
-        l = Operation[]
+        l = []
         for i = 1:n
             push!(l, derivate(op.args[i], v) * ModelingToolkit.derivative(op, i))
         end
-        # a = derivate(op.args[1], v)
-        # δa = ModelingToolkit.derivative(op, 1)
-        # b = derivate(op.args[2], v)
-        # δb = ModelingToolkit.derivative(op, 2)
-        # return Operation(+, [a * δa, b * δb])
-        return Operation(+, l)
+        return Term{Real}(+, l)
     end
 end
 
-derivate(::ModelingToolkit.Constant, ::Operation) = 0
+derivate(::Number, ::Symbolic) = 0
 
 import Base.isconst
 
-isconst(x::ModelingToolkit.Constant) = true
 isconst(x::Number) = true
-isconst(x::Operation) = false
-isconst(x::Expression) = false
-# iszero(x::Operation) = isconst(x) && iszero(x.value)
-# isone(x::Operation) = isconst(x) && isone(x.value)
-isminusone(x::Operation) = false
-isminusone(x::ModelingToolkit.Constant) = isone(-x.value)
+isconst(x::Symbolic) = false
+isminusone(x::Symbolic) = false
 isminusone(x) = isone(-x)
 
-simplify(x::ModelingToolkit.Constant) = x.value
 simplify(x::Equation) = x.lhs ~ simplify(x.rhs)
 
-function simplify(op::Operation)
+function simplify(op::Symbolic)
     n = length(op.args)
 
     if n == 0
@@ -185,12 +175,12 @@ function simplify(op::Operation)
     end
 end
 
-function simplify_unary(op::Operation)
-    return Operation(op.op, [simplify(op.args[1])])
+function simplify_unary(op::Symbolic)
+    return Term{Real}(operation(op), [simplify(op.args[1])])
 end
 
-function simplify_binary(op::Operation)
-    g = op.op
+function simplify_binary(op::Symbolic)
+    g = operation(op)
     x = simplify(op.args[1])
     y = simplify(op.args[2])
 
@@ -266,14 +256,14 @@ function simplify_binary(op::Operation)
             return x ^ y
         end
     else
-        Operation(g, [x, y])
+        Term{Real}(g, [x, y])
     end
 end
 
-function simplify_nary(op::Operation)
-    g = op.op
+function simplify_nary(op::Symbolic)
+    g = operation(op)
     x = simplify(op.args[1])
-    y = simplify(Operation(op.op, op.args[2:end]))
+    y = simplify(Term{Real}(g, op.args[2:end]))
 
     if g == +
         if iszero(x)
@@ -292,18 +282,18 @@ function simplify_nary(op::Operation)
             return x * y
         end
     else
-        return Operation(op.op, [x,y])
+        return Term{Real}(g, [x,y])
     end
 end
 
 ##############################################################################
 
-prerequisite(::Set{Operation}, x::ModelingToolkit.Constant) = true
-prerequisite(s::Set{Operation}, x::Equation) = prerequisite(s, x.rhs)
+prerequisite(::Set, ::Number) = true
+prerequisite(s::Set, x::Equation) = prerequisite(s, x.rhs)
 
-function prerequisite(s::Set{Operation}, op::Operation)
+function prerequisite(s::Set, op::Symbolic)
     if length(op.args) == 0
-        return !(op.op isa Variable) || op ∈ s
+        return !(op isa Sym) || op ∈ s
     else
         return all(map(x -> prerequisite(s,x), op.args))
     end

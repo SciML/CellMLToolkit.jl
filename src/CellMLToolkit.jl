@@ -7,6 +7,7 @@ export list_params, list_initial_conditions, list_states, update_list!
 
 using LightXML
 using ModelingToolkit
+using ModelingToolkit: Symbolic, operation, FnType
 
 import Base.floor, Base.ceil
 
@@ -61,21 +62,21 @@ end
 #############################################################################
 
 mutable struct CellModel
-    vars::Dict{String, Operation}   # the list of model variables
+    vars::Dict   # the list of model variables
     inits::Dict{String, T}          # the initialization list
     eqs::Array{Equation}            # the list of ODE equations
     alg::Array{Equation}            # the algebraic equations
-    iv::Union{Operation, Nothing}   # the independent variable
-    units::Dict{Operation, String}  # the variable units
+    iv   # the independent variable
+    units::Dict  # the variable units
 
     function CellModel()
         return new(
-            Dict{String,Operation}(),
+            Dict(),
             Dict{String,T}(),
             Equation[],
             Equation[],
             nothing,
-            Dict{Operation,String}()
+            Dict()
         )
     end
 end
@@ -89,14 +90,14 @@ function get_var(ml::CellModel, tag)
     if haskey(ml.vars, tag)
         return ml.vars[tag]
     else
-        v = Variable(Symbol(tag))()
+        v = Variable(Symbol(tag))
         ml.vars[tag] = v
         return v
     end
 end
 
 function list_states(ml::CellModel)
-    states = Set{Operation}()
+    states = Set()
     for eq in ml.eqs
         if eq.lhs.op isa Variable
             push!(states, eq.lhs)
@@ -109,13 +110,13 @@ end
 
 ################### Utility Functions for Adjacency Matrix ####################
 
-function find_dependency_list(u::Operation)
-    if u.op isa Variable
-        v = Set{Operation}([u])
+function find_dependency_list(u)
+    if u isa Sym
+        v = Set([u])
     else
-        v = Set{Operation}()
+        v = Set()
         for w in u.args
-            if w isa Operation
+            if w isa Symbolic
                 v = union(v, find_dependency_list(w))
             end
         end
@@ -167,7 +168,7 @@ function process_doc(doc; dependency=true)
 
     if dependency
         states = collect(list_states(ml))
-        map(v -> push!(v.args, ml.iv), states)
+        map(v -> Sym{FnType{Tuple{Real},Real}}(nameof(v))(ml.iv), states)
     end
 
     return ml
@@ -237,10 +238,10 @@ function process_math_element(ml::CellModel, e)
         end
 
         y_tag = strip(content(h[3]))
-        X = Variable(Symbol(x_tag))()
+        X = Variable(Symbol(x_tag))
         if ml.iv == nothing
             ml.iv = X
-        elseif ml.iv.op !== X.op
+        elseif !isequal(ml.iv, X)
             parse_error(e, "only can define one independent variable")
         end
         Y = get_var(ml, y_tag)
@@ -411,9 +412,9 @@ function convert_nary_apply(ml::CellModel, e)
     ts = [convert_term(ml, c) for c in l[2:end]]
 
     if s == "plus"
-        return Operation(+, ts)
+        return Term{Real}(+, ts)
     elseif s == "times"
-        return Operation(*, ts)
+        return Term{Real}(*, ts)
     else
         return apply_nary_boolean(s, ts, e)
     end
@@ -498,11 +499,11 @@ end
     if select_params == false, it returns a list of state variables (u0 in ODEProblem)
 """
 function get_init_list(ml::CellModel, select_params=false)
-    l = Pair{Operation,T}[]
+    l = Pair[]
     states = list_states(ml)
 
     for v in values(ml.vars)
-        s = repr(v.op)
+        s = repr(v)
         if haskey(ml.inits, s) && (v ∈ states) != select_params
             push!(l, v => ml.inits[s])
         end
@@ -526,23 +527,23 @@ list_params(ml::CellModel) = get_init_list(ml, true)
 """
     update_list! updates the value of an item in an initial value list (either p or u0)
     l is the list
-    sym is a Symbol pointing to the variable (we also pass a string or a ModelingToolkit.Operation)
+    sym is a Symbol pointing to the variable (we also pass a string or a Symbolic)
     val is the new value
 """
-function update_list!(l::Array{Pair{Operation,Float64}}, sym::Symbol, val)
+function update_list!(l::Array{<:Pair}, sym::Symbol, val)
     for (i,x) in enumerate(l)
-        if first(x).op.name == sym
+        if nameof(first(x)) == sym
             l[i] = first(x) => T(val)
             return
         end
     end
-    parse_error(e, "param not found: $name")
+    parse_error(e, "param not found: $sym")
 end
 
-update_list!(l::Array{Pair{Operation,Float64}}, name::AbstractString, val) =
+update_list!(l::Array{<:Pair}, name::AbstractString, val) =
         update_list!(l, Symbol(name), val)
 
-update_list!(l::Array{Pair{Operation,Float64}}, v::Operation, val) =
+update_list!(l::Array{<:Pair}, v::Number, val) =
         update_list!(l, v.op, val)
 
 import ModelingToolkit.ODEProblem
