@@ -6,12 +6,12 @@ path = @__DIR__
 ml = CellModel(path * "/../models/beeler_reuter_1977.cellml.xml")
 
 @test length(ml.eqs) == 8
-@test ml.iv.op.name == :time
+@test nameof(ml.iv) == :time
 
 eqs, vs = CellMLToolkit.flat_equations(ml)
 @test length(vs) == 8
 
-@test find_V(ml).op.name == :V
+@test nameof(find_V(ml)) == :V
 
 prob = ODEProblem(ml, (0,10000.0))
 sol1 = solve(prob, Euler(), dt=0.01, saveat=1.0)
