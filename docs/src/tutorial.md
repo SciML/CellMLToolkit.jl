@@ -75,7 +75,7 @@ Here, we are interested in `list_params`. Let's go back to the ten Tusscher-Nobl
 We get a list of the 45 parameters:
 
 ```julia
-45-element Array{Pair{Operation,Float64},1}:
+45-element Array{Pair,1}:
  stim_start => 10.0
        g_pK => 0.0146
       g_bna => 0.00029
