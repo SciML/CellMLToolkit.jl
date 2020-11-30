@@ -1,5 +1,7 @@
 # CellMLToolkit.jl
 
+[![Build Status](https://github.com/SciML/CellMLToolkit.jl/workflows/CI/badge.svg)](https://github.com/SciML/CellMLToolkit.jl/actions?query=workflow%3ACI)
+
 CellMLToolkit.jl is a Julia library that connects [CellML](http://cellml.org) models to [SciML](http://github.com/SciML), the Scientific Julia ecosystem. CellMLToolkit.jl acts as a bridge between CellML and ModelingToolkit.jl. It imports a CellML model (in XML) and emits a ModelingToolkit.jl intermediate representation (IR), which can then enter the SciML ecosystem.
 
 ## CellML
