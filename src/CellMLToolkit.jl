@@ -7,7 +7,7 @@ export list_params, list_initial_conditions, list_states, update_list!
 
 using LightXML
 using ModelingToolkit
-using ModelingToolkit: Symbolic, operation, FnType
+using ModelingToolkit: Symbolic, operation, FnType, arguments
 
 import Base.floor, Base.ceil
 
@@ -99,10 +99,10 @@ end
 function list_states(ml::CellModel)
     states = Set()
     for eq in ml.eqs
-        if eq.lhs.op isa Variable
+        if operation(eq.lhs) isa Sym
             push!(states, eq.lhs)
         else
-            push!(states, eq.lhs.args[1])
+            push!(states, arguments(eq.lhs)[1])
         end
     end
     return states
@@ -115,7 +115,7 @@ function find_dependency_list(u)
         v = Set([u])
     else
         v = Set()
-        for w in u.args
+        for w in arguments(u)
             if w isa Symbolic
                 v = union(v, find_dependency_list(w))
             end
@@ -487,7 +487,7 @@ function flat_equations(ml::CellModel; level=1)
         alg = [first(a) => substitute(last(a), alg) for a in alg]
     end
     eqs = [eq.lhs ~ substitute(eq.rhs, alg) for eq in ml.eqs]
-    vs = [eq.lhs.args[1] for eq in eqs]
+    vs = [arguments(eq.lhs)[1] for eq in eqs]
     return eqs, vs
 end
 
@@ -509,7 +509,7 @@ function get_init_list(ml::CellModel, select_params=false)
         end
     end
 
-    return l
+    return map(identity, l)
 end
 
 """
@@ -554,7 +554,6 @@ import ModelingToolkit.ODEProblem
 function ODEProblem(ml::CellModel, tspan;
         jac=false, level=1, p=list_params(ml), u0=list_initial_conditions(ml))
     eqs, vs = flat_equations(ml; level=level)
-    # u0, p = get_init_lists(ml)
     ps = map(first, p)
     sys = ODESystem(eqs, ml.iv, vs, ps)
     prob = ODEProblem(sys, u0, tspan, p; jac=jac)
