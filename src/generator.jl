@@ -86,7 +86,7 @@ function generate_f(io, ml::CellModel, p, u0)
 
     for a in ml.eqs
         eq = simplify(a.rhs)
-        write(io, "\t∂$(a.lhs.args[1]) = $eq\n")
+        write(io, "\t∂$(arguments(a.lhs)[1]) = $eq\n")
     end
 
     write(io, "\n\t# state variables:\n")
@@ -126,7 +126,7 @@ end
 #############################################################################
 
 function derivate(op::Symbolic, v::Symbolic)
-    n = length(op.args)
+    n = length(arguments(op))
 
     iseq = isequal(op, v)
     if op isa Sym && iseq
@@ -138,13 +138,13 @@ function derivate(op::Symbolic, v::Symbolic)
             return 0
         end
     elseif n == 1
-        a = derivate(op.args[1], v)
+        a = derivate(arguments(op)[1], v)
         δa = ModelingToolkit.derivative(op, 1)
         return a * δa
     elseif n >= 2
         l = []
         for i = 1:n
-            push!(l, derivate(op.args[i], v) * ModelingToolkit.derivative(op, i))
+            push!(l, derivate(arguments(op)[i], v) * ModelingToolkit.derivative(op, i))
         end
         return Term{Real}(+, l)
     end
@@ -162,7 +162,7 @@ isminusone(x) = isone(-x)
 simplify(x::Equation) = x.lhs ~ simplify(x.rhs)
 
 function simplify(op::Symbolic)
-    n = length(op.args)
+    n = length(arguments(op))
 
     if n == 0
         return op
@@ -176,13 +176,13 @@ function simplify(op::Symbolic)
 end
 
 function simplify_unary(op::Symbolic)
-    return Term{Real}(operation(op), [simplify(op.args[1])])
+    return Term{Real}(operation(op), [simplify(arguments(op)[1])])
 end
 
 function simplify_binary(op::Symbolic)
     g = operation(op)
-    x = simplify(op.args[1])
-    y = simplify(op.args[2])
+    x = simplify(arguments(op)[1])
+    y = simplify(arguments(op)[2])
 
     if g == +
         if iszero(x)
@@ -262,8 +262,8 @@ end
 
 function simplify_nary(op::Symbolic)
     g = operation(op)
-    x = simplify(op.args[1])
-    y = simplify(Term{Real}(g, op.args[2:end]))
+    x = simplify(arguments(op)[1])
+    y = simplify(Term{Real}(g, arguments(op)[2:end]))
 
     if g == +
         if iszero(x)
@@ -292,9 +292,9 @@ prerequisite(::Set, ::Number) = true
 prerequisite(s::Set, x::Equation) = prerequisite(s, x.rhs)
 
 function prerequisite(s::Set, op::Symbolic)
-    if length(op.args) == 0
+    if length(arguments(op)) == 0
         return !(op isa Sym) || op ∈ s
     else
-        return all(map(x -> prerequisite(s,x), op.args))
+        return all(map(x -> prerequisite(s,x), arguments(op)))
     end
 end
