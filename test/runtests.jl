@@ -20,11 +20,11 @@ sys_u0 = ModelingToolkit.get_default_u0(sys)
 sys_ps = ModelingToolkit.parameters(sys)
 
 # would like to just pass sys_u0::Dict{Sym{Real}, Float64}
-prob_sys = ODEProblem(sys, collect(values(sys_u0)), (0, 10.)) 
-prob_sys2 = ODEProblem(sys, Pair[], (0, 10.)) 
-@test_broken prob_sys.u0 == prob_sys2.u0 
+# prob_sys = ODEProblem(sys, collect(values(sys_u0)), (0, 10.)) 
+prob_sys = ODEProblem(sys, Pair[], (0, 10.))
+# @test_broken prob_sys.u0 == prob_sys2.u0 
 
-prob_ml = ODEProblem(ml, (0,10000.0))
+prob_ml = ODEProblem(ml, (0, 10000.0))
 @test_broken prob_sys == prob_ml 
 @test_broken prob_sys.u0 == prob_ml.u0 
 @test_broken prob_sys.p == prob_ml.p # here prob_ml.p is a list, not a pair vec 
@@ -43,7 +43,7 @@ err = sum(abs.(V1 .- V3)) / length(V1)
 
 p = list_params(ml)
 update_list!(p, "IstimPeriod", 280.0)
-prob = ODEProblem(ml, (0,10000.0); jac=false, p=p)
+prob = ODEProblem(ml, (0, 10000.0); jac=false, p=p)
 sol4 = solve(prob, TRBDF2(), dtmax=0.5, saveat=1.0)
 V4 = map(x -> x[1], sol2.u)
 err = sum(abs.(V1[1:250] .- V4[1:250])) / 250
