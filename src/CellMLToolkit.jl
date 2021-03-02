@@ -1,6 +1,6 @@
 module CellMLToolkit
 
-export CellModel, ODEProblem
+export CellModel, load_cellml, ODEProblem
 export parse_file, process_doc
 export find_adjacency_matrix, find_V
 export list_params, list_initial_conditions, list_states, update_list!
@@ -10,10 +10,11 @@ using ModelingToolkit
 using ModelingToolkit: Symbolic, operation, FnType, arguments
 
 import Base.floor, Base.ceil
+import ModelingToolkit.ODEProblem
 
 const T = Float64
 
-# The Heavide function
+# The Heaviside function
 𝐻(x) = (x >= zero(x) ? one(x) : zero(x))    # 1 / (1 + exp(-10000*x))
 ModelingToolkit.@register 𝐻(x)
 const σ = T(1e-4)
@@ -83,6 +84,40 @@ end
 
 CellModel(doc::XMLDocument; dependency=true) = process_doc(doc; dependency=dependency)
 CellModel(s::AbstractString; dependency=true) = process_doc(parse_file(s); dependency=dependency)
+
+""" 
+    
+`load_cellml` is used to read cellml files into a ModelingToolkit.AbstractSystem.
+
+Can be given an XMLDocument or a filepath to a `.cellml` or `.xml` file.
+Eventually load_cellml will not have to construct an intermediate CellModel. 
+"""
+function load_cellml end
+
+load_cellml(doc::XMLDocument; dependency=true) = cellml_to_sys(CellModel(doc; dependency=dependency))
+load_cellml(s::AbstractString; dependency=true) = cellml_to_sys(CellModel(s; dependency=dependency))
+
+"""
+    cellml_to_sys constructs an ODESystem from a CellModel
+"""
+function cellml_to_sys(ml::CellModel;
+        jac=false, level=1, p=list_params(ml), u0=list_initial_conditions(ml))
+    eqs, vs = flat_equations(ml; level=level)
+    sys = ODESystem(eqs, ml.iv, vs, p; default_u0=u0)
+    return sys
+end
+
+"""
+    ODEProblem constructs an ODEProblem from a CellModel
+"""
+function ODEProblem(ml::CellModel, tspan;
+        jac=false, level=1, p=list_params(ml), u0=list_initial_conditions(ml))
+    eqs, vs = flat_equations(ml; level=level)
+    ps = map(first, p)
+    sys = ODESystem(eqs, ml.iv, vs, ps)
+    prob = ODEProblem(sys, u0, tspan, p; jac=jac)
+    return prob
+end
 
 ########################### Basic Utility Functions ##########################
 
@@ -545,20 +580,6 @@ update_list!(l::Array{<:Pair}, name::AbstractString, val) =
 
 update_list!(l::Array{<:Pair}, v::Number, val) =
         update_list!(l, v.op, val)
-
-import ModelingToolkit.ODEProblem
-
-"""
-    ODEProblem constructs an ODEProblem from a CellModel
-"""
-function ODEProblem(ml::CellModel, tspan;
-        jac=false, level=1, p=list_params(ml), u0=list_initial_conditions(ml))
-    eqs, vs = flat_equations(ml; level=level)
-    ps = map(first, p)
-    sys = ODESystem(eqs, ml.iv, vs, ps)
-    prob = ODEProblem(sys, u0, tspan, p; jac=jac)
-    return prob
-end
 
 include("generator.jl")
 
