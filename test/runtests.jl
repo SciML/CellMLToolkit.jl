@@ -1,5 +1,6 @@
 using Test
 using CellMLToolkit
+using ModelingToolkit
 using OrdinaryDiffEq
 
 path = @__DIR__
@@ -34,3 +35,7 @@ sol4 = solve(prob, TRBDF2(), dtmax=0.5, saveat=1.0)
 V4 = map(x -> x[1], sol2.u)
 err = sum(abs.(V1[1:250] .- V4[1:250])) / 250
 @test err < 0.1
+
+# test that MTK's @named works
+@named beeler = load_cellml(path * "/../models/beeler_reuter_1977.cellml.xml")
+@test nameof(beeler) == :beeler

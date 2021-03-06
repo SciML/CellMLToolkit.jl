@@ -1,6 +1,7 @@
 module CellMLToolkit
 
 export CellModel, ODEProblem
+export load_cellml, cellml_to_sys
 export parse_file, process_doc
 export find_adjacency_matrix, find_V
 export list_params, list_initial_conditions, list_states, update_list!
@@ -83,6 +84,27 @@ end
 
 CellModel(doc::XMLDocument; dependency=true) = process_doc(doc; dependency=dependency)
 CellModel(s::AbstractString; dependency=true) = process_doc(parse_file(s); dependency=dependency)
+
+"""
+    load_cellml(data; dependency=true, kwargs...) 
+
+where data is XMLDocument or a path. returns ODESystem.
+Kwargs are passed to ODESystem constructor, for use with `@named`
+"""
+function load_cellml end
+
+load_cellml(doc::XMLDocument; dependency=true, kwargs...) = cellml_to_sys(CellModel(doc; dependency=dependency); kwargs...)
+load_cellml(s::AbstractString; dependency=true, kwargs...) = cellml_to_sys(CellModel(s; dependency=dependency); kwargs...)
+
+"""
+    cellml_to_sys constructs an ODESystem from a CellModel
+"""
+function cellml_to_sys(ml::CellModel;
+        jac=false, level=1, p=list_params(ml), u0=list_initial_conditions(ml), kwargs...)
+    eqs, vs = flat_equations(ml; level=level)
+    sys = ODESystem(eqs, ml.iv, vs, p; default_u0=u0, kwargs...)
+    return sys
+end
 
 ########################### Basic Utility Functions ##########################
 
