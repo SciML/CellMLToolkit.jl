@@ -14,7 +14,7 @@ import Base.floor, Base.ceil
 
 const T = Float64
 
-# The Heavide function
+# The Heaviside function
 𝐻(x) = (x >= zero(x) ? one(x) : zero(x))    # 1 / (1 + exp(-10000*x))
 ModelingToolkit.@register 𝐻(x)
 const σ = T(1e-4)
