@@ -1,15 +1,15 @@
 using EzXML, Symbolics, Statistics
 using Symbolics: FnType, Sym
 
-
 include("parse.jl")
 include("utils.jl")
 
 const cellml_ns = "http://www.cellml.org/cellml/1.0#"
 const mathml_ns = "http://www.w3.org/1998/Math/MathML"
 
-create_sym(x) = Num(Variable(Symbol(x)))
-create_sym(x, iv) = Num(Sym{FnType{Tuple{Real}}}(Symbol(x))(Variable(Symbol(iv))))
+create_var(x) = Num(Variable(Symbol(x))).val
+create_var(x, iv) = Num(Sym{FnType{Tuple{Real}}}(Symbol(x))(Variable(Symbol(iv)))).val
+create_param(x) = Num(Sym{ModelingToolkit.Parameter{Real}}(Symbol(x))).val
 
 # list the name of the CellML variables (state variables + parameters)
 function list_variables(xml)
@@ -45,29 +45,60 @@ function list_parameters(xml)
     return params
 end
 
-# create_sym(x::AbstractString) = Num(Variable(Symbol(x)))
-# create_sym(x::AbstractString, iv::AbstractString) = Sym{FnType{Tuple{Real}}}(Symbol(x))(Symbol(iv))
+# create_var(x::AbstractString) = Num(Variable(Symbol(x)))
+# create_var(x::AbstractString, iv::AbstractString) = Sym{FnType{Tuple{Real}}}(Symbol(x))(Symbol(iv))
 
 function list_p(xml)
     vars = findall("//x:variable[@initial_value]", root(xml), ["x"=>cellml_ns])
     params = list_parameters(xml)
-    p = map(x -> (create_sym(x["name"]) => x["initial_value"]), filter(x -> x["name"] ∈ params, vars))
+    p = map(x -> (create_param(x["name"]) => parse(Float64, x["initial_value"])),
+            filter(x -> x["name"] ∈ params, vars))
     return p
 end
 
-function list_u0(xml)
+function list_u0(xml, iv=find_iv(xml))
     vars = findall("//x:variable[@initial_value]", root(xml), ["x"=>cellml_ns])
     states = list_state_variables(xml)
-    iv = find_iv(xml)
-    # u0 = map(x -> (create_sym(x["name"], iv) => x["initial_value"]), filter(x -> x["name"] ∈ states, vars))
-    u0 = map(x -> (create_sym(x["name"]) => x["initial_value"]), filter(x -> x["name"] ∈ states, vars))
+    u0 = map(x -> (create_var(x["name"], iv) => parse(Float64, x["initial_value"])),
+             filter(x -> x["name"] ∈ states, vars))
     return u0
 end
 
-function list_substitution(xml)
-    vars = findall("//x:variable[@initial_value]", root(xml), ["x"=>cellml_ns])
+function list_substitution(xml, iv=find_iv(xml))
+    nodes = findall("//x:variable[@initial_value]", root(xml), ["x"=>cellml_ns])
+    vars = map(x -> x["name"], nodes)
     states = list_state_variables(xml)
+    Dict(create_var(x) => x ∈ states ? create_var(x, iv) : create_param(x) for x in vars)
+end
+
+function generate_prob(xml, eqs, tspan)
     iv = find_iv(xml)
-    u0 = map(x -> (create_sym(x["name"]) => create_sym(x["name"], iv)), filter(x -> x["name"] ∈ states, vars))
-    return u0
+    s = list_substitution(xml, iv)
+    eqs = [substitute(eq.lhs, s) ~ substitute(eq.rhs, s) for eq in eqs]
+    sys = ODESystem(eqs)
+    p = list_p(xml)
+    u0 = list_u0(xml, iv)
+    prob = ODEProblem(sys, u0, tspan, p)
+    return prob
+end
+
+# function generate_eval_string(xml, eqs)
+#     iv = find_iv(xml)
+#     params = "@parameters " * join(list_parameters(xml), " ") * " " * iv
+#     l = ["$x($iv)" for x in list_state_variables(xml)]
+#     vars = "@variables " * join(l, " ")
+#
+#     return params * ";" * vars * ";sys = ODESystem(" * string(eqs) * ");"
+# end
+
+using DifferentialEquations, Plots
+
+function test()
+    xml = readxml("models/lorenz.cellml.xml")
+    ml = extract_mathml(xml)
+    eqs = parse_node(ml[1])
+    prob = generate_prob(xml, eqs, (0, 100.0))
+    sol = solve(prob)
+    x = Array(sol)
+    plot(x[1,:], x[3,:])
 end
