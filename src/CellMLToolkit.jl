@@ -20,8 +20,10 @@ ModelingToolkit.derivative(::typeof(H), args::NTuple{1,Any}, ::Val{1}) = 1/(sqrt
 
 ModelingToolkit.@register floor(x)
 ModelingToolkit.@register ceil(x)
+ModelingToolkit.@register round(x)
 ModelingToolkit.derivative(::typeof(floor), args::NTuple{1,Any}, ::Val{1}) = zero(args[1])
 ModelingToolkit.derivative(::typeof(ceil), args::NTuple{1,Any}, ::Val{1}) = zero(args[1])
+ModelingToolkit.derivative(::typeof(round), args::NTuple{1,Any}, ::Val{1}) = zero(args[1])
 
 # children(c) = collect(child_elements(c))
 # first_child(c) = first(child_elements(c))

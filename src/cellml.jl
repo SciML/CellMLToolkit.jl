@@ -71,11 +71,26 @@ function list_substitution(xml, iv=find_iv(xml))
     Dict(create_var(x) => x ∈ states ? create_var(x, iv) : create_param(x) for x in vars)
 end
 
+function split_equations(eqs)
+    alg = filter(eq -> eq.lhs isa Sym, eqs)
+    eqs = filter(!(eq -> eq.lhs isa Sym), eqs)
+    return eqs, alg
+end
+
+function flatten_equations(eqs; level=1)
+    eqs, alg = split_equations(eqs)
+    s = Dict(a.lhs => a.rhs for a in alg)
+    for i = 1:level
+        eqs = [substitute(eq.lhs, s) ~ substitute(eq.rhs, s) for eq in eqs]
+    end
+    return eqs
+end
+
 function generate_prob(xml, eqs, tspan)
     iv = find_iv(xml)
     s = list_substitution(xml, iv)
     eqs = [substitute(eq.lhs, s) ~ substitute(eq.rhs, s) for eq in eqs]
-    sys = ODESystem(eqs)
+    sys = ODESystem(eqs, create_var(iv))
     p = list_p(xml)
     u0 = list_u0(xml, iv)
     prob = ODEProblem(sys, u0, tspan, p)
@@ -94,11 +109,14 @@ end
 using DifferentialEquations, Plots
 
 function test()
-    xml = readxml("models/lorenz.cellml.xml")
+    # xml = readxml("models/lorenz.cellml.xml")
+    xml = readxml("models/beeler_reuter_1977.cellml.xml")
     ml = extract_mathml(xml)
-    eqs = parse_node(ml[1])
-    prob = generate_prob(xml, eqs, (0, 100.0))
-    sol = solve(prob)
+    eqs = parse_node.(ml)
+    eqs = vcat(eqs...)
+    eqs = flatten_equations(eqs; level=2)
+    prob = generate_prob(xml, eqs, (0, 5000.0))
+    sol = solve(prob, TRBDF2(), dtmax=0.5)
     x = Array(sol)
-    plot(x[1,:], x[3,:])
+    plot(x[1,:])
 end
