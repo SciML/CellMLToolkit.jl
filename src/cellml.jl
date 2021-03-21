@@ -68,29 +68,52 @@ function split_equations(eqs)
     return eqs, alg
 end
 
-function flatten_equations(eqs; level=1)
+function flatten_equations(eqs)
     eqs, alg = split_equations(eqs)
-    s = Dict(a.lhs => a.rhs for a in alg)
+    s = Dict(eq.lhs => eq.rhs for eq in alg)
 
-    for i = 1:level
-        alg = [eq.lhs ~ substitute(eq.rhs, s) for eq in alg]
+    # alg = [eq.lhs ~ substitute(eq.rhs, s) for eq in alg]
+    for (i,eq) in enumerate(alg)
+        eq = eq.lhs ~ substitute(eq.rhs, s)
+        s[eq.lhs] = eq.rhs
+        alg[i] = eq
     end
 
-    s = Dict(a.lhs => a.rhs for a in alg)
+    # s = Dict(a.lhs => a.rhs for a in alg)
     eqs = [eq.lhs ~ substitute(eq.rhs, s) for eq in eqs]
 
     return eqs
 end
 
-function read_cellml(xml::EzXML.Document; level=2)
+function process_cellml_xml(xml::EzXML.Document)
     ml = extract_mathml(xml)
     eqs = vcat(parse_node.(ml)...)
-    eqs = flatten_equations(eqs; level=level)
+    eqs = flatten_equations(eqs)
     iv = find_iv(xml)
     s = list_substitution(xml, iv)
     eqs = [substitute(eq.lhs, s) ~ substitute(eq.rhs, s) for eq in eqs]
     sys = ODESystem(eqs, create_var(iv))
     return sys
+end
+
+function test_cellml(xml::EzXML.Document)
+    ml = extract_mathml(xml)
+    iv = find_iv(xml)
+
+    for (i, m) in enumerate(ml)
+        println(i, "  ****************************************")
+        eqs = parse_node(m)
+        for eq in eqs
+            println(eq)
+            #eq = flatten_equations(eq)
+            s = list_substitution(xml, iv)
+            eq = substitute(eq.lhs, s) ~ substitute(eq.rhs, s)
+            try
+                sys = ODESystem(eq)
+            catch e
+            end
+        end
+    end
 end
 
 # This is the fall-back option in case of breaking changes in

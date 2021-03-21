@@ -1,31 +1,29 @@
 module CellMLToolkit
 
-using EzXML #, Symbolics, SymbolicUtils
+using MathML
+
 using SymbolicUtils: FnType, Sym, operation
-
-#using MathML
-using Statistics
-include("parse.jl")
-include("utils.jl")
-
 using ModelingToolkit
+using EzXML
 
 include("cellml.jl")
 
 """
     reads a CellML path or io and returns an ODESystem
 """
-function read_cellml(path)
+function read_cellml(path, tspan)
     xml = readxml(path)
-    return read_cellml(xml)
+    ml = CellModel(xml, process_cellml_xml(xml))
+    ODEProblem(ml, tspan)
 end
 
 """
     parses a CellML XML string and returns an ODESystem
 """
-function parse_cellml(xmlstr::AbstractString)
+function parse_cellml(xmlstr::AbstractString, tspan)
     xml = parsexml(xmlstr)
-    return read_cellmL(xml)
+    ml = CellModel(xml, process_cellml_xml(xml))
+    ODEProblem(ml, tspan)
 end
 
 ##############################################################################
@@ -33,19 +31,22 @@ end
 export CellModel, ODEProblem
 export read_cellml, parse_cellml
 export list_params, list_initial_conditions, list_states, update_list!
-export eval_cellml, eval_string, readxml
+export eval_string, readxml
 
 struct CellModel
     xml::EzXML.Document
     sys::ODESystem
 end
 
+getxml(ml::CellModel) = ml.xml
+getsys(ml::CellModel) = ml.sys
+
 """
     constructs a CellModel struct for the CellML model defined in path
 """
 function CellModel(path::AbstractString; dependency=true)
     xml = readxml(path)
-    CellModel(xml, read_cellml(xml))
+    CellModel(xml, process_cellml_xml(xml))
 
     # fall-back option:
     # s = eval_string(xml)
@@ -54,16 +55,16 @@ function CellModel(path::AbstractString; dependency=true)
     # CellModel(xml, sys)
 end
 
-list_states(ml::CellModel) = list_states(ml.xml)
-list_params(ml::CellModel) = list_params(ml.xml)
-# list_initial_conditions(ml::CellModel) = list_initial_conditions(ml.xml)
+list_states(ml::CellModel) = getsys(ml).states
+list_params(ml::CellModel) = list_params(getxml(ml))
 
-# extracts the initial conditions from ml.xml and sorts them
-# according to ml.sys.states
+"""
+    extracts the initial conditions from ml.xml and sorts them
+    according to ml.sys.states
+"""
 function list_initial_conditions(ml::CellModel)
-    states = ml.sys.states
-    u0 = list_initial_conditions(ml.xml)
-    # map(x -> (x => value_of(x, u0)), states)
+    states = list_states(ml)
+    u0 = list_initial_conditions(getxml(ml))
     map(x -> value_of(x, u0), states)
 end
 
@@ -93,7 +94,7 @@ end
 function update_list!(l, sym::Symbol, val)
     for (i,x) in enumerate(l)
         if first(x).name == sym
-            l[i] = first(x) => val
+            l[i] = (first(x) => val)
             return
         end
     end
