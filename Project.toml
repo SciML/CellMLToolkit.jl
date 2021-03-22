@@ -11,4 +11,17 @@ SymbolicUtils = "d1185830-fcd6-423d-90d6-eec64667417b"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [compat]
+EzXML = "1.1"
+MathML = "0.1"
+ModelingToolkit = "5.13"
+SymbolicUtils = "0.9"
 julia = "1.5"
+
+[extras]
+Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
+DifferentialEquations = "0c46a032-eb83-5123-abaf-570d42b7fbaa"
+ModelingToolkit = "961ee093-0014-501f-94e3-6117800e7a78"
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test", "ModelingToolkit", "DifferentialEquations", "Plots"]
