@@ -2,7 +2,7 @@ module CellMLToolkit
 
 using MathML
 
-using SymbolicUtils: FnType, Sym, operation
+using SymbolicUtils: FnType, Sym, operation, arguments
 using ModelingToolkit
 using EzXML
 
