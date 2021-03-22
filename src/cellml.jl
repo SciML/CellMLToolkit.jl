@@ -68,8 +68,51 @@ function split_equations(eqs)
     return eqs, alg
 end
 
-function flatten_equations(eqs)
+function left_hand_side(eqs, alg)
+    lq = [arguments(eq.lhs)[1] for eq in eqs]
+    la = [eq.lhs for eq in alg]
+    union(lq, la)
+end
+
+function connections(xml, eqs, alg)
+    a = []
+    p = map(x -> string(first(x)), list_params(xml))
+    l = string.(left_hand_side(eqs, alg))
+    maps = findall("//x:map_variables", root(xml), ["x"=>cellml_ns])
+    for m in maps
+        var1 = m["variable_1"]
+        var2 = m["variable_2"]
+        if var1 != var2
+            if var1 ∈ l && var2 ∉ l
+                push!(a, create_var(var2) ~ create_var(var1))
+                @info "accept connection: $var2 ~ $var1"
+            elseif var1 ∉ l && var2 ∈ l
+                push!(a, create_var(var1) ~ create_var(var2))
+                @info "accept connection: $var1 ~ $var2"
+            elseif var1 ∈ l && var2 ∈ l
+                @warn "frustrated connection: $var1 ~ $var2"
+            else
+                if var1 ∈ p
+                    push!(a, create_var(var2) ~ create_var(var1))
+                    @info "accept connection: $var2 ~ param($var1)"
+                elseif var2 ∈ p
+                    push!(a, create_var(var1) ~ create_var(var2))
+                    @info "accept connection: $var1 ~ param($var2)"
+                else
+                    @warn "dangling connection: $var1 ~ $var2"
+                end
+            end
+        end
+    end
+    return a
+end
+
+function flatten_equations(xml, eqs)
     eqs, alg = split_equations(eqs)
+
+    a = connections(xml, eqs, alg)
+    append!(alg, a)
+
     s = Dict(eq.lhs => eq.rhs for eq in alg)
 
     # alg = [eq.lhs ~ substitute(eq.rhs, s) for eq in alg]
@@ -88,13 +131,49 @@ end
 function process_cellml_xml(xml::EzXML.Document)
     ml = extract_mathml(xml)
     eqs = vcat(parse_node.(ml)...)
-    eqs = flatten_equations(eqs)
+    eqs = flatten_equations(xml, eqs)
     iv = find_iv(xml)
     s = list_substitution(xml, iv)
     eqs = [substitute(eq.lhs, s) ~ substitute(eq.rhs, s) for eq in eqs]
     sys = ODESystem(eqs, create_var(iv))
     return sys
 end
+
+function find_component_names(xml::EzXML.Document)
+    c = findall("//x:component", root(xml), ["x"=>cellml_ns])
+    map(x -> x["name"], c)
+end
+
+function process_components(xml::EzXML.Document)
+    names = find_component_names(xml)
+
+    cs = []
+    for c in names
+        sys = process_component(xml, c)
+        if sys != nothing
+            push!(cs, sys)
+        end
+    end
+
+    return cs
+end
+
+function process_component(xml::EzXML.Document, component)
+    math = findfirst("//x:component[@name='$component']/y:math", root(xml), ["x"=>cellml_ns, "y"=>mathml_ns])
+    if math == nothing
+        return nothing
+    end
+    eqs = parse_node(math)
+    # eqs = flatten_equations(eqs)
+    iv = find_iv(xml)
+    s = list_substitution(xml, iv)
+    eqs = [substitute(eq.lhs, s) ~ substitute(eq.rhs, s) for eq in eqs]
+    println(eqs)
+    sys = ODESystem(eqs, create_var(iv); name=Symbol(component))
+    return sys
+end
+
+##############################################################################
 
 function test_cellml(xml::EzXML.Document)
     ml = extract_mathml(xml)
@@ -105,7 +184,7 @@ function test_cellml(xml::EzXML.Document)
         eqs = parse_node(m)
         for eq in eqs
             println(eq)
-            #eq = flatten_equations(eq)
+            eq = flatten_equations(eq)
             s = list_substitution(xml, iv)
             eq = substitute(eq.lhs, s) ~ substitute(eq.rhs, s)
             try

@@ -1,4 +1,4 @@
-module CellMLToolkit
+# module CellMLToolkit
 
 using MathML
 
@@ -71,7 +71,12 @@ end
 function value_of(x, u0)
     name = string(x)
     i = findfirst(x -> string(first(x)) == name, u0)
-    return last(u0[i])
+    if i == nothing
+        @warn "param $name not found"
+        return 0
+    else
+        return last(u0[i])
+    end
 end
 
 
@@ -103,4 +108,4 @@ end
 
 update_list!(l, name::AbstractString, val) = update_list!(l, Symbol(name), val)
 
-end # module
+# end # module
