@@ -1,10 +1,8 @@
 using Test
 using CellMLToolkit
-using DifferentialEquations, Plots
+using OrdinaryDiffEq
 using JSON3, Base.Threads
 using ModelingToolkit
-using DataFrames, CSV 
-# todo lighten test deps, remove de, plots, dataframes, maybe csv 
 
 
 @testset "CellMLToolkit.jl" begin

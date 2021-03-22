@@ -1,3 +1,4 @@
+# using Downloads # still getting multi_socket error
 "
 in place modifies a matrix with data about how far to `solve`
 we get for a given set of cellml files
@@ -35,27 +36,30 @@ function test_cellml!(row, fn)
 end
 
 """
-
-grabs the cellml model repo
-
+a
 """
 function main(dir="data/")
     tspan = (0., 1.)
-    grab(generate_cellml_links())
-    
-    # @test ispath("data")
-    # @test length(readdir("data")) == 2379
-
     fns = readdir(dir; join=true)
     names = [:filename, :to_system, :to_problem, :to_solve, :states, :parameters, :error]
     n = length(names)
     mat = Array{Any,2}(nothing, length(fns), n)
     test_cellmls!(mat, fns)
     replace!(mat, nothing => missing)
-    df = DataFrame(names .=> eachcol(mat))
-    CSV.write("aggregate_stats.csv", df)
-    print(df)
-    df
+    names .=> eachcol(mat) # used with DataFrame()
+    # CSV.write("aggregate_stats.csv", df)
+    # print(df)
 end
 
-# df = main()
+function json_to_cellml_links()
+    s = read("cellml.json", String);
+    j = JSON3.read(s);
+    x = j.collection.links
+    map(x -> x.href[1:end - 5], x) # remove `/view` from urls 
+end
+
+ls = json_to_cellml_links(curl_exposures())
+@test length(ls) == 2379
+CellMLToolkit.grab(ls[1:10])
+df = main()
+@test eltype(df) == Pair

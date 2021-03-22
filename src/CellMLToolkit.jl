@@ -6,6 +6,9 @@ using SymbolicUtils: FnType, Sym, operation
 using ModelingToolkit
 using EzXML
 
+include("utils.jl")
+export curl_exposures
+
 include("cellml.jl")
 
 """
