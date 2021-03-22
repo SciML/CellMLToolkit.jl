@@ -17,14 +17,14 @@ function find_state_names(xml)
     # nodes = findall("//x:math//x:eq/following-sibling::x:apply[1]/x:ci", root(xml), ["x"=>mathml_ns])
     # vars = nodecontent.(nodes)
     nodes = findall("//x:math//x:apply/x:diff", root(xml), ["x"=>mathml_ns])
-    vars = [nodecontent(lastelement(parentnode(n))) for n in nodes]
+    vars = [strip(nodecontent(lastelement(parentnode(n)))) for n in nodes]
     return unique(vars)
 end
 
 # find the unique independent variable
 function find_iv(xml)
     nodes = findall("//x:math//x:bvar/x:ci", root(xml), ["x"=>mathml_ns])
-    ivs = unique(nodecontent.(nodes))
+    ivs = unique(strip.(nodecontent.(nodes)))
     if length(ivs) > 1
         error("Only one independent variable (iv) is acceptable")
     end
@@ -116,10 +116,15 @@ function flatten_equations(xml, eqs)
     s = Dict(eq.lhs => eq.rhs for eq in alg)
 
     # alg = [eq.lhs ~ substitute(eq.rhs, s) for eq in alg]
-    for (i,eq) in enumerate(alg)
-        eq = eq.lhs ~ substitute(eq.rhs, s)
-        s[eq.lhs] = eq.rhs
-        alg[i] = eq
+    b = true
+    while b
+        b = false
+        for (i,eq) in enumerate(alg)
+            eq = (eq.lhs ~ substitute(eq.rhs, s))
+            b = b || !isequal(eq, alg[i])
+            s[eq.lhs] = eq.rhs
+            alg[i] = eq
+        end
     end
 
     # s = Dict(a.lhs => a.rhs for a in alg)
