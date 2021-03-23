@@ -1,4 +1,4 @@
-const cellml_ns = "http://www.cellml.org/cellml/1.0#"
+const cellml_ns(xml) = namespace(root(xml))
 const mathml_ns = "http://www.w3.org/1998/Math/MathML"
 
 create_var(x) = Num(Variable(Symbol(x))).val
@@ -8,7 +8,7 @@ create_param(x) = Num(Sym{ModelingToolkit.Parameter{Real}}(Symbol(x))).val
 # list the name of the CellML initialized variables, i.e., state variables
 # and parameters with an initial_value tag
 function find_initialized_variables(xml)
-    return findall("//x:variable[@initial_value]", root(xml), ["x"=>cellml_ns])
+    return findall("//x:variable[@initial_value]", root(xml), ["x"=>cellml_ns(xml)])
 end
 
 # list the name of the state variables, i.e., variables that occur on the left
@@ -27,6 +27,8 @@ function find_iv(xml)
     ivs = unique(strip.(nodecontent.(nodes)))
     if length(ivs) > 1
         error("Only one independent variable (iv) is acceptable")
+    elseif length(ivs) == 0
+        error("Deficient XML Model! No ODE is defined.")
     end
     return ivs[1]
 end
@@ -51,10 +53,6 @@ function list_states(xml)
 end
 
 function list_substitution(xml, iv=find_iv(xml))
-    # nodes = findall("//x:variable[@initial_value]", root(xml), ["x"=>cellml_ns])
-    # vars = map(x -> x["name"], nodes)
-    # states = find_state_names(xml)
-    # Dict(create_var(x) => x ∈ states ? create_var(x, iv) : create_param(x) for x in vars)
     states = first.(list_initial_conditions(xml, iv))
     params = first.(list_params(xml, iv))
     u0_dict = Dict(create_var(operation(x).name) => x for x in states)
@@ -78,7 +76,7 @@ function connections(xml, eqs, alg)
     a = []
     p = map(x -> string(first(x)), list_params(xml))
     l = string.(left_hand_side(eqs, alg))
-    maps = findall("//x:map_variables", root(xml), ["x"=>cellml_ns])
+    maps = findall("//x:map_variables", root(xml), ["x"=>cellml_ns(xml)])
     for m in maps
         var1 = m["variable_1"]
         var2 = m["variable_2"]
@@ -113,23 +111,21 @@ function flatten_equations(xml, eqs)
     a = connections(xml, eqs, alg)
     append!(alg, a)
 
-    s = Dict(eq.lhs => eq.rhs for eq in alg)
+    s = Dict{Sym{Real,Nothing}, Any}(eq.lhs => eq.rhs for eq in alg)
+    # Any is needed to take care of possible Float values
 
-    # alg = [eq.lhs ~ substitute(eq.rhs, s) for eq in alg]
     b = true
     while b
         b = false
         for (i,eq) in enumerate(alg)
             eq = (eq.lhs ~ substitute(eq.rhs, s))
-            b = b || !isequal(eq, alg[i])
+            b = b || !isequal(eq, alg[i])            
             s[eq.lhs] = eq.rhs
             alg[i] = eq
         end
     end
 
-    # s = Dict(a.lhs => a.rhs for a in alg)
     eqs = [eq.lhs ~ substitute(eq.rhs, s) for eq in eqs]
-
     return eqs
 end
 
@@ -137,15 +133,17 @@ function process_cellml_xml(xml::EzXML.Document)
     ml = extract_mathml(xml)
     eqs = vcat(parse_node.(ml)...)
     eqs = flatten_equations(xml, eqs)
+    # append!(eqs, connections(xml, split_equations(eqs)...))
     iv = find_iv(xml)
     s = list_substitution(xml, iv)
     eqs = [substitute(eq.lhs, s) ~ substitute(eq.rhs, s) for eq in eqs]
     sys = ODESystem(eqs, create_var(iv))
+    # sys = structural_simplify(sys)
     return sys
 end
 
 function find_component_names(xml::EzXML.Document)
-    c = findall("//x:component", root(xml), ["x"=>cellml_ns])
+    c = findall("//x:component", root(xml), ["x"=>cellml_ns(xml)])
     map(x -> x["name"], c)
 end
 
@@ -164,7 +162,7 @@ function process_components(xml::EzXML.Document)
 end
 
 function process_component(xml::EzXML.Document, component)
-    math = findfirst("//x:component[@name='$component']/y:math", root(xml), ["x"=>cellml_ns, "y"=>mathml_ns])
+    math = findfirst("//x:component[@name='$component']/y:math", root(xml), ["x"=>cellml_ns(xml), "y"=>mathml_ns])
     if math == nothing
         return nothing
     end
