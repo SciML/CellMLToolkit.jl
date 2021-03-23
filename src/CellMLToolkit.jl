@@ -6,6 +6,9 @@ using SymbolicUtils: FnType, Sym, operation, arguments
 using ModelingToolkit
 using EzXML
 
+include("utils.jl")
+export curl_exposures
+
 include("cellml.jl")
 
 """
@@ -97,7 +100,7 @@ end
     val is the new value
 """
 function update_list!(l, sym::Symbol, val)
-    for (i,x) in enumerate(l)
+    for (i, x) in enumerate(l)
         if first(x).name == sym
             l[i] = (first(x) => val)
             return
