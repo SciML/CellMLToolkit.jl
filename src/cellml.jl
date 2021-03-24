@@ -2,7 +2,8 @@ const cellml_ns(xml) = namespace(root(xml))
 const mathml_ns = "http://www.w3.org/1998/Math/MathML"
 
 create_var(x) = Num(Variable(Symbol(x))).val
-create_var(x, iv) = Num(Sym{FnType{Tuple{Real}}}(Symbol(x))(Variable(Symbol(iv)))).val
+# create_var(x, iv) = Num(Sym{FnType{Tuple{Real}}}(Symbol(x))(Variable(Symbol(iv)))).val
+create_var(x, iv) = Num(Variable{Symbolics.FnType{Tuple{Any},Real}}(Symbol(x)))(Variable(Symbol(iv))).val
 create_param(x) = Num(Sym{ModelingToolkit.Parameter{Real}}(Symbol(x))).val
 
 # list the name of the CellML initialized variables, i.e., state variables
@@ -66,49 +67,11 @@ function split_equations(eqs)
     return eqs, alg
 end
 
-function left_hand_side(eqs, alg)
-    lq = [arguments(eq.lhs)[1] for eq in eqs]
-    la = [eq.lhs for eq in alg]
-    union(lq, la)
-end
-
-function connections(xml, eqs, alg)
-    a = []
-    p = map(x -> string(first(x)), list_params(xml))
-    l = string.(left_hand_side(eqs, alg))
-    maps = findall("//x:map_variables", root(xml), ["x"=>cellml_ns(xml)])
-    for m in maps
-        var1 = m["variable_1"]
-        var2 = m["variable_2"]
-        if var1 != var2
-            if var1 ∈ l && var2 ∉ l
-                push!(a, create_var(var2) ~ create_var(var1))
-                @info "accept connection: $var2 ~ $var1"
-            elseif var1 ∉ l && var2 ∈ l
-                push!(a, create_var(var1) ~ create_var(var2))
-                @info "accept connection: $var1 ~ $var2"
-            elseif var1 ∈ l && var2 ∈ l
-                @warn "frustrated connection: $var1 ~ $var2"
-            else
-                if var1 ∈ p
-                    push!(a, create_var(var2) ~ create_var(var1))
-                    @info "accept connection: $var2 ~ param($var1)"
-                elseif var2 ∈ p
-                    push!(a, create_var(var1) ~ create_var(var2))
-                    @info "accept connection: $var1 ~ param($var2)"
-                else
-                    @warn "dangling connection: $var1 ~ $var2"
-                end
-            end
-        end
-    end
-    return a
-end
-
 function flatten_equations(xml, eqs)
     eqs, alg = split_equations(eqs)
 
-    a = connections(xml, eqs, alg)
+    # a = connections(xml, eqs, alg)
+    a = connections_global(xml)
     append!(alg, a)
 
     s = Dict{Sym{Real,Nothing}, Any}(eq.lhs => eq.rhs for eq in alg)
@@ -119,7 +82,7 @@ function flatten_equations(xml, eqs)
         b = false
         for (i,eq) in enumerate(alg)
             eq = (eq.lhs ~ substitute(eq.rhs, s))
-            b = b || !isequal(eq, alg[i])            
+            b = b || !isequal(eq, alg[i])
             s[eq.lhs] = eq.rhs
             alg[i] = eq
         end
@@ -139,40 +102,6 @@ function process_cellml_xml(xml::EzXML.Document)
     eqs = [substitute(eq.lhs, s) ~ substitute(eq.rhs, s) for eq in eqs]
     sys = ODESystem(eqs, create_var(iv))
     # sys = structural_simplify(sys)
-    return sys
-end
-
-function find_component_names(xml::EzXML.Document)
-    c = findall("//x:component", root(xml), ["x"=>cellml_ns(xml)])
-    map(x -> x["name"], c)
-end
-
-function process_components(xml::EzXML.Document)
-    names = find_component_names(xml)
-
-    cs = []
-    for c in names
-        sys = process_component(xml, c)
-        if sys != nothing
-            push!(cs, sys)
-        end
-    end
-
-    return cs
-end
-
-function process_component(xml::EzXML.Document, component)
-    math = findfirst("//x:component[@name='$component']/y:math", root(xml), ["x"=>cellml_ns(xml), "y"=>mathml_ns])
-    if math == nothing
-        return nothing
-    end
-    eqs = parse_node(math)
-    # eqs = flatten_equations(eqs)
-    iv = find_iv(xml)
-    s = list_substitution(xml, iv)
-    eqs = [substitute(eq.lhs, s) ~ substitute(eq.rhs, s) for eq in eqs]
-    println(eqs)
-    sys = ODESystem(eqs, create_var(iv); name=Symbol(component))
     return sys
 end
 

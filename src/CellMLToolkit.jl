@@ -10,6 +10,7 @@ include("utils.jl")
 export curl_exposures
 
 include("cellml.jl")
+include("components.jl")
 
 """
     reads a CellML path or io and returns an ODESystem
@@ -35,6 +36,7 @@ export CellModel, ODEProblem
 export read_cellml, parse_cellml
 export list_params, list_initial_conditions, list_states, update_list!
 export eval_string, readxml
+export process_components
 
 struct CellModel
     xml::EzXML.Document
