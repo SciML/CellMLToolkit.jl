@@ -1,4 +1,4 @@
-module CellMLToolkit
+# module CellMLToolkit
 
 using MathML
 
@@ -113,4 +113,4 @@ end
 
 update_list!(l, name::AbstractString, val) = update_list!(l, Symbol(name), val)
 
-end # module
+# end # module

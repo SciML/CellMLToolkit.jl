@@ -215,6 +215,12 @@ function translate_connections(systems, conns, class)
             end
         end
     end
+
+    s = collect(values(systems))
+    for i = 1:length(s)-1
+        # push!(a, s[i].iv ~ s[i+1].iv)
+    end
+
     return a
 end
 
@@ -228,7 +234,7 @@ function process_components(xml::EzXML.Document, iv=find_iv(xml); simplify=true)
     class = classify_variables(xml)
     systems = subsystems(xml, class, iv)
     l = translate_connections(systems, connections(xml), class)
-    sys = ODESystem(l; systems=collect(values(systems)))
+    sys = ODESystem(l, create_var(iv); systems=collect(values(systems)))
     if simplify
         sys = structural_simplify(sys)
     end
@@ -259,6 +265,7 @@ function list_substitution(xml, comp, class, iv=find_iv(xml))
 end
 
 function process_component(xml::EzXML.Document, comp, class, iv=find_iv(xml))
+    extract_mathml(xml)     # this is called for the side-effect of disambiguiting equals
     math = findall("//x:component[@name='$comp']/y:math", root(xml), ["x"=>cellml_ns(xml), "y"=>mathml_ns])
     s = list_substitution(xml, comp, class, iv)
     if length(math) == 0
@@ -274,4 +281,40 @@ function process_component(xml::EzXML.Document, comp, class, iv=find_iv(xml))
     sys = ODESystem(eqs, ivp, states, ps; name=Symbol(comp))
     # sys = ODESystem(eqs; name=Symbol(comp))
     return sys
+end
+
+function collect_initiated_values(xml::EzXML.Document)
+    c = Dict{Var, Float64}()
+    for v in findall("//x:component/x:variable[@initial_value]", root(xml), ["x"=>cellml_ns(xml)])
+        comp = parentnode(v)["name"]
+        var = v["name"]
+        c[make_var(comp, var)] = Float64(Meta.parse(v["initial_value"]))
+    end
+    return c
+end
+
+function split_sym(sym)
+    s = string(sym)
+    i = findfirst(isequal('('), s)
+    if i != nothing
+        s = s[1:i-1]
+    end
+    s = split(s, "₊")
+    make_var(s[1], s[2])
+end
+
+find_sys_p(xml::EzXML.Document, sys) = find_list_value(xml, sys.ps)
+find_sys_u0(xml::EzXML.Document, sys) = find_list_value(xml, sys.states)
+
+function find_list_value(xml::EzXML.Document, a)
+    c = collect_initiated_values(xml)
+    d = collect(keys(c))
+    groups = find_equivalence_groups(xml)
+
+    val = Float64[]
+    for x in a
+        var = [x for x in groups[split_sym(x)] ∩ d][1]
+        push!(val, c[var])
+    end
+    return val
 end
