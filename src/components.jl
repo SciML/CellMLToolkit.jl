@@ -198,7 +198,7 @@ function connections(xml::EzXML.Document)
     return a
 end
 
-function translate_connections(systems, conns, class)
+function translate_connections(systems, conns, class, iv)
     a = []
     for c in conns
         v1, v2 = c
@@ -216,27 +216,59 @@ function translate_connections(systems, conns, class)
         end
     end
 
+    return a
+end
+
+function default_p(systems, iv)
+    a = []
     s = collect(values(systems))
-    for i = 1:length(s)-1
-        # push!(a, s[i].iv ~ s[i+1].iv)
+    for i = 1:length(s)
+        push!(a, getproperty(s[i], Symbol(iv)) => s[i].iv)
+    end
+
+    return a
+end
+
+function time_links(systems, iv)
+    a = []
+    s = collect(values(systems))
+    for i = 1:length(s)
+        push!(a, getproperty(s[i], Symbol(iv)) ~ iv)
     end
 
     return a
 end
 
 
+function post_substitution_list(systems, iv)
+    a = []
+
+    ivp = ivp = create_var(iv)
+
+    for s in keys(systems)
+        t = string(s) * "₊" * iv
+        push!(a, create_param(t) => ivp)
+    end
+
+    return a
+end
+
 ##############################################################################
 
 component_lhs(xml::EzXML.Document, comp) = find_state_names(xml, comp) ∪ find_alg_names(xml, comp)
 all_lhs(xml::EzXML.Document) = ∪([component_lhs(xml, c) for c in find_components(xml)]...)
 
+substitute_eqs(eqs, s) = [substitute(eq.lhs, s) ~ substitute(eq.rhs, s) for eq in eqs]
+
 function process_components(xml::EzXML.Document, iv=find_iv(xml); simplify=true)
     class = classify_variables(xml)
     systems = subsystems(xml, class, iv)
-    l = translate_connections(systems, connections(xml), class)
+    s = post_substitution_list(systems, iv)
+    l = translate_connections(systems, connections(xml), class, iv)
     sys = ODESystem(l, create_var(iv); systems=collect(values(systems)))
     if simplify
         sys = structural_simplify(sys)
+        sys = ODESystem(substitute_eqs(sys.eqs, s), sys.iv, sys.states, sys.ps)
     end
     return sys
 end
@@ -272,10 +304,11 @@ function process_component(xml::EzXML.Document, comp, class, iv=find_iv(xml))
         eqs = Equation[]
     else
         eqs = vcat(parse_node.(math)...)
-        eqs = [substitute(eq.lhs, s) ~ substitute(eq.rhs, s) for eq in eqs]
+        eqs = substitute_eqs(eqs, s)
     end
 
     ivp = create_var(iv)
+    # ps = [Num(last(x)) for x in values(s) if last(x) isa Sym && Symbol(first(x)) != Symbol(iv)]
     ps = [Num(last(x)) for x in values(s) if last(x) isa Sym && Symbol(first(x)) != Symbol(iv)]
     states = [Num(last(x)) for x in values(s) if !(last(x) isa Sym)]
     sys = ODESystem(eqs, ivp, states, ps; name=Symbol(comp))
