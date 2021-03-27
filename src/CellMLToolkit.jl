@@ -1,4 +1,4 @@
-# module CellMLToolkit
+module CellMLToolkit
 
 using MathML
 
@@ -35,8 +35,9 @@ end
 
 export CellModel, ODEProblem
 export read_cellml, parse_cellml
-export find_sys_p, find_sys_u0
+export list_params, list_states
 export readxml, getxml, getsys
+export update_list!
 
 struct CellModel
     xml::EzXML.Document
@@ -54,8 +55,8 @@ function CellModel(path::AbstractString)
     CellModel(xml, process_components(xml))
 end
 
-find_sys_p(ml::CellModel) = find_sys_p(ml.xml, ml.sys)
-find_sys_u0(ml::CellModel) = find_sys_u0(ml.xml, ml.sys)
+list_params(ml::CellModel) = find_sys_p(ml.xml, ml.sys)
+list_states(ml::CellModel) = find_sys_u0(ml.xml, ml.sys)
 
 import ModelingToolkit.ODEProblem
 
@@ -63,8 +64,17 @@ import ModelingToolkit.ODEProblem
     ODEProblem constructs an ODEProblem from a CellModel
 """
 function ODEProblem(ml::CellModel, tspan;
-        jac=false, level=1, p=last.(find_sys_p(ml)), u0=last.(find_sys_u0(ml)))
+        jac=false, level=1, p=last.(list_params(ml)), u0=last.(list_states(ml)))
     ODEProblem(ml.sys, u0, tspan, p; jac=jac)
 end
 
-# end # module
+function update_list!(l, sym, val)
+    i = findfirst(isequal(sym), Symbol.(first.(l)))
+    if i != nothing
+        l[i] = (first(l[i]) => val)
+    else
+        @warn "symbol $sym not found"
+    end
+end
+
+end # module
