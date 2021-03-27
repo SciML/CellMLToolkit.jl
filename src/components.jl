@@ -1,130 +1,93 @@
+const cellml_ns(xml) = namespace(root(xml))
+const mathml_ns = "http://www.w3.org/1998/Math/MathML"
 
+create_var(x) = Num(Variable(Symbol(x))).val
+# create_var(x, iv) = Num(Sym{FnType{Tuple{Real}}}(Symbol(x))(Variable(Symbol(iv)))).val
+create_var(x, iv) = Num(Variable{Symbolics.FnType{Tuple{Any},Real}}(Symbol(x)))(Variable(Symbol(iv))).val
+create_param(x) = Num(Sym{ModelingToolkit.Parameter{Real}}(Symbol(x))).val
 
+global iv_currying = Dict{EzXML.Document, String}()
 
-function left_hand_side(eqs, alg)
-    lq = [arguments(eq.lhs)[1] for eq in eqs]
-    la = [eq.lhs for eq in alg]
-    union(lq, la)
-end
+"""
+    find_iv finds the unique independent variable
 
-function connections(xml, eqs, alg)
-    a = []
-    p = map(x -> string(first(x)), list_params(xml))
-    l = string.(left_hand_side(eqs, alg))
-    maps = findall("//x:map_variables", root(xml), ["x"=>cellml_ns(xml)])
-    for m in maps
-        var1 = m["variable_1"]
-        var2 = m["variable_2"]
-        if var1 != var2
-            if var1 ∈ l && var2 ∉ l
-                push!(a, create_var(var2) ~ create_var(var1))
-                @info "accept connection: $var2 ~ $var1"
-            elseif var1 ∉ l && var2 ∈ l
-                push!(a, create_var(var1) ~ create_var(var2))
-                @info "accept connection: $var1 ~ $var2"
-            elseif var1 ∈ l && var2 ∈ l
-                @warn "frustrated connection: $var1 ~ $var2"
-            else
-                if var1 ∈ p
-                    push!(a, create_var(var2) ~ create_var(var1))
-                    @info "accept connection: $var2 ~ param($var1)"
-                elseif var2 ∈ p
-                    push!(a, create_var(var1) ~ create_var(var2))
-                    @info "accept connection: $var1 ~ param($var2)"
-                else
-                    @warn "dangling connection: $var1 ~ $var2"
-                end
-            end
-        end
+    Note: We assume iv is stable and use Currying to cache the result.
+          However, xml is potentially mutable. Be careful!
+"""
+function find_iv(xml)
+    if haskey(iv_currying, xml)
+        return iv_currying[xml]
     end
-    return a
-end
-
-function find_components(xml::EzXML.Document)
-    comps = findall("//x:component", root(xml), ["x"=>cellml_ns(xml)])
-    map(x -> x["name"], comps)
-end
-
-function find_component_variables(xml::EzXML.Document, comp)
-    vars = findall("//x:component[@name='$comp']/x:variable", root(xml), ["x"=>cellml_ns(xml)])
-    map(x -> x["name"], vars)
-end
-
-find_connections(xml::EzXML.Document) = findall("//x:connection", root(xml), ["x"=>cellml_ns(xml)])
-
-function find_connection_components(xml::EzXML.Document, k)
-    m = findfirst("x:map_components", k, ["x"=>cellml_ns(xml)])
-    m["component_1"], m["component_2"]
-end
-
-function find_connection_variables(xml::EzXML.Document, k)
-    vs = findall("x:map_variables", k, ["x"=>cellml_ns(xml)])
-    [(v["variable_1"], v["variable_2"]) for v in vs]
-end
-
-function find_state_names(xml::EzXML.Document, comp)
-    nodes = findall("//x:component[@name='$comp']/y:math/y:apply", root(xml), ["x"=>cellml_ns(xml), "y"=>mathml_ns])
-    names = String[]
-    for n in nodes
-        e = elements(n)
-        if e[1].name == "eq" && e[2].name == "apply"
-            h = elements(e[2])
-            if h[1].name == "diff" && h[3].name == "ci"
-                push!(names, strip(nodecontent(h[3])))
-            end
-        end
+    nodes = findall("//x:math//x:bvar/x:ci", root(xml), ["x"=>mathml_ns])
+    ivs = unique(strip.(nodecontent.(nodes)))
+    if length(ivs) > 1
+        error("Only one independent variable (iv) is acceptable")
+    elseif length(ivs) == 0
+        @warn("Deficient XML Model! No ODE is defined.")
     end
-    return names
+
+    iv = ivs[1]
+    iv_currying[xml] = iv
+    return iv
 end
 
-function find_alg_names(xml::EzXML.Document, comp)
-    nodes = findall("//x:component[@name='$comp']/y:math/y:apply", root(xml), ["x"=>cellml_ns(xml), "y"=>mathml_ns])
-    names = String[]
-    for n in nodes
-        e = elements(n)
-        if e[1].name == "eq" && e[2].name == "ci"
-            push!(names, strip(nodecontent(e[2])))
-        end
-    end
-    return names
-end
+###############################################################################
 
-function find_initiated_names(xml::EzXML.Document, comp)
-    nodes = findall("//x:component[@name='$comp']/x:variable[@initial_value]", root(xml), ["x"=>cellml_ns(xml)])
-    map(x -> x["name"], nodes)
-end
-
-################################################################################
-
+# A CellML Variable
 struct Var
     comp::Symbol
     var::Symbol
 end
 
-make_var(c::AbstractString, v::AbstractString) = Var(Symbol(c), Symbol(v))
+to_symbol(x::Symbol) = x
+to_symbol(x::AbstractString) = Symbol(x)
+to_symbol(x::EzXML.Node) = Symbol(x["name"])
+
+make_var(c, v) = Var(to_symbol(c), to_symbol(v))
 
 names_to_varset(comp, l) = Set([make_var(comp, x) for x in l])
 
+"""
+    list_component_lhs returns a set of Var composed of all variables in component
+    comp that occur on the left-hand-side of an ODE or algebraic equation
+"""
 function list_component_lhs(xml::EzXML.Document, comp)
-    names_to_varset(comp, find_state_names(xml, comp)) ∪ names_to_varset(comp, find_alg_names(xml, comp))
-    # ∪ names_to_varset(comp, find_initiated_names(xml, comp))
+    names_to_varset(comp, list_state_names(xml, comp)) ∪ names_to_varset(comp, find_alg_names(xml, comp))
 end
 
-list_all_lhs(xml::EzXML.Document) = ∪([list_component_lhs(xml, c) for c in find_components(xml)]...)
+"""
+    list_component_lhs returns a set of Var composed of all variables anywhere in
+    the xml document that occur on the left-hand-side of an ODE or algebraic equation
+"""
+list_all_lhs(xml::EzXML.Document) = ∪([list_component_lhs(xml, c) for c in list_components(xml)]...)
 
+
+
+global equivalnce_currying = Dict{EzXML.Document, Dict{Var, Set{Var}}}()
+
+"""
+    find_equivalence_groups categorizes all the variables in the xml document
+    based on the connections into equivalnce groups
+    it returns a Dictionary of Var to groups (Set of Vars)
+"""
 function find_equivalence_groups(xml::EzXML.Document)
+    if haskey(equivalnce_currying, xml)
+        return equivalnce_currying[xml]
+    end
     groups = Dict{Var, Set{Var}}()
 
-    for c in find_components(xml)
-        for v in find_component_variables(xml, c)
+    # phase 1: each variable belongs to only one set composed of the variable itself
+    for c in list_components(xml)
+        for v in get_component_variables(xml, c)
             u = make_var(c, v)
             groups[u] = Set([u])
         end
     end
 
-    for k in find_connections(xml)
-        c1, c2 = find_connection_components(xml, k)
-        for (v1,v2) in find_connection_variables(xml, k)
+    # phase 2: equivalence groups (sets) are merged according to the connections
+    for k in list_connections(xml)
+        c1, c2 = get_connection_components(xml, k)
+        for (v1,v2) in get_connection_variables(xml, k)
             u1 = make_var(c1, v1)
             u2 = make_var(c2, v2)
             s = groups[u1] ∪ groups[u2]
@@ -134,220 +97,170 @@ function find_equivalence_groups(xml::EzXML.Document)
         end
     end
 
+    equivalnce_currying[xml] = groups
     return groups
 end
 
-function can_use_global_names(groups)
-    s = Dict{Symbol, Set{Var}}()
-    iv = Symbol(find_iv(xml))
-
-    for g in groups
-        v = first(g).var
-        if v != iv && haskey(s, v) && s[v] != last(g)
-            error("Conflict detected! cannot use global naming: $(first(g)) vs $(first(s[v]))")
-        else
-            s[v] = last(g)
-        end
-    end
-end
-
+"""
+    classify_variables divides all the variables in the xml document into
+    two categorizes and returns a Dict from Var to Bool:
+        true: Var is a left-hand-side variable
+        false: Var is not a left-hand-side variable (should be a parameter)
+"""
 function classify_variables(xml::EzXML.Document)
     groups = find_equivalence_groups(xml)
     lhs = list_all_lhs(xml)
     Dict{Var, Bool}(first(g) => (length(last(g) ∩ lhs) == 1) for g in groups)
 end
 
-function connections_global(xml::EzXML.Document)
-    groups = find_equivalence_groups(xml)
-    can_use_global_names(groups)
-    lhs = list_all_lhs(xml)
-    iv = find_iv(xml)
-
+"""
+    translate_connections translates the list of MathML connections to
+    a list of ModelingToolkit equations
+"""
+function translate_connections(xml::EzXML.Document, systems, class)
     a = []
-
-    for g in groups
-        var1 = string(first(g).var)
-        s = [x for x in (last(g) ∩ lhs)]
-        if length(s) == 1
-            var2 = string(s[1].var)
-            if var1 != var2
-                push!(a, create_var(var1) ~ create_var(var2))
-                @info "accept connection: $var1 ~ $var2"
-            end
-        elseif length(s) == 0
-            if var1 != iv
-                @warn "dangling variable: $var1"
-            end
-        else
-            @warn "frustrated variable $var1: $s"
-        end
-    end
-
-    return a
-end
-
-function connections(xml::EzXML.Document)
-    a = []
-    for k in find_connections(xml)
-        c1, c2 = find_connection_components(xml, k)
-        for w in find_connection_variables(xml, k)
-            v1, v2 = w
-            push!(a, (make_var(c1,v1), make_var(c2,v2)))
-        end
-    end
-    return a
-end
-
-function translate_connections(systems, conns, class, iv)
-    a = []
-    for c in conns
-        v1, v2 = c
-
-        if class[v1] && class[v2]
-            sys1 = systems[v1.comp]
-            sys2 = systems[v2.comp]
-
-            if Symbol(sys1.iv) != v1.var
-                #assert(Symbol(sys2.iv) != c[2].var)
-                var1 = getproperty(sys1, c[1].var)
-                var2 = getproperty(sys2, c[2].var)
+    for k in list_connections(xml)
+        c1, c2 = Symbol.(get_connection_components(xml, k))
+        sys1 = systems[c1]
+        sys2 = systems[c2]
+        for w in get_connection_variables(xml, k)
+            v1, v2 = Symbol.(w)
+            if class[Var(c1,v1)] && class[Var(c2,v2)] && Symbol(sys1.iv) != v1
+                var1 = getproperty(sys1, v1)
+                var2 = getproperty(sys2, v2)
                 push!(a, var1 ~ var2)
             end
         end
     end
-
     return a
 end
 
-function default_p(systems, iv)
-    a = []
-    s = collect(values(systems))
-    for i = 1:length(s)
-        push!(a, getproperty(s[i], Symbol(iv)) => s[i].iv)
-    end
+"""
+    pre_substitution generates the substitution rules to be applied to
+    individual systems before structural_simplify merges them together
 
-    return a
-end
-
-function time_links(systems, iv)
-    a = []
-    s = collect(values(systems))
-    for i = 1:length(s)
-        push!(a, getproperty(s[i], Symbol(iv)) ~ iv)
-    end
-
-    return a
-end
-
-
-function post_substitution_list(systems, iv)
-    a = []
-
-    ivp = ivp = create_var(iv)
-
-    for s in keys(systems)
-        t = string(s) * "₊" * iv
-        push!(a, create_param(t) => ivp)
-    end
-
-    return a
-end
-
-##############################################################################
-
-component_lhs(xml::EzXML.Document, comp) = find_state_names(xml, comp) ∪ find_alg_names(xml, comp)
-all_lhs(xml::EzXML.Document) = ∪([component_lhs(xml, c) for c in find_components(xml)]...)
-
-substitute_eqs(eqs, s) = [substitute(eq.lhs, s) ~ substitute(eq.rhs, s) for eq in eqs]
-
-function process_components(xml::EzXML.Document, iv=find_iv(xml); simplify=true)
-    class = classify_variables(xml)
-    systems = subsystems(xml, class, iv)
-    s = post_substitution_list(systems, iv)
-    l = translate_connections(systems, connections(xml), class, iv)
-    sys = ODESystem(l, create_var(iv); systems=collect(values(systems)))
-    if simplify
-        sys = structural_simplify(sys)
-        sys = ODESystem(substitute_eqs(sys.eqs, s), sys.iv, sys.states, sys.ps)
-    end
-    return sys
-end
-
-function subsystems(xml::EzXML.Document, class, iv=find_iv(xml))
-    names = find_components(xml)
-    systems = Dict{Symbol,ODESystem}()
-
-    for c in names
-        sys = process_component(xml, c, class, iv)
-        if sys != nothing
-            systems[sys.name] = sys
-        end
-    end
-    return systems
-end
-
-function list_substitution(xml, comp, class, iv=find_iv(xml))
-    vars = find_component_variables(xml, comp)
+    it morphes variables and parameters to their correct form for ModelingToolkit
+    based on the global CellML xml information
+"""
+function pre_substitution(xml::EzXML.Document, comp, class)
+    iv=find_iv(xml)
+    vars = get_component_variables(xml, comp)
     states = [create_var(x) => create_var(x, iv) for x in vars if class[make_var(comp,x)]]
     params = [create_var(x) => create_param(x) for x in vars if !class[make_var(comp,x)]]
-    # params = [create_var(x) => create_param(x) for x in find_initiated_names(xml, comp) if x ∉ state_names]
-    # [create_var(x) => create_var(x, iv) for x in vars if x != iv]
 
     return states ∪ params
 end
 
-function process_component(xml::EzXML.Document, comp, class, iv=find_iv(xml))
-    extract_mathml(xml)     # this is called for the side-effect of disambiguiting equals
-    math = findall("//x:component[@name='$comp']/y:math", root(xml), ["x"=>cellml_ns(xml), "y"=>mathml_ns])
-    s = list_substitution(xml, comp, class, iv)
+"""
+    post_substitution generates the substitution rules to be applied to
+    the merged system after structural_simplify is applied
+
+    if changes the names of the indepedent variable (iv) in each system
+    to the global iv name
+
+    TODO: this function assumes the basic iv name is the same among all systems
+"""
+function post_substitution(xml, systems)
+    iv=find_iv(xml)
+    ivp = create_var(iv)
+    [create_param(string(s) * "₊" * iv) => ivp for s in keys(systems)]
+end
+
+##############################################################################
+
+substitute_eqs(eqs, s) = [substitute(eq.lhs, s) ~ substitute(eq.rhs, s) for eq in eqs]
+
+"""
+    process_components is the main entry point
+    it processes an xml document and returns a merged ODESystem
+
+    use simplify=false only for debugging purposes!
+"""
+function process_components(xml::EzXML.Document; simplify=true)
+    extract_mathml(xml)     # this is called here for the side-effect of disambiguiting equals
+    class = classify_variables(xml)
+    systems = subsystems(xml, class)
+    post_sub = post_substitution(xml, systems)
+
+    sys = ODESystem(
+        translate_connections(xml, systems, class),
+        create_var(find_iv(xml)),
+        systems=collect(values(systems))
+    )
+
+    if simplify
+        sys = structural_simplify(sys)
+        sys = ODESystem(substitute_eqs(sys.eqs, post_sub), sys.iv, sys.states, sys.ps)
+    end
+
+    return sys
+end
+
+"""
+    subsystems returns a Dict of the subsystems (keys are Symbols), each one
+    based on one CellML component of the xml document.
+
+    class is the output of classify_variables
+"""
+function subsystems(xml::EzXML.Document, class)
+    Dict{Symbol,ODESystem}(
+        Symbol(comp) => process_component(xml, comp, class)
+        for comp in list_components(xml)
+    )
+end
+
+"""
+    process_component converts a single CellML component to an ODESystem
+
+    comp in the name of the component
+    class is the output of classify_variables
+"""
+function process_component(xml::EzXML.Document, comp, class)
+    math = list_component_math(xml, comp)
+    pre_sub = pre_substitution(xml, comp, class)
+
     if length(math) == 0
         eqs = Equation[]
     else
         eqs = vcat(parse_node.(math)...)
-        eqs = substitute_eqs(eqs, s)
+        eqs = substitute_eqs(eqs, pre_sub)
     end
 
+    iv = find_iv(xml)
     ivp = create_var(iv)
-    # ps = [Num(last(x)) for x in values(s) if last(x) isa Sym && Symbol(first(x)) != Symbol(iv)]
-    ps = [Num(last(x)) for x in values(s) if last(x) isa Sym && Symbol(first(x)) != Symbol(iv)]
-    states = [Num(last(x)) for x in values(s) if !(last(x) isa Sym)]
-    sys = ODESystem(eqs, ivp, states, ps; name=Symbol(comp))
-    # sys = ODESystem(eqs; name=Symbol(comp))
-    return sys
+    ps = [last(x) for x in values(pre_sub) if last(x) isa Sym && Symbol(first(x)) != Symbol(iv)]
+    states = [last(x) for x in values(pre_sub) if !(last(x) isa Sym)]
+
+    ODESystem(eqs, ivp, states, ps; name=Symbol(comp))
 end
 
+###############################################################################
+
 function collect_initiated_values(xml::EzXML.Document)
-    c = Dict{Var, Float64}()
-    for v in findall("//x:component/x:variable[@initial_value]", root(xml), ["x"=>cellml_ns(xml)])
-        comp = parentnode(v)["name"]
-        var = v["name"]
-        c[make_var(comp, var)] = Float64(Meta.parse(v["initial_value"]))
-    end
-    return c
+    Dict{Var, Float64}(
+        make_var(parentnode(v), v) => Float64(Meta.parse(v["initial_value"]))
+        for v in list_initiated_variables(xml)
+    )
 end
 
 function split_sym(sym)
-    s = string(sym)
-    i = findfirst(isequal('('), s)
-    if i != nothing
-        s = s[1:i-1]
-    end
-    s = split(s, "₊")
-    make_var(s[1], s[2])
+    # # remove dependency, e.g., (time) from the end
+    s = replace(string(sym), r"\([^\)]*\)" => "")
+    make_var(split(s, "₊")...)
 end
 
-find_sys_p(xml::EzXML.Document, sys) = find_list_value(xml, sys.ps)
-find_sys_u0(xml::EzXML.Document, sys) = find_list_value(xml, sys.states)
+find_sys_p(xml::EzXML.Document, sys) = find_list_value(xml, parameters(sys))
+find_sys_u0(xml::EzXML.Document, sys) = find_list_value(xml, states(sys))
 
 function find_list_value(xml::EzXML.Document, a)
     c = collect_initiated_values(xml)
     d = collect(keys(c))
     groups = find_equivalence_groups(xml)
 
-    val = Float64[]
+    val = []
     for x in a
         var = [x for x in groups[split_sym(x)] ∩ d][1]
-        push!(val, c[var])
+        push!(val, x => c[var])
     end
     return val
 end
