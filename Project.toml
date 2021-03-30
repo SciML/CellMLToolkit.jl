@@ -18,7 +18,7 @@ JSON3 = "1.8"
 MathML = "0.1"
 ModelingToolkit = "5.13"
 OrdinaryDiffEq = "5.52"
-SymbolicUtils = "0.9"
+SymbolicUtils = "0.10"
 julia = "1.5"
 
 [extras]
