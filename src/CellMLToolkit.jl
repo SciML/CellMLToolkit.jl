@@ -1,10 +1,11 @@
-module CellMLToolkit
+# module CellMLToolkit
 
 using MathML
 
 using SymbolicUtils: FnType, Sym, operation, arguments
 using ModelingToolkit
 using EzXML
+using Memoize
 
 include("utils.jl")
 export curl_exposures
@@ -12,12 +13,13 @@ export curl_exposures
 # include("cellml.jl")
 include("accessors.jl")
 include("components.jl")
+include("import.jl")
 
 """
     reads a CellML path or io and returns an ODEProblem
 """
 function read_cellml(path, tspan)
-    xml = readxml(path)
+    xml = read_full_xml(path)
     ml = CellModel(xml, process_components(xml))
     ODEProblem(ml, tspan)
 end
@@ -51,7 +53,7 @@ getsys(ml::CellModel) = ml.sys
     constructs a CellModel struct for the CellML model defined in path
 """
 function CellModel(path::AbstractString)
-    xml = readxml(path)
+    xml = read_full_xml(path)
     CellModel(xml, process_components(xml))
 end
 
@@ -77,4 +79,4 @@ function update_list!(l, sym, val)
     end
 end
 
-end # module
+# end # module

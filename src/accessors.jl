@@ -1,11 +1,13 @@
+list_component_nodes(xml::EzXML.Document) = findall("//x:model/x:component", root(xml), ["x"=>cellml_ns(xml)])
+
+get_model_node(xml::EzXML.Document) = findfirst("//x:model", root(xml), ["x"=>cellml_ns(xml)])
+
+get_component_node(xml::EzXML.Document, comp) = findfirst("//x:component[@name='$comp']", root(xml), ["x"=>cellml_ns(xml)])
+
 """
     list_components returns the names of CellML <Component>s
 """
-function list_components(xml::EzXML.Document)
-    comps = findall("//x:component", root(xml),
-                    ["x"=>cellml_ns(xml)])
-    map(x -> x["name"], comps)
-end
+@memoize list_components(xml::EzXML.Document) = map(x -> x["name"], list_component_nodes(xml))
 
 """
     get_component_variables returns the names of the variables of a component
@@ -16,24 +18,17 @@ function get_component_variables(xml::EzXML.Document, comp)
     map(x -> x["name"], vars)
 end
 
-global initiated_currying = Dict{EzXML.Document, Array{EzXML.Node}}()
-
 """
     list_initiated_variables returns all variables that have an initial_value
 """
-function list_initiated_variables(xml::EzXML.Document)
-    if haskey(initiated_currying, xml)
-        return initiated_currying[xml]
-    end
-    vs = findall("//x:component/x:variable[@initial_value]", root(xml), ["x"=>cellml_ns(xml)])
-    initiated_currying[xml] = vs
-    return vs
+@memoize function list_initiated_variables(xml::EzXML.Document)
+    findall("//x:component/x:variable[@initial_value]", root(xml), ["x"=>cellml_ns(xml)])
 end
 
 """
     list_connections returns the list of <connection> nodes in the CellML document
 """
-list_connections(xml::EzXML.Document) = findall("//x:connection", root(xml), ["x"=>cellml_ns(xml)])
+@memoize list_connections(xml::EzXML.Document) = findall("//x:connection", root(xml), ["x"=>cellml_ns(xml)])
 
 """
     get_connection_variables returns the pair of components for the given connection
@@ -99,3 +94,7 @@ function list_component_math(xml::EzXML.Document, comp)
     findall("//x:component[@name='$comp']/y:math", root(xml),
             ["x"=>cellml_ns(xml), "y"=>mathml_ns])
 end
+
+list_import_nodes(xml::EzXML.Document) = findall("//x:import", root(xml), ["x"=>cellml_ns(xml)])
+
+list_import_component_nodes(xml::EzXML.Document, n) = findall("//x:import/x:component", n, ["x"=>cellml_ns(xml)])

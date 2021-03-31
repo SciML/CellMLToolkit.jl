@@ -1,6 +1,6 @@
 """queries the cellml repo api for links to cellml model repo"""
 function curl_exposures()
-    run(`curl -sL -H 'Accept: application/vnd.physiome.pmr2.json.1' 
+    run(`curl -sL -H 'Accept: application/vnd.physiome.pmr2.json.1'
         https://models.physiomeproject.org/search -d '{
         "template": {"data": [
             {"name": "Subject", "value": "CellML Model"},
@@ -15,7 +15,7 @@ todo use Base.Downloads to speed this up
 """
 function grab(ls)
     !ispath("data") && mkpath("data")
-    @sync Threads.@threads for l in ls 
+    @sync Threads.@threads for l in ls
         fn = splitdir(l)[end]
         download(l, "data/$(fn)")
     end
