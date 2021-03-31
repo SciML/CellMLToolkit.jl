@@ -18,10 +18,14 @@ URIs = "5c2747f8-b7ea-4ff2-ba2e-563bfd36b1d4"
 [compat]
 EzXML = "1.1"
 JSON3 = "1.8"
+<<<<<<< HEAD
 MathML = "0.1.5"
+=======
+MathML = "1.5"
+>>>>>>> 89bc89f71b474831a04d095dd1682e3a1bcd34a1
 ModelingToolkit = "5.13"
 OrdinaryDiffEq = "5.52"
-SymbolicUtils = "0.9"
+SymbolicUtils = "0.9.3"
 julia = "1.5"
 
 [extras]
