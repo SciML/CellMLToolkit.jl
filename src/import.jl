@@ -7,6 +7,10 @@ is_url(path) = length(path) > 7 && path[1:7] ∈ ["http://", "https:/", "HTTP://
     if applicable to generate a single XML document
 """
 function read_full_xml(path)
+    Document(read_and_import_xml(path))
+end
+
+function read_and_import_xml(path)
     if is_url(path)
         r = HTTP.request(:GET, path)
         str = String(r.body)
@@ -15,18 +19,20 @@ function read_full_xml(path)
         xml = readxml(path)
     end
 
-    model = get_model_node(xml)
+    xmls = [xml]
+    model = get_model(xml)
 
-    for x in list_import_nodes(xml)
+    for x in list_imports(xml)
         href = x["xlink:href"]
         if !is_url(href)
             href = joinpath(splitdir(path)[1], href)
         end
 
-        child = read_full_xml(href)
-
-        for y in list_import_component_nodes(xml, x)
-            c = get_component_node(child, y["component_ref"])
+        for y in list_import_components(x)
+            child = read_full_xml(href)
+            append!(xmls, child.xmls)
+            c = get_component(child, y["component_ref"])
+            # @info("adding sub-component: $(c["name"])")
             if c != nothing
                 unlink!(c)
                 c["name"] = y["name"]
@@ -35,5 +41,5 @@ function read_full_xml(path)
         end
     end
 
-    return xml
+    return xmls
 end

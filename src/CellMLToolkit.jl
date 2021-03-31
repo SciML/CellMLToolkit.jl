@@ -1,4 +1,4 @@
-# module CellMLToolkit
+module CellMLToolkit
 
 using MathML
 
@@ -42,23 +42,22 @@ export readxml, getxml, getsys
 export update_list!
 
 struct CellModel
-    xml::EzXML.Document
+    doc::Document
     sys::ODESystem
 end
 
-getxml(ml::CellModel) = ml.xml
 getsys(ml::CellModel) = ml.sys
 
 """
     constructs a CellModel struct for the CellML model defined in path
 """
 function CellModel(path::AbstractString)
-    xml = read_full_xml(path)
-    CellModel(xml, process_components(xml))
+    doc = read_full_xml(path)
+    CellModel(doc, process_components(doc))
 end
 
-list_params(ml::CellModel) = find_sys_p(ml.xml, ml.sys)
-list_states(ml::CellModel) = find_sys_u0(ml.xml, ml.sys)
+list_params(ml::CellModel) = find_sys_p(ml.doc, ml.sys)
+list_states(ml::CellModel) = find_sys_u0(ml.doc, ml.sys)
 
 import ModelingToolkit.ODEProblem
 
@@ -79,4 +78,4 @@ function update_list!(l, sym, val)
     end
 end
 
-# end # module
+end # module

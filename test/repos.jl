@@ -1,7 +1,7 @@
-using CSV
+using CSV, OrdinaryDiffEq
 
 function clone(repo)
-    run(`git clone $url`)    
+    run(`git clone $url`)
 end
 
 function run_all_repos(root; skip=0)
@@ -64,7 +64,7 @@ function list_top_cellml_files(repo)
     imported = Set{String}()
     for f in files
         xml = readxml(joinpath(repo, f))
-        for n in list_import_nodes(xml)
+        for n in list_imports(xml)
             push!(imported, n["xlink:href"])
         end
     end
