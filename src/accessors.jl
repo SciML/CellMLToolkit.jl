@@ -2,7 +2,7 @@ list_component_nodes(xml::EzXML.Document) = findall("//x:model/x:component", roo
 
 get_model_node(xml::EzXML.Document) = findfirst("//x:model", root(xml), ["x"=>cellml_ns(xml)])
 
-get_component_node(xml::EzXML.Document, comp) = findfirst("//x:component[@name='$comp']", root(xml), ["x"=>cellml_ns(xml)])
+# get_component_node(xml::EzXML.Document, comp) = findfirst("//x:component[@name='$comp']", root(xml), ["x"=>cellml_ns(xml)])
 
 """
     list_components returns the names of CellML <Component>s

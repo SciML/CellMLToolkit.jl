@@ -2,6 +2,10 @@ using HTTP
 
 is_url(path) = length(path) > 7 && path[1:7] ∈ ["http://", "https:/", "HTTP://", "HTTPS:/"]
 
+"""
+    read_full_xml reads a CellML XML file or URL and applies the imports
+    if applicable to generate a single XML document
+"""
 function read_full_xml(path)
     if is_url(path)
         r = HTTP.request(:GET, path)
@@ -17,8 +21,10 @@ function read_full_xml(path)
         href = x["xlink:href"]
         if !is_url(href)
             href = joinpath(splitdir(path)[1], href)
-        end        
+        end
+
         child = read_full_xml(href)
+
         for y in list_import_component_nodes(xml, x)
             c = get_component_node(child, y["component_ref"])
             if c != nothing
