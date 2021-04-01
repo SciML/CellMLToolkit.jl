@@ -15,7 +15,7 @@ CellMLToolkit.jl is a Julia library that connects [CellML](http://cellml.org) mo
 To install, run
 
 ```julia
-  Pkg.add(CellMLToolkit)
+  ] add CellMLToolkit
 ```
 
 ## Simple Example
