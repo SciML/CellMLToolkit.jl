@@ -5,6 +5,7 @@ using MathML
 using SymbolicUtils: FnType, Sym, operation, arguments
 using ModelingToolkit
 using EzXML
+using Memoize
 
 include("utils.jl")
 export curl_exposures
@@ -12,12 +13,13 @@ export curl_exposures
 # include("cellml.jl")
 include("accessors.jl")
 include("components.jl")
+include("import.jl")
 
 """
     reads a CellML path or io and returns an ODEProblem
 """
 function read_cellml(path, tspan)
-    xml = readxml(path)
+    xml = read_full_xml(path)
     ml = CellModel(xml, process_components(xml))
     ODEProblem(ml, tspan)
 end
@@ -40,23 +42,22 @@ export readxml, getxml, getsys
 export update_list!
 
 struct CellModel
-    xml::EzXML.Document
+    doc::Document
     sys::ODESystem
 end
 
-getxml(ml::CellModel) = ml.xml
 getsys(ml::CellModel) = ml.sys
 
 """
     constructs a CellModel struct for the CellML model defined in path
 """
 function CellModel(path::AbstractString)
-    xml = readxml(path)
-    CellModel(xml, process_components(xml))
+    doc = read_full_xml(path)
+    CellModel(doc, process_components(doc))
 end
 
-list_params(ml::CellModel) = find_sys_p(ml.xml, ml.sys)
-list_states(ml::CellModel) = find_sys_u0(ml.xml, ml.sys)
+list_params(ml::CellModel) = find_sys_p(ml.doc, ml.sys)
+list_states(ml::CellModel) = find_sys_u0(ml.doc, ml.sys)
 
 import ModelingToolkit.ODEProblem
 

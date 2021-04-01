@@ -1,66 +1,87 @@
-"""
-    list_components returns the names of CellML <Component>s
-"""
-function list_components(xml::EzXML.Document)
-    comps = findall("//x:component", root(xml),
-                    ["x"=>cellml_ns(xml)])
-    map(x -> x["name"], comps)
+# Accessor functions to parse CellML xml(doc) files
+# naming convention:
+#   list_*:         returns a list of 'Ezxml(doc).Node's
+#   get_*:          returns a single 'Ezxml(doc).Node'
+#   list_*_names:   returns a list of String
+
+struct Document
+    xmls::Array{EzXML.Document}
 end
 
-"""
-    get_component_variables returns the names of the variables of a component
-"""
-function get_component_variables(xml::EzXML.Document, comp)
-    vars = findall("//x:component[@name='$comp']/x:variable", root(xml),
-                   ["x"=>cellml_ns(xml)])
-    map(x -> x["name"], vars)
-end
+EzXML.root(doc::Document) = root(doc.xmls[1])
+cellml_ns(doc::Document) = cellml_ns(doc.xmls[1])
 
-global initiated_currying = Dict{EzXML.Document, Array{EzXML.Node}}()
+"""
+    list_components returns the list of CellML <Component>s
+"""
+@memoize list_components(doc::Document) = list_components_unmem(doc)
+
+"""
+    unmemoizied version of list_components
+"""
+list_components_unmem(doc::Document) = findall("//x:model/x:component", root(doc), ["x"=>cellml_ns(doc)])
+
+get_component(doc::Document, name) = findfirst("//x:model/x:component[@name='$name']", root(doc), ["x"=>cellml_ns(doc)])
+
+"""
+    get_model returns the single <model> element of a CellML file
+"""
+get_model(doc::Document) = findfirst("//x:model", root(doc), ["x"=>cellml_ns(doc)])
+
+get_model(xml::EzXML.Document) = findfirst("//x:model", root(xml), ["x"=>cellml_ns(xml)])
+
+"""
+    get_component_variables returns the list of the variables of a component
+    comp is an Ezxml(doc) as returned by list_components
+"""
+@memoize list_component_variables(comp) = findall("./x:variable", comp, ["x"=>cellml_ns(comp)])
 
 """
     list_initiated_variables returns all variables that have an initial_value
 """
-function list_initiated_variables(xml::EzXML.Document)
-    if haskey(initiated_currying, xml)
-        return initiated_currying[xml]
-    end
-    vs = findall("//x:component/x:variable[@initial_value]", root(xml), ["x"=>cellml_ns(xml)])
-    initiated_currying[xml] = vs
-    return vs
-end
+@memoize list_initiated_variables(doc::Document) =
+    findall("//x:component/x:variable[@initial_value]", root(doc), ["x"=>cellml_ns(doc)])
 
 """
     list_connections returns the list of <connection> nodes in the CellML document
 """
-list_connections(xml::EzXML.Document) = findall("//x:connection", root(xml), ["x"=>cellml_ns(xml)])
+@memoize list_connections(doc::Document) =
+    findall("//x:connection", root(doc), ["x"=>cellml_ns(doc)])
 
 """
     get_connection_variables returns the pair of components for the given connection
-    connection: an EzXML node
+    conn is an Ezxml(doc) node as returned by list_connections
 """
-function get_connection_components(xml::EzXML.Document, k)
-    m = findfirst("x:map_components", k, ["x"=>cellml_ns(xml)])
-    m["component_1"], m["component_2"]
-end
+get_connection_component(conn) =
+    findfirst("./x:map_components", conn, ["x"=>cellml_ns(conn)])
 
 """
-    get_connection_variables returns list composed of pairs of variable names
-    for the given connection
-    connection: an EzXML node
+    components_of converts the output of get_connection_component to a pair
+    of strings (the names of the components)
 """
-function get_connection_variables(xml::EzXML.Document, connection)
-    vs = findall("x:map_variables", connection, ["x"=>cellml_ns(xml)])
-    [(v["variable_1"], v["variable_2"]) for v in vs]
-end
+components_of(x) = (x["component_1"], x["component_2"])
+
+"""
+    list_connection_variables returns a list composed of pairs of variable
+    for the given connection
+    conn is an Ezxml(doc) node as returned by list_connections
+"""
+list_connection_variables(conn) =
+    findall("./x:map_variables", conn, ["x"=>cellml_ns(conn)])
+
+"""
+    components_of converts the output of list_connection_variables to a pair
+    of strings (the names of the variables)
+"""
+variables_of(x) = (x["variable_1"], x["variable_2"])
 
 """
     list_state_names returns the names of variables that occur on the left-hand-side
     of an ODE; hence are *state* variables
+    comp is an Ezxml(doc) as returned by list_components
 """
-function list_state_names(xml::EzXML.Document, comp)
-    nodes = findall("//x:component[@name='$comp']/y:math/y:apply", root(xml),
-                    ["x"=>cellml_ns(xml), "y"=>mathml_ns])
+function find_state_names(comp)
+    nodes = findall("./y:math/y:apply", comp, ["y"=>mathml_ns])
     names = String[]
     for n in nodes
         e = elements(n)
@@ -77,10 +98,10 @@ end
 """
     list_alg_names returns the names of variables that occur on the left-hand-side
     of a non-ODE equation; hence are *algebraic* variables
+    comp is an Ezxml(doc) as returned by list_components
 """
-function find_alg_names(xml::EzXML.Document, comp)
-    nodes = findall("//x:component[@name='$comp']/y:math/y:apply", root(xml),
-                    ["x"=>cellml_ns(xml), "y"=>mathml_ns])
+function find_alg_names(comp)
+    nodes = findall("./y:math/y:apply", comp, ["y"=>mathml_ns])
     names = String[]
     for n in nodes
         e = elements(n)
@@ -92,10 +113,21 @@ function find_alg_names(xml::EzXML.Document, comp)
 end
 
 """
-    list_component_math returns a list of math elements (as EzXML.Node) in the
+    list_component_math returns a list of the math elements in the
     given component
 """
-function list_component_math(xml::EzXML.Document, comp)
-    findall("//x:component[@name='$comp']/y:math", root(xml),
-            ["x"=>cellml_ns(xml), "y"=>mathml_ns])
-end
+list_component_math(comp) = findall("./y:math", comp, ["y"=>mathml_ns])
+
+"""
+    list_imports returns the list of <import> nodes in the CellML document
+"""
+list_imports(doc::Document) = findall("//x:import", root(doc), ["x"=>cellml_ns(doc)])
+
+list_imports(xml::EzXML.Document) = findall("//x:import", root(xml), ["x"=>cellml_ns(xml)])
+
+"""
+    list_import_components returns the list of component nodes of the given
+    import element
+    node: an import node as returned by list_imports
+"""
+list_import_components(node) = findall("./x:component", node, ["x"=>cellml_ns(node)])

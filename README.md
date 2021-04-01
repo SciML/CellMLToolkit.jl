@@ -30,7 +30,7 @@ To install, run
 
 # Tutorial
 
-The models directory contains few CellML model examples. Let's start with a simple one, the famous Lorenz equations!
+The models directory contains a few CellML model examples. Let's start with a simple one, the famous Lorenz equations!
 
 ```Julia
   using CellMLToolkit
@@ -125,7 +125,7 @@ Assume we want to change `IstimPeriod`. We can easily do this with the help of `
   prob = ODEProblem(ml, (0, 10000.0); p=p)
 ```
 
-The rest is same as before.
+The rest is the same as before.
 
 ```Julia
   sol = solve(prob, TRBDF2(), dtmax=1.0)
