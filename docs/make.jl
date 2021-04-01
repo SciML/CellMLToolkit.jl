@@ -1,6 +1,4 @@
-push!(LOAD_PATH,"../src/")
-
-using Documenter, CellMLToolkit
+using Documenter
 
 makedocs(
     sitename= "CellMLToolkit",    
