@@ -1,4 +1,4 @@
-using CSV, OrdinaryDiffEq
+using OrdinaryDiffEq
 
 function clone(repo)
     run(`git clone $url`)

@@ -13,15 +13,16 @@ ModelingToolkit = "961ee093-0014-501f-94e3-6117800e7a78"
 OrdinaryDiffEq = "1dea7af3-3e70-54e6-95c3-0bf5283fa5ed"
 SymbolicUtils = "d1185830-fcd6-423d-90d6-eec64667417b"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
-URIs = "5c2747f8-b7ea-4ff2-ba2e-563bfd36b1d4"
 
 [compat]
 EzXML = "1.1"
 JSON3 = "1.8"
 MathML = "0.1.5"
-ModelingToolkit = "5.13"
+Memoize = "0.4"
+ModelingToolkit = "5.14"
 OrdinaryDiffEq = "5.52"
 SymbolicUtils = "0.9.3"
+HTTP = "0.9"
 julia = "1.5"
 
 [extras]
