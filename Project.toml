@@ -22,6 +22,7 @@ MathML = "0.1.5"
 ModelingToolkit = "5.13"
 OrdinaryDiffEq = "5.52"
 SymbolicUtils = "0.9.3"
+URIs = "1.2"
 julia = "1.5"
 
 [extras]
