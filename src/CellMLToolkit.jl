@@ -7,10 +7,6 @@ using ModelingToolkit
 using EzXML
 using Memoize
 
-include("utils.jl")
-export curl_exposures
-
-# include("cellml.jl")
 include("accessors.jl")
 include("components.jl")
 include("import.jl")
