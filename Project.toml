@@ -6,7 +6,6 @@ version = "2.3.0"
 [deps]
 EzXML = "8f5d6c58-4d21-5cfd-889c-e3ad7ee6a615"
 HTTP = "cd3eb016-35fb-5094-929b-558a96fad6f3"
-JSON3 = "0f8b85d8-7281-11e9-16c2-39a750bddbf1"
 MathML = "abcecc63-2b08-419c-80c4-c63dca6fa478"
 Memoize = "c03570c3-d221-55d1-a50c-7939bbd78826"
 ModelingToolkit = "961ee093-0014-501f-94e3-6117800e7a78"
@@ -16,13 +15,12 @@ Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [compat]
 EzXML = "1.1"
-JSON3 = "1.8"
+HTTP = "0.9"
 MathML = "0.1.5"
 Memoize = "0.4"
 ModelingToolkit = "5.14"
 OrdinaryDiffEq = "5.52"
 SymbolicUtils = "0.9.3"
-HTTP = "0.9"
 julia = "1.5"
 
 [extras]
