@@ -15,13 +15,13 @@ CellMLToolkit.jl is a Julia library that connects [CellML](http://cellml.org) mo
 To install, run
 
 ```julia
-  Pkg.add("https://github.com/SciML/CellMLToolkit.jl")
+  ] add CellMLToolkit
 ```
 
 ## Simple Example
 
 ```Julia
-  using CellMLToolkit, DifferentialEquations, Plots
+  using CellMLToolkit, OrdinaryDiffEq, Plots
 
   prob = read_cellml("models/lorenz.cellml.xml", (0,100.0))
   sol = solve(prob)
