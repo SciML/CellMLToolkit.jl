@@ -28,6 +28,19 @@ To install, run
   plot(sol, vars=(1,3))
 ```
 
+Note that `model` is a directory of the CellMLToolkit package. You can find its path as 
+
+```Julia
+  model_root = joinpath(splitdir(pathof(CellMLToolkit))[1], "..", "models")
+```
+
+and then
+
+```julia
+  model_path = joinpath(model_root, "lorenz.cellml.xml")
+  prob = read_cellml(model_path, (0,100.0))
+```
+
 # Tutorial
 
 The models directory contains a few CellML model examples. Let's start with a simple one, the famous Lorenz equations!
