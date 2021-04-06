@@ -161,7 +161,7 @@ function translate_connections(doc::Document, systems, class)
         sys2 = systems[c2]
         for w in variables_of.(list_connection_variables(k))
             v1, v2 = Symbol.(w)
-            if class[make_var(c1,v1)] && class[make_var(c2,v2)] && Symbol(sys1.iv) != v1
+            if class[make_var(c1,v1)] && class[make_var(c2,v2)]
                 var1 = getproperty(sys1, v1)
                 var2 = getproperty(sys2, v2)
                 push!(a, var1 ~ var2)
@@ -185,7 +185,7 @@ function pre_substitution(doc::Document, comp, class)
     vars = to_symbol.(list_component_variables(comp))
 
     states = [create_var(x) => create_var(x, ivₚ) for x in vars if class[make_var(comp,x)]]
-    params = [create_var(x) => create_param(x) for x in vars if !class[make_var(comp,x)] && x != ivₘ]
+    params = [create_var(x) => create_param(x) for x in vars if !class[make_var(comp,x)] && !isequal(x, ivₘ)]
     ivsub =  [create_var(ivₘ) => ivₚ]
 
     return states ∪ params ∪ ivsub
@@ -291,7 +291,7 @@ function process_component(doc::Document, comp, class)
     end
 
     ivₚ = get_ivₚ(doc)
-    ps = [last(x) for x in values(pre_sub) if last(x) isa Sym && last(x) != ivₚ]
+    ps = [last(x) for x in values(pre_sub) if last(x) isa Sym && !isequal(last(x), ivₚ)]
     states = [last(x) for x in values(pre_sub) if !(last(x) isa Sym)]
 
     ODESystem(eqs, ivₚ, states, ps; name=to_symbol(comp))
