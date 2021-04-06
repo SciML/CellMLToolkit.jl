@@ -1,7 +1,7 @@
 name = "CellMLToolkit"
 uuid = "03cb29e0-1ef4-4721-aa24-cf58a006576f"
 authors = ["Shahriar Iravanian <siravan@svtsim.com>"]
-version = "2.3.0"
+version = "2.3.1"
 
 [deps]
 EzXML = "8f5d6c58-4d21-5cfd-889c-e3ad7ee6a615"
@@ -16,7 +16,7 @@ Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 [compat]
 EzXML = "1.1"
 HTTP = "0.9"
-MathML = "0.1.5"
+MathML = "0.1"
 Memoize = "0.4"
 ModelingToolkit = "5.14"
 OrdinaryDiffEq = "5.52"
