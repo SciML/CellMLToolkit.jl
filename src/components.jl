@@ -4,7 +4,11 @@ const mathml_ns = "http://www.w3.org/1998/Math/MathML"
 
 create_var(x) = Num(Variable(Symbol(x))).val
 create_var(x, iv) = Num(Variable{Symbolics.FnType{Tuple{Any},Real}}(Symbol(x)))(iv).val
-create_param(x) = Num(Sym{ModelingToolkit.Parameter{Real}}(Symbol(x))).val
+function create_param(x)
+  p = Sym{Real}(Symbol(x))
+  ModelingToolkit.toparam(p)
+  p
+end
 
 to_symbol(x::Symbol) = x
 to_symbol(x::AbstractString) = Symbol(x)
