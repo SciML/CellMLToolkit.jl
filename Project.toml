@@ -1,7 +1,7 @@
 name = "CellMLToolkit"
 uuid = "03cb29e0-1ef4-4721-aa24-cf58a006576f"
 authors = ["Shahriar Iravanian <siravan@svtsim.com>"]
-version = "2.3.2"
+version = "2.4.0"
 
 [deps]
 CSV = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
