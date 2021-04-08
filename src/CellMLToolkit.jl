@@ -2,11 +2,16 @@ module CellMLToolkit
 
 using MathML
 
-using SymbolicUtils: FnType, Sym, operation, arguments
 using ModelingToolkit
+using SymbolicUtils: FnType, Sym, operation, arguments
 using EzXML
 using Memoize
 
+# include("utils.jl")
+# export curl_exposures
+
+# include("cellml.jl")
+include("structures.jl")
 include("accessors.jl")
 include("components.jl")
 include("import.jl")
@@ -37,18 +42,13 @@ export list_params, list_states
 export readxml, getxml, getsys
 export update_list!
 
-struct CellModel
-    doc::Document
-    sys::ODESystem
-end
-
 getsys(ml::CellModel) = ml.sys
 
 """
     constructs a CellModel struct for the CellML model defined in path
 """
 function CellModel(path::AbstractString)
-    doc = read_full_xml(path)
+    doc = load_cellml(path)
     CellModel(doc, process_components(doc))
 end
 

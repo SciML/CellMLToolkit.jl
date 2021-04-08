@@ -4,6 +4,7 @@ const mathml_ns = "http://www.w3.org/1998/Math/MathML"
 
 create_var(x) = Num(Variable(Symbol(x))).val
 create_var(x, iv) = Num(Variable{Symbolics.FnType{Tuple{Any},Real}}(Symbol(x)))(iv).val
+
 function create_param(x)
   p = Sym{Real}(Symbol(x))
   ModelingToolkit.toparam(p)
@@ -13,6 +14,7 @@ end
 to_symbol(x::Symbol) = x
 to_symbol(x::AbstractString) = Symbol(x)
 to_symbol(x::EzXML.Node) = Symbol(x["name"])
+to_symbol(comp::Component) = comp.name
 
 """
     find_iv finds the unique independent variable
@@ -33,8 +35,8 @@ function find_components_iv(doc::Document)
     dv = Dict{Symbol, Symbol}()
     nv = Symbol[]
 
-    for comp in list_components(doc)
-        nodes = findall(".//y:math//y:bvar/y:ci", comp, ["y"=>mathml_ns])
+    for comp in components(doc)
+        nodes = list_component_bvar(comp)
         ivs = unique(strip.(nodecontent.(nodes)))
         sym = to_symbol(comp)
 
@@ -81,12 +83,6 @@ end
 
 ###############################################################################
 
-# A CellML Variable
-struct Var
-    comp::Symbol
-    var::Symbol
-end
-
 make_var(c, v) = Var(to_symbol(c), to_symbol(v))
 
 names_to_varset(comp, l) = Set([make_var(comp, x) for x in l])
@@ -103,7 +99,7 @@ end
     list_component_lhs returns a set of Var composed of all variables anywhere in
     the doc document that occur on the left-hand-side of an ODE or algebraic equation
 """
-list_all_lhs(doc::Document) = ∪([list_component_lhs(c) for c in list_components(doc)]...)
+list_all_lhs(doc::Document) = ∪([list_component_lhs(c) for c in components(doc)]...)
 
 """
     find_equivalence_groups categorizes all the variables in the doc document
@@ -114,7 +110,7 @@ list_all_lhs(doc::Document) = ∪([list_component_lhs(c) for c in list_component
     groups = Dict{Var, Set{Var}}()
 
     # phase 1: each variable belongs to only one set composed of the variable itself
-    for c in list_components(doc)
+    for c in components(doc)
         for v in list_component_variables(c)
             u = make_var(c, v)
             groups[u] = Set([u])
@@ -122,11 +118,8 @@ list_all_lhs(doc::Document) = ∪([list_component_lhs(c) for c in list_component
     end
 
     # phase 2: equivalence groups (sets) are merged according to the connections
-    for k in list_connections(doc)
-        c1, c2 = components_of(get_connection_component(k))
-        for (v1,v2) in variables_of.(list_connection_variables(k))
-            u1 = make_var(c1, v1)
-            u2 = make_var(c2, v2)
+    for conn in connections(doc)
+        for (u1,u2) in variables(conn)
             s = groups[u1] ∪ groups[u2]
             for x in s
                 groups[x] = s
@@ -155,15 +148,11 @@ end
 """
 function translate_connections(doc::Document, systems, class)
     a = []
-    for k in list_connections(doc)
-        c1, c2 = Symbol.(components_of(get_connection_component(k)))
-        sys1 = systems[c1]
-        sys2 = systems[c2]
-        for w in variables_of.(list_connection_variables(k))
-            v1, v2 = Symbol.(w)
-            if class[make_var(c1,v1)] && class[make_var(c2,v2)]
-                var1 = getproperty(sys1, v1)
-                var2 = getproperty(sys2, v2)
+    for conn in connections(doc)
+        for (u1,u2) in variables(conn)
+            if class[u1] && class[u2] 
+                var1 = getproperty(systems[u1.comp], u1.var)
+                var2 = getproperty(systems[u2.comp], u2.var)
                 push!(a, var1 ~ var2)
             end
         end
@@ -221,7 +210,7 @@ substitute_eqs(eqs, s) = [substitute(eq.lhs, s) ~ substitute(eq.rhs, s) for eq i
     use simplify=false only for debugging purposes!
 """
 function process_components(doc::Document; simplify=true)
-    extract_mathml(doc.xmls[1])     # this is called here for the side-effect of disambiguiting equals
+    extract_mathml.(doc.xmls)     # this is called here for the side-effect of disambiguiting equals
     infer_iv(doc)
 
     class = classify_variables(doc)
@@ -251,24 +240,8 @@ end
 function subsystems(doc::Document, class)
     Dict{Symbol,ODESystem}(
         to_symbol(comp) => process_component(doc, comp, class)
-        for comp in list_components(doc)
+        for comp in components(doc)
     )
-end
-
-function simplify_systems(systems)
-    for x in systems
-        sys = last(x)
-        print("simplifying $(sys.name)")
-        try
-            sys = structural_simplify(sys)
-            k = max(1, 50-length(string(sys.name)))
-            printstyled(repeat(" ", k) * "OK!"; color=:green)
-            println()
-        catch e
-            println(e)
-        end
-
-    end
 end
 
 """
@@ -300,10 +273,14 @@ end
 ###############################################################################
 
 function collect_initiated_values(doc::Document)
-    Dict{Var, Float64}(
-        make_var(parentnode(v), v) => Float64(Meta.parse(v["initial_value"]))
-        for v in list_initiated_variables(doc)
-    )
+    vars = Dict{Var, Float64}()
+
+    for comp in components(doc)
+        for v in list_initiated_variables(comp)
+            vars[make_var(to_symbol(comp), v)] = Float64(Meta.parse(v["initial_value"]))
+        end
+    end
+    vars
 end
 
 function split_sym(sym)
@@ -326,7 +303,7 @@ function find_list_value(doc::Document, a)
     for x in a
         var = [x for x in groups[split_sym(x)] ∩ d]
         if length(var) == 0
-            error("value of $x in not found")
+            error("value of $x is not found")
         end
         push!(val, x => c[var[1]])
 
