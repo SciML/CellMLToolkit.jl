@@ -4,13 +4,12 @@ const mathml_ns = "http://www.w3.org/1998/Math/MathML"
 
 create_var(x) = Num(Variable(Symbol(x))).val
 create_var(x, iv) = Num(Variable{Symbolics.FnType{Tuple{Any},Real}}(Symbol(x)))(iv).val
-create_param(x) = Num(Sym{ModelingToolkit.Parameter{Real}}(Symbol(x))).val
-
-# function create_param(x)
-#   tmp = Sym{Real}(Symbol(x))
-#   ModelingToolkit.toparam(tmp)
-#   tmp
-# end
+# create_param(x) = Num(Sym{ModelingToolkit.Parameter{Real}}(Symbol(x))).val
+function create_param(x)
+  p = Sym{Real}(Symbol(x))
+  ModelingToolkit.toparam(p)
+  p
+end
 
 to_symbol(x::Symbol) = x
 to_symbol(x::AbstractString) = Symbol(x)
@@ -120,7 +119,6 @@ list_all_lhs(doc::Document) = ∪([list_component_lhs(c) for c in components(doc
 
     # phase 2: equivalence groups (sets) are merged according to the connections
     for conn in connections(doc)
-        c1, c2 = components(conn)
         for (u1,u2) in variables(conn)
             s = groups[u1] ∪ groups[u2]
             for x in s
@@ -151,13 +149,10 @@ end
 function translate_connections(doc::Document, systems, class)
     a = []
     for conn in connections(doc)
-        c1, c2 = components(conn)
-        sys1 = systems[c1]
-        sys2 = systems[c2]
         for (u1,u2) in variables(conn)
-            if class[u1] && class[u2] # && Symbol(sys1.iv) != v1
-                var1 = getproperty(sys1, u1.var)
-                var2 = getproperty(sys2, u2.var)
+            if class[u1] && class[u2] # && Symbol(sys1.iv) != u1.var
+                var1 = getproperty(systems[u1.comp], u1.var)
+                var2 = getproperty(systems[u2.comp], u2.var)
                 push!(a, var1 ~ var2)
             end
         end
@@ -179,14 +174,22 @@ function pre_substitution(doc::Document, comp, class)
     vars = to_symbol.(list_component_variables(comp))
 
     states = [create_var(x) => create_var(x, ivₚ) for x in vars if class[make_var(comp,x)]]
-    params = [create_var(x) => create_param(x) for x in vars if !class[make_var(comp,x)] && x != ivₘ]
+    params = [create_var(x) => create_param(x) for x in vars if !class[make_var(comp,x)] && !isequal(x, ivₘ)]
     ivsub =  [create_var(ivₘ) => ivₚ]
 
     return states ∪ params ∪ ivsub
 end
 
 function remove_rhs_diff(eqs)
-    [eq.lhs => eq.rhs for eq in eqs if operation(eq.lhs) isa Differential]
+    l = []
+    for eq in eqs
+        println(typeof(eq.lhs), ": ", eq.lhs)
+        if operation(eq.lhs) isa Differential
+            push!(l, eq.lhs => eq.rhs)
+        end
+    end
+    l
+    # [eq.lhs => eq.rhs for eq in eqs if operation(eq.lhs) isa Differential]
 end
 
 """
@@ -215,7 +218,7 @@ substitute_eqs(eqs, s) = [substitute(eq.lhs, s) ~ substitute(eq.rhs, s) for eq i
     use simplify=false only for debugging purposes!
 """
 function process_components(doc::Document; simplify=true)
-    extract_mathml(doc.xmls[1])     # this is called here for the side-effect of disambiguiting equals
+    extract_mathml.(doc.xmls)     # this is called here for the side-effect of disambiguiting equals
     infer_iv(doc)
 
     class = classify_variables(doc)
@@ -249,22 +252,6 @@ function subsystems(doc::Document, class)
     )
 end
 
-function simplify_systems(systems)
-    for x in systems
-        sys = last(x)
-        print("simplifying $(sys.name)")
-        try
-            sys = structural_simplify(sys)
-            k = max(1, 50-length(string(sys.name)))
-            printstyled(repeat(" ", k) * "OK!"; color=:green)
-            println()
-        catch e
-            println(e)
-        end
-
-    end
-end
-
 """
     process_component converts a single CellML component to an ODESystem
 
@@ -285,7 +272,7 @@ function process_component(doc::Document, comp, class)
     end
 
     ivₚ = get_ivₚ(doc)
-    ps = [last(x) for x in values(pre_sub) if last(x) isa Sym && last(x) != ivₚ]
+    ps = [last(x) for x in values(pre_sub) if last(x) isa Sym && !isequal(last(x),ivₚ)]
     states = [last(x) for x in values(pre_sub) if !(last(x) isa Sym)]
 
     ODESystem(eqs, ivₚ, states, ps; name=to_symbol(comp))
@@ -324,7 +311,7 @@ function find_list_value(doc::Document, a)
     for x in a
         var = [x for x in groups[split_sym(x)] ∩ d]
         if length(var) == 0
-            error("value of $x in not found")
+            error("value of $x is not found")
         end
         push!(val, x => c[var[1]])
 

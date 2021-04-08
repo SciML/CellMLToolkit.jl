@@ -2,8 +2,8 @@ module CellMLToolkit
 
 using MathML
 
-using SymbolicUtils: FnType, Sym, operation, arguments
 using ModelingToolkit
+using SymbolicUtils: FnType, Sym, operation, arguments
 using EzXML
 using Memoize
 

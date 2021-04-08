@@ -1,63 +1,23 @@
-using HTTP
+using Random
 
-is_url(path) = length(path) > 7 && path[1:7] ∈ ["http://", "https:/", "HTTP://", "HTTPS:/"]
+component_sym(x) = Symbol(x)
 
 """
-    read_full_xml reads a CellML XML file or URL and applies the imports
-    if applicable to generate a single XML document
+    load_cellml loads a CellML file and populates a Document structures with
+    the components and connections.
+
+    If resolve = true, load_cellml also resolve the imported components.
 """
-function read_full_xml(path)
-    Document(read_and_import_xml(path))
-end
-
-function read_and_import_xml(path)
-    if is_url(path)
-        r = HTTP.request(:GET, path)
-        str = String(r.body)
-        xml = parsexml(str)
-    else
-        xml = readxml(path)
-    end
-
-    xmls = [xml]
-    model = get_model(xml)
-
-    for x in list_imports(xml)
-        href = x["xlink:href"]
-        if !is_url(href)
-            href = joinpath(splitdir(path)[1], href)
-        end
-
-        for y in list_import_components(x)
-            child = read_full_xml(href)
-            append!(xmls, child.xmls)
-            c = get_component(child, y["component_ref"])
-            # @info("adding sub-component: $(c["name"])")
-            if c != nothing
-                unlink!(c)
-                c["name"] = y["name"]
-                link!(model, c)
-            end
-        end
-    end
-
-    return xmls
-end
-
-
-
 function load_cellml(path; resolve=true)
     xml = readxml(path)
 
-    comps = [Component(Symbol(c["name"]), c) for c in list_components(xml)]
+    comps = [Component(component_sym(c["name"]), c) for c in list_components(xml)]
 
     conns = Connection[]
     for conn in list_connections(xml)
-        vars = Pair{Var}[]
-        c1, c2 = Symbol.(components_of(get_connection_component(conn)))
-        for (v1,v2) in variables_of.(list_connection_variables(conn))
-            push!(vars, make_var(c1,v1) => make_var(c2,v2))
-        end
+        c1, c2 = component_sym.(components_of(get_connection_component(conn)))
+        vars = [make_var(c1,v1) => make_var(c2,v2)
+                for (v1,v2) in variables_of.(list_connection_variables(conn))]
         push!(conns, Connection(c1, c2, vars))
     end
 
@@ -70,55 +30,65 @@ function load_cellml(path; resolve=true)
     return doc
 end
 
-function find_component(doc::Document, name)
-    i = findfirst(x -> x.name == Symbol(name), doc.comps)
-    return i == nothing ? nothing : doc.comps[i]
+"""
+    find_component finds a component by name
+"""
+function find_component(comps::Array{Component}, name)
+    i = findfirst(x -> x.name == Symbol(name), comps)
+    return i == nothing ? nothing : comps[i]
 end
 
-implicit_name(sym, k) = Symbol("$(string(sym))_$k")
+find_component(doc::Document, name) = find_component(doc.comps, name)
 
+implicit_name(sym) = Symbol("$(string(sym))_$(randstring(6))")
+
+"""
+    resolve_imports recursivelly resolves the imported components of doc.
+"""
 function resolve_imports(doc::Document)
-    k = 1
     for ϵ in list_imports(doc)  # εισαγωγή == import
         href = ϵ["xlink:href"]
+        @info "importing $href"
         path = joinpath(splitdir(doc.path)[1], href)
         child = load_cellml(path)
         append!(doc.xmls, child.xmls)
 
-        L = Dict{Symbol, Symbol}()    # list of directly imported components
+        L = Dict{Symbol, Symbol}()    # L keeps the import names of components
 
+        # first, import explicitly imported component
         for σ in list_import_components(ϵ)  # συστατικό == component
-            name = Symbol(σ["component_ref"])
+            name = component_sym(σ["component_ref"])
             comp = find_component(child, name)
-            push!(doc.comps, Component(Symbol(σ["name"]), comp.node))
-            L[name] = Symbol(σ["name"])
+            push!(doc.comps, Component(component_sym(σ["name"]), comp.node))
+            L[name] = component_sym(σ["name"])
         end
 
-        cluster = find_cluster(child, collect(keys(L)))
+        # second, import implicitly imported component, as defined by closure
+        for c in find_closure(child, collect(keys(L)))
+            comp = find_component(child, c)
+            name = implicit_name(c) # generates a name with a random suffix to prevent name collision
+            push!(doc.comps, Component(name, comp.node))
+            L[c] = name
+        end
 
-        if !isempty(cluster)
-            for c in cluster
-                comp = find_component(child, c)
-                name = implicit_name(c, k)
-                push!(doc.comps, Component(name, comp.node))
-                L[c] = name
+        # third, we also need to import connections from the child CellML file
+        for conn in connections(child)
+            c1, c2 = components(conn)
+            if haskey(L,c1) || haskey(L,c2)
+                d1, d2 = L[c1], L[c2]
+                vars = [Var(d1,v1.var) => Var(d2,v2.var) for (v1,v2) in conn.vars]
+                push!(doc.conns, Connection(d1, d2, vars))
             end
-
-            for conn in connections(child)
-                c1, c2 = components(conn)
-                if haskey(L,c1) || haskey(L,c2)
-                    d1, d2 = L[c1], L[c2]
-                    vars = [Var(d1,v1.var) => Var(d2,v2.var) for (v1,v2) in conn.vars]
-                    push!(doc.conns, Connection(L[c1], L[c2], vars))
-                end
-            end
-
-            k += 1
         end
     end
 end
 
-function find_cluster(doc::Document, l)
+"""
+    find_closure finds the transitive closure of a list of componenets (l) minus
+    the list itself, i.e., it returns the list of components in doc which are
+    reachable through a chain of connections starting from any component in l.
+"""
+function find_closure(doc::Document, l)
     n = copy(l)
 
     done = false
