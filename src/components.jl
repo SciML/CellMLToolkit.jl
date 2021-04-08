@@ -181,15 +181,7 @@ function pre_substitution(doc::Document, comp, class)
 end
 
 function remove_rhs_diff(eqs)
-    l = []
-    for eq in eqs
-        println(typeof(eq.lhs), ": ", eq.lhs)
-        if operation(eq.lhs) isa Differential
-            push!(l, eq.lhs => eq.rhs)
-        end
-    end
-    l
-    # [eq.lhs => eq.rhs for eq in eqs if operation(eq.lhs) isa Differential]
+    [eq.lhs => eq.rhs for eq in eqs if operation(eq.lhs) isa Differential]
 end
 
 """

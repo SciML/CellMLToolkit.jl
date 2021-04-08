@@ -5,25 +5,21 @@ version = "2.3.2"
 
 [deps]
 CSV = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
-DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
 EzXML = "8f5d6c58-4d21-5cfd-889c-e3ad7ee6a615"
-HTTP = "cd3eb016-35fb-5094-929b-558a96fad6f3"
 IfElse = "615f187c-cbe4-4ef1-ba3b-2fcf58d6d173"
 MathML = "abcecc63-2b08-419c-80c4-c63dca6fa478"
 Memoize = "c03570c3-d221-55d1-a50c-7939bbd78826"
 ModelingToolkit = "961ee093-0014-501f-94e3-6117800e7a78"
-OrdinaryDiffEq = "1dea7af3-3e70-54e6-95c3-0bf5283fa5ed"
+Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 StatsBase = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"
 SymbolicUtils = "d1185830-fcd6-423d-90d6-eec64667417b"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [compat]
 EzXML = "1.1"
-HTTP = "0.9"
 MathML = "0.1"
 Memoize = "0.4"
 ModelingToolkit = "5.14.1"
-OrdinaryDiffEq = "5.52"
 SymbolicUtils = "0.10.2"
 julia = "1.5"
 
