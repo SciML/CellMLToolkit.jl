@@ -4,7 +4,7 @@ const mathml_ns = "http://www.w3.org/1998/Math/MathML"
 
 create_var(x) = Num(Variable(Symbol(x))).val
 create_var(x, iv) = Num(Variable{Symbolics.FnType{Tuple{Any},Real}}(Symbol(x)))(iv).val
-# create_param(x) = Num(Sym{ModelingToolkit.Parameter{Real}}(Symbol(x))).val
+
 function create_param(x)
   p = Sym{Real}(Symbol(x))
   ModelingToolkit.toparam(p)
@@ -150,7 +150,7 @@ function translate_connections(doc::Document, systems, class)
     a = []
     for conn in connections(doc)
         for (u1,u2) in variables(conn)
-            if class[u1] && class[u2] # && Symbol(sys1.iv) != u1.var
+            if class[u1] && class[u2] 
                 var1 = getproperty(systems[u1.comp], u1.var)
                 var2 = getproperty(systems[u2.comp], u2.var)
                 push!(a, var1 ~ var2)
@@ -264,7 +264,7 @@ function process_component(doc::Document, comp, class)
     end
 
     ivₚ = get_ivₚ(doc)
-    ps = [last(x) for x in values(pre_sub) if last(x) isa Sym && !isequal(last(x),ivₚ)]
+    ps = [last(x) for x in values(pre_sub) if last(x) isa Sym && !isequal(last(x), ivₚ)]
     states = [last(x) for x in values(pre_sub) if !(last(x) isa Sym)]
 
     ODESystem(eqs, ivₚ, states, ps; name=to_symbol(comp))
