@@ -81,7 +81,7 @@ We can tell which variable to plot (vars=12, here) by looking at the output of '
 Instead of directly generating an `ODEProblem` by calling `read_cellml`, we can use a two-step process with more control by first calling `CellModel` factory function:
 
 ```Julia
-  ml = CellML("models/tentusscher_noble_noble_panfilov_2004_a.cellml.xml")
+  ml = CellModel("models/tentusscher_noble_noble_panfilov_2004_a.cellml.xml")
 ```
 
 `CellModel` is a light wrapper around an `ODESystem`. We can access the underlying `ODESystem` as `getsys(ml)` and the model XML as `getxml(ml)` (as an [EzXML](https://github.com/JuliaIO/EzXML.jl) tree). We can then generate an `ODEProblem` as
