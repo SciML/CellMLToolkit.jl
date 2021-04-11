@@ -6,6 +6,7 @@ end
 struct Component
     name::Symbol
     node::EzXML.Node
+    deps::Set{Symbol}
 end
 
 nameof(comp::Component) = comp.name
