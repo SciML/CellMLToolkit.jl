@@ -1,6 +1,26 @@
 using Random
 
-component_sym(x) = Symbol(x)
+sym(x) = Symbol(x)
+
+function populate_dependency!(doc, comp)
+    empty!(comp.deps)
+    for x in list_encapsulation(doc, comp)
+        push!(comp.deps, sym(x["component"]))
+    end
+end
+
+function add_component!(doc, name, node, populate=true)
+    comp = Component(name, node, Set{Symbol}())
+    populate && populate_dependency!(doc, comp)
+    push!(doc.comps, comp)
+    comp
+end
+
+function add_connection!(doc, c1, c2, vars)
+    conn = Connection(c1, c2, vars)
+    push!(doc.conns, conn)
+    conn
+end
 
 """
     load_cellml loads a CellML file and populates a Document structures with
@@ -10,22 +30,20 @@ component_sym(x) = Symbol(x)
 """
 function load_cellml(path; resolve=true)
     xml = readxml(path)
+    doc = Document(path, [xml], Component[], Connection[])
 
-    comps = [Component(component_sym(c["name"]), c) for c in list_components(xml)]
+    for c in list_components(xml)
+        add_component!(doc, sym(c["name"]), c)
+    end
 
-    conns = Connection[]
     for conn in list_connections(xml)
-        c1, c2 = component_sym.(components_of(get_connection_component(conn)))
+        c1, c2 = sym.(components_of(get_connection_component(conn)))
         vars = [make_var(c1,v1) => make_var(c2,v2)
                 for (v1,v2) in variables_of.(list_connection_variables(conn))]
-        push!(conns, Connection(c1, c2, vars))
+        add_connection!(doc, c1, c2, vars)
     end
 
-    doc = Document(path, [xml], comps, conns)
-
-    if resolve
-        resolve_imports(doc)
-    end
+    resolve && resolve_imports!(doc)
 
     return doc
 end
@@ -40,12 +58,13 @@ end
 
 find_component(doc::Document, name) = find_component(doc.comps, name)
 
-implicit_name(sym) = Symbol("$(string(sym))_$(randstring(6))")
+# implicit_name(sym) = Symbol("$(string(sym))_$(randstring(6))")
+implicit_name(sym) = Symbol("$(string(sym))")
 
 """
     resolve_imports recursivelly resolves the imported components of doc.
 """
-function resolve_imports(doc::Document)
+function resolve_imports!(doc::Document)
     for ϵ in list_imports(doc)  # εισαγωγή == import
         href = ϵ["xlink:href"]
         @info "importing $href"
@@ -53,31 +72,41 @@ function resolve_imports(doc::Document)
         child = load_cellml(path)
         append!(doc.xmls, child.xmls)
 
-        L = Dict{Symbol, Symbol}()    # L keeps the import names of components
+        L = Dict{Symbol, Symbol}()      # L keeps the import names of components
+        D = Set{Symbol}()               # D is the set of imported dependencies
+        C = Set{Symbol}()
 
         # first, import explicitly imported component
         for σ in list_import_components(ϵ)  # συστατικό == component
-            name = component_sym(σ["component_ref"])
-            comp = find_component(child, name)
-            push!(doc.comps, Component(component_sym(σ["name"]), comp.node))
-            L[name] = component_sym(σ["name"])
+            old_name = sym(σ["component_ref"])
+            new_name = sym(σ["name"])
+            old_comp = find_component(child, old_name)
+
+            add_component!(doc, new_name, old_comp.node)
+
+            D = D ∪ old_comp.deps
+            L[old_name] = new_name
+            push!(C, old_name)
         end
 
         # second, import implicitly imported component, as defined by closure
-        for c in find_closure(child, collect(keys(L)))
-            comp = find_component(child, c)
-            name = implicit_name(c) # generates a name with a random suffix to prevent name collision
-            push!(doc.comps, Component(name, comp.node))
-            L[c] = name
+        #for c in find_closure(child, collect(keys(L)))
+        for old_name in D
+            if old_name ∉ C
+                old_comp = find_component(child, old_name)
+                new_name = implicit_name(old_name) # generates a name with a random suffix to prevent name collision
+                add_component!(doc, new_name, old_comp.node, false)
+                L[old_name] = new_name
+            end
         end
 
         # third, we also need to import connections from the child CellML file
         for conn in connections(child)
             c1, c2 = components(conn)
-            if haskey(L,c1) || haskey(L,c2)
+            if haskey(L,c1) && haskey(L,c2)
                 d1, d2 = L[c1], L[c2]
                 vars = [Var(d1,v1.var) => Var(d2,v2.var) for (v1,v2) in conn.vars]
-                push!(doc.conns, Connection(d1, d2, vars))
+                add_connection!(doc, d1, d2, vars)
             end
         end
     end

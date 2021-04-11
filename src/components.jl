@@ -139,7 +139,16 @@ end
 @memoize function classify_variables(doc::Document)
     groups = find_equivalence_groups(doc)
     lhs = list_all_lhs(doc)
-    Dict{Var, Bool}(first(g) => (length(last(g) ∩ lhs) == 1) for g in groups)
+    class = Dict{Var, Bool}()
+
+    for g in groups
+        n = length(last(g) ∩ lhs)
+        if n > 1
+            error("Equivalence group $g has more than one initial_value: $(last(g) ∩ lhs)")
+        end
+        class[first(g)] = (n == 1)
+    end
+    class
 end
 
 """
@@ -150,7 +159,7 @@ function translate_connections(doc::Document, systems, class)
     a = []
     for conn in connections(doc)
         for (u1,u2) in variables(conn)
-            if class[u1] && class[u2] 
+            if class[u1] && class[u2]
                 var1 = getproperty(systems[u1.comp], u1.var)
                 var2 = getproperty(systems[u2.comp], u2.var)
                 push!(a, var1 ~ var2)
@@ -250,7 +259,7 @@ end
     comp in the name of the component
     class is the output of classify_variables
 """
-function process_component(doc::Document, comp, class)
+function process_component(doc::Document, comp, class)    
     math = list_component_math(comp)
     pre_sub = pre_substitution(doc, comp, class)
 
@@ -274,13 +283,19 @@ end
 
 function collect_initiated_values(doc::Document)
     vars = Dict{Var, Float64}()
+    syms = Dict{Var, Var}()
 
     for comp in components(doc)
         for v in list_initiated_variables(comp)
-            vars[make_var(to_symbol(comp), v)] = Float64(Meta.parse(v["initial_value"]))
+            val = Meta.parse(v["initial_value"])
+            if val isa Symbol
+                syms[make_var(to_symbol(comp), v)] = make_var(to_symbol(comp), val)
+            else
+                vars[make_var(to_symbol(comp), v)] = Float64(val)
+            end
         end
     end
-    vars
+    vars, syms
 end
 
 function split_sym(sym)
@@ -292,21 +307,22 @@ end
 find_sys_p(doc::Document, sys) = find_list_value(doc, parameters(sys))
 find_sys_u0(doc::Document, sys) = find_list_value(doc, states(sys))
 
-function find_list_value(doc::Document, a)
-    c = collect_initiated_values(doc)
-    iv = find_iv(doc)
-
-    d = collect(keys(c))
+function find_list_value(doc::Document, names)
+    vars, syms = collect_initiated_values(doc)
+    varkeys = Set(keys(vars))
     groups = find_equivalence_groups(doc)
 
-    val = []
-    for x in a
-        var = [x for x in groups[split_sym(x)] ∩ d]
+    vals = []
+
+    for x in names
+        u = split_sym(x)
+        u = haskey(syms,u) ? syms[u] : u
+        var = groups[u] ∩ varkeys
         if length(var) == 0
             error("value of $x is not found")
         end
-        push!(val, x => c[var[1]])
+        push!(vals, x => vars[first(var)])
 
     end
-    return val
+    return vals
 end
