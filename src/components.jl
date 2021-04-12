@@ -8,7 +8,6 @@ create_var(x, iv) = Num(Variable{Symbolics.FnType{Tuple{Any},Real}}(Symbol(x)))(
 function create_param(x)
   p = Sym{Real}(Symbol(x))
   ModelingToolkit.toparam(p)
-  p
 end
 
 to_symbol(x::Symbol) = x
