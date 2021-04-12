@@ -1,7 +1,7 @@
 name = "CellMLToolkit"
 uuid = "03cb29e0-1ef4-4721-aa24-cf58a006576f"
 authors = ["Shahriar Iravanian <siravan@svtsim.com>"]
-version = "2.4.1"
+version = "2.4.2"
 
 [deps]
 EzXML = "8f5d6c58-4d21-5cfd-889c-e3ad7ee6a615"
@@ -9,7 +9,11 @@ MathML = "abcecc63-2b08-419c-80c4-c63dca6fa478"
 Memoize = "c03570c3-d221-55d1-a50c-7939bbd78826"
 ModelingToolkit = "961ee093-0014-501f-94e3-6117800e7a78"
 Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
+<<<<<<< HEAD
 SafeTestsets = "1bc83da4-3b8d-516f-aca4-4fe02f6d838f"
+=======
+Setfield = "efcf1570-3423-57d1-acb7-fd33fddbac46"
+>>>>>>> 8f362ef3c3340b5181d5e61b32b3abc0e256890f
 SymbolicUtils = "d1185830-fcd6-423d-90d6-eec64667417b"
 Symbolics = "0c5d862f-8b57-4792-8d23-62f2024744c7"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
@@ -19,7 +23,8 @@ EzXML = "1.1"
 MathML = "0.1"
 Memoize = "0.4"
 ModelingToolkit = "5.14.1"
-SymbolicUtils = "0.10.2"
+Setfield = "0.7"
+SymbolicUtils = "0.10.2, 0.11"
 julia = "1.5"
 
 [extras]
