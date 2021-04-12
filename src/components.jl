@@ -2,13 +2,22 @@ const cellml_ns(xml::EzXML.Document) = namespace(root(xml))
 const cellml_ns(node::EzXML.Node) = namespace(node)
 const mathml_ns = "http://www.w3.org/1998/Math/MathML"
 
-create_var(x) = Num(Variable(Symbol(x))).val
-create_var(x, iv) = Num(Variable{Symbolics.FnType{Tuple{Any},Real}}(Symbol(x)))(iv).val
+# create_var(x) = Num(Sym{Real}(Symbol(x))).val  # Num(Variable(Symbol(x))).val
+# create_var(x, iv) = Num(Sym{Symbolics.FnType{Tuple{Any},Real}}(Symbol(x)))(iv).val  # Num(Variable{Symbolics.FnType{Tuple{Any},Real}}(Symbol(x)))(iv).val
+
+function create_var(x)
+    @variables v
+    ModelingToolkit.rename(v.val, Symbol(x))
+end
+
+function create_var(x, iv)
+    @variables v(iv)
+    ModelingToolkit.rename(v.val, Symbol(x))
+end
 
 function create_param(x)
-  p = Sym{Real}(Symbol(x))
-  ModelingToolkit.toparam(p)
-  p
+    @parameters p
+    ModelingToolkit.rename(p.val, Symbol(x))
 end
 
 to_symbol(x::Symbol) = x
@@ -259,7 +268,7 @@ end
     comp in the name of the component
     class is the output of classify_variables
 """
-function process_component(doc::Document, comp, class)    
+function process_component(doc::Document, comp, class)
     math = list_component_math(comp)
     pre_sub = pre_substitution(doc, comp, class)
 

@@ -1,4 +1,4 @@
-module CellMLToolkit
+# module CellMLToolkit
 
 using MathML
 
@@ -74,4 +74,4 @@ function update_list!(l, sym, val)
     end
 end
 
-end # module
+# end # module

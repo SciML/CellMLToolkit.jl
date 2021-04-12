@@ -9,7 +9,9 @@ MathML = "abcecc63-2b08-419c-80c4-c63dca6fa478"
 Memoize = "c03570c3-d221-55d1-a50c-7939bbd78826"
 ModelingToolkit = "961ee093-0014-501f-94e3-6117800e7a78"
 Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
+SafeTestsets = "1bc83da4-3b8d-516f-aca4-4fe02f6d838f"
 SymbolicUtils = "d1185830-fcd6-423d-90d6-eec64667417b"
+Symbolics = "0c5d862f-8b57-4792-8d23-62f2024744c7"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [compat]
@@ -25,6 +27,6 @@ JSON3 = "0f8b85d8-7281-11e9-16c2-39a750bddbf1"
 ModelingToolkit = "961ee093-0014-501f-94e3-6117800e7a78"
 OrdinaryDiffEq = "1dea7af3-3e70-54e6-95c3-0bf5283fa5ed"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
-  
+
 [targets]
 test = ["Test", "ModelingToolkit", "OrdinaryDiffEq", "JSON3"]
