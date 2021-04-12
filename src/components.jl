@@ -1,3 +1,5 @@
+using Setfield
+
 const cellml_ns(xml::EzXML.Document) = namespace(root(xml))
 const cellml_ns(node::EzXML.Node) = namespace(node)
 const mathml_ns = "http://www.w3.org/1998/Math/MathML"
@@ -233,7 +235,7 @@ function process_components(doc::Document; simplify=true)
 
     if simplify
         sys = structural_simplify(sys)
-        sys = ODESystem(substitute_eqs(sys.eqs, post_sub), sys.iv, sys.states, sys.ps)
+        @set! sys.eqs = substitute_eqs(equations(sys), post_sub)
     end
 
     return sys
