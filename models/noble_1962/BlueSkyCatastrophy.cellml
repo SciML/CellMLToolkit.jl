@@ -1,0 +1,60 @@
+<?xml version='1.0'?>
+<model name="van_der_pol_model" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="main">
+        <variable initial_value="0" name="t" units="dimensionless"/>
+        <variable initial_value="0.9" name="x" units="dimensionless"/>
+        <variable initial_value="0.4" name="y" units="dimensionless"/>
+        <variable initial_value="0.2645" name="A" units="dimensionless"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>x</ci>
+                </apply>
+                <ci>y</ci>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>y</ci>
+                </apply>
+                <apply>
+                    <plus/>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <minus/>
+                            <ci>x</ci>
+                            <apply>
+                                <power/>
+                                <ci>x</ci>
+                                <cn cellml:units="dimensionless">3</cn>
+                            </apply>
+                        </apply>
+                        <apply>
+                            <times/>
+                            <cn cellml:units="dimensionless">0.25</cn>
+                            <ci>y</ci>
+                        </apply>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <ci>A</ci>
+                        <apply>
+                            <sin/>
+                            <ci>t</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+        </math>
+    </component>
+</model>

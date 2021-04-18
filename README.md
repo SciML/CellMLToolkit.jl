@@ -28,7 +28,7 @@ To install, run
   plot(sol, vars=(1,3))
 ```
 
-Note that `model` is a directory of the CellMLToolkit package. You can find its path as 
+Note that `model` is a directory of the CellMLToolkit package. You can find its path as
 
 ```Julia
   model_root = joinpath(splitdir(pathof(CellMLToolkit))[1], "..", "models")
@@ -41,7 +41,7 @@ and then
   prob = read_cellml(model_path, (0,100.0))
 ```
 
-# Tutorial
+## Tutorial
 
 The models directory contains a few CellML model examples. Let's start with a simple one, the famous Lorenz equations!
 
@@ -145,7 +145,7 @@ The rest is the same as before.
   plot(sol, vars=8)   # 8 is the index of membrane₊V
 ```
 
-For the last example, we chose a complex model to stress the ODE solvers: [the O'Hara-Rudy left ventricular model](https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1002061). This model has 49 state variables, is very stiff, and is prone to oscillation. The best solver for this model is `CVODE_BDF` from the Sundial suite.
+For the next example, we chose a complex model to stress the ODE solvers: [the O'Hara-Rudy left ventricular model](https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1002061). This model has 49 state variables, is very stiff, and is prone to oscillation. The best solver for this model is `CVODE_BDF` from the Sundial suite.
 
 ```Julia
   using Sundials
@@ -158,3 +158,35 @@ For the last example, we chose a complex model to stress the ODE solvers: [the O
 ```
 
 ![](figures/ohara_rudy.png)
+
+## Multi-file Models (Import)
+
+CellML specification allows for multi-file models. In these models, the top level CellML XML file imports components from other CellML files, which in turn may import from other files. CellMLToolkit supports this functionality. It assumes that *the top-level file and all the imported files reside in the same directory*. `models/noble_1962` contained one such example:
+
+```julia
+  ml = CellModel("models/noble_1962/Noble_1962.cellml")
+  prob = ODEProblem(ml, tspan)
+  sol = solve(prob, TRBDF2(), dtmax=0.5)
+```
+
+Note that the syntax is exactly the same as before. However, the list of the imported files are printed during `CellModel` generation:
+
+```
+[ Info: importing Noble62_Na_channel.cellml
+[ Info: importing Noble62_units.cellml
+[ Info: importing Noble62_K_channel.cellml
+[ Info: importing Noble62_units.cellml
+[ Info: importing Noble62_L_channel.cellml
+[ Info: importing Noble62_units.cellml
+[ Info: importing Noble62_units.cellml
+[ Info: importing Noble62_parameters.cellml
+[ Info: importing Noble62_units.cellml
+```
+
+Same as before, we can plot the output as
+
+```julia
+  plot(sol, vars=2)
+```
+
+![](figures/noble_1962.png)

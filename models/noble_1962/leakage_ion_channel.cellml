@@ -1,0 +1,62 @@
+<?xml version='1.0'?>
+<model name="leakage_ion_channel" xmlns="http://www.cellml.org/cellml/1.0#" xmlns:cellml="http://www.cellml.org/cellml/1.0#">
+    <units name="millisec">
+        <unit prefix="milli" units="second"/>
+    </units>
+    <units name="millivolt">
+        <unit prefix="milli" units="volt"/>
+    </units>
+    <units name="per_millivolt">
+        <unit exponent="-1" units="millivolt"/>
+    </units>
+    <units name="microA_per_cm2">
+        <unit prefix="micro" units="ampere"/>
+        <unit exponent="-2" prefix="centi" units="metre"/>
+    </units>
+    <units name="milliS_per_cm2">
+        <unit prefix="milli" units="siemens"/>
+        <unit exponent="-2" prefix="centi" units="metre"/>
+    </units>
+    <component name="environment">
+        <variable initial_value="0" name="V" public_interface="out" units="millivolt"/>
+        <variable name="t" public_interface="out" units="millisec"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>V</ci>
+                </apply>
+                <cn cellml:units="dimensionless">1</cn>
+            </apply>
+        </math>
+    </component>
+    <component name="leakage_channel">
+        <variable name="V" public_interface="in" units="millivolt"/>
+        <variable name="i_L" public_interface="out" units="microA_per_cm2"/>
+        <variable initial_value="0.3" name="g_L" units="milliS_per_cm2"/>
+        <variable initial_value="-54.4" name="E_L" units="millivolt"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>i_L</ci>
+                <apply>
+                    <times/>
+                    <ci>g_L</ci>
+                    <apply>
+                        <minus/>
+                        <ci>V</ci>
+                        <ci>E_L</ci>
+                    </apply>
+                </apply>
+            </apply>
+        </math>
+    </component>
+    <connection>
+        <map_components component_1="leakage_channel" component_2="environment"/>
+        <map_variables variable_1="V" variable_2="V"/>
+    </connection>
+</model>

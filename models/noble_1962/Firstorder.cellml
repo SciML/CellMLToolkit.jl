@@ -1,0 +1,33 @@
+<?xml version='1.0'?>
+<model name="first_order_model" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="main">
+        <variable initial_value="0" name="t" units="dimensionless"/>
+        <variable initial_value="5" name="y" units="dimensionless"/>
+        <variable initial_value="1" name="a" units="dimensionless"/>
+        <variable initial_value="2" name="b" units="dimensionless"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>y</ci>
+                </apply>
+                <apply>
+                    <plus/>
+                    <apply>
+                        <times/>
+                        <apply>
+                            <minus/>
+                            <ci>a</ci>
+                        </apply>
+                        <ci>y</ci>
+                    </apply>
+                    <ci>b</ci>
+                </apply>
+            </apply>
+        </math>
+    </component>
+</model>

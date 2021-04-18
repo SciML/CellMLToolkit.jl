@@ -1,0 +1,258 @@
+<?xml version='1.0'?>
+<model name="potassium_ion_channel" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#" xmlns:cmeta="http://www.cellml.org/metadata/1.0#" cmeta:id="model">
+
+	<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+		xmlns:bqs="http://www.cellml.org/bqs/1.0#" xmlns:dc="http://purl.org/dc/elements/1.1/">
+		<rdf:Description rdf:about="">
+			<dc:title>HH potassium ion channel model</dc:title>
+		</rdf:Description>
+		<rdf:Description rdf:about="#model">
+			<bqs:reference rdf:parseType="Resource">
+				<dc:subject rdf:parseType="Resource">
+					<bqs:subject_type>keyword</bqs:subject_type>
+					<rdf:value>
+						<rdf:Bag>
+							<rdf:li>protein module</rdf:li>
+						</rdf:Bag>
+					</rdf:value>
+				</dc:subject>
+			</bqs:reference>
+		</rdf:Description>
+	</rdf:RDF>
+
+    <units name="millisec">
+        <unit prefix="milli" units="second"/>
+    </units>
+    <units name="per_millisec">
+        <unit exponent="-1" prefix="milli" units="second"/>
+    </units>
+    <units name="millivolt">
+        <unit prefix="milli" units="volt"/>
+    </units>
+    <units name="per_millivolt">
+        <unit exponent="-1" units="millivolt"/>
+    </units>
+    <units name="per_millivolt_millisec">
+        <unit units="per_millivolt"/>
+        <unit units="per_millisec"/>
+    </units>
+    <units name="microA_per_cm2">
+        <unit prefix="micro" units="ampere"/>
+        <unit exponent="-2" prefix="centi" units="metre"/>
+    </units>
+    <units name="milliS_per_cm2">
+        <unit prefix="milli" units="siemens"/>
+        <unit exponent="-2" prefix="centi" units="metre"/>
+    </units>
+    <units name="mM">
+        <unit prefix="milli" units="mole"/>
+    </units>
+    <component name="environment">
+        <variable name="V" public_interface="out" units="millivolt"/>
+        <variable name="t" public_interface="out" units="millisec"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>V</ci>
+                <piecewise>
+                    <piece>
+                        <apply>
+                            <minus/>
+                            <cn cellml:units="millivolt">85.0</cn>
+                        </apply>
+                        <apply>
+                            <and/>
+                            <apply>
+                                <gt/>
+                                <ci>t</ci>
+                                <cn cellml:units="millisec">5</cn>
+                            </apply>
+                            <apply>
+                                <lt/>
+                                <ci>t</ci>
+                                <cn cellml:units="millisec">15</cn>
+                            </apply>
+                        </apply>
+                    </piece>
+                    <otherwise>
+                        <cn cellml:units="millivolt">0.0</cn>
+                    </otherwise>
+                </piecewise>
+            </apply>
+        </math>
+    </component>
+    <group>
+        <relationship_ref relationship="encapsulation"/>
+        <component_ref component="potassium_channel">
+            <component_ref component="potassium_channel_n_gate"/>
+        </component_ref>
+    </group>
+    <component cmeta:id="id_000000001" name="potassium_channel">
+        <variable name="V" private_interface="out" public_interface="in" units="millivolt"/>
+        <variable name="t" private_interface="out" public_interface="in" units="millisec"/>
+        <variable name="n" private_interface="in" units="dimensionless"/>
+        <variable name="i_K" public_interface="out" units="microA_per_cm2"/>
+        <variable initial_value="36" name="g_K" units="milliS_per_cm2"/>
+        <variable cmeta:id="id_000000002" initial_value="90" name="Ki" units="mM"/>
+        <variable cmeta:id="id_000000003" initial_value="3" name="Ko" units="mM"/>
+        <variable initial_value="25" name="RTF" units="millivolt"/>
+        <variable name="E_K" units="millivolt"/>
+        <variable name="K_conductance" public_interface="out" units="milliS_per_cm2"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>E_K</ci>
+                <apply>
+                    <times/>
+                    <ci>RTF</ci>
+                    <apply>
+                        <ln/>
+                        <apply>
+                            <divide/>
+                            <ci>Ko</ci>
+                            <ci>Ki</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>K_conductance</ci>
+                <apply>
+                    <times/>
+                    <ci>g_K</ci>
+                    <apply>
+                        <power/>
+                        <ci>n</ci>
+                        <cn cellml:units="dimensionless">4</cn>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>i_K</ci>
+                <apply>
+                    <times/>
+                    <ci>K_conductance</ci>
+                    <apply>
+                        <minus/>
+                        <ci>V</ci>
+                        <ci>E_K</ci>
+                    </apply>
+                </apply>
+            </apply>
+        </math>
+    </component>
+    <component name="potassium_channel_n_gate">
+        <variable name="V" public_interface="in" units="millivolt"/>
+        <variable name="t" public_interface="in" units="millisec"/>
+        <variable initial_value="0.325" name="n" public_interface="out" units="dimensionless"/>
+        <variable name="alpha_n" units="per_millisec"/>
+        <variable name="beta_n" units="per_millisec"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>alpha_n</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <cn cellml:units="per_millivolt_millisec">0.01</cn>
+                        <apply>
+                            <plus/>
+                            <ci>V</ci>
+                            <cn cellml:units="millivolt">10</cn>
+                        </apply>
+                    </apply>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <exp/>
+                            <apply>
+                                <divide/>
+                                <apply>
+                                    <plus/>
+                                    <ci>V</ci>
+                                    <cn cellml:units="millivolt">10</cn>
+                                </apply>
+                                <cn cellml:units="millivolt">10</cn>
+                            </apply>
+                        </apply>
+                        <cn cellml:units="dimensionless">1</cn>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>beta_n</ci>
+                <apply>
+                    <times/>
+                    <cn cellml:units="per_millisec">0.125</cn>
+                    <apply>
+                        <exp/>
+                        <apply>
+                            <divide/>
+                            <ci>V</ci>
+                            <cn cellml:units="millivolt">80</cn>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>n</ci>
+                </apply>
+                <apply>
+                    <minus/>
+                    <apply>
+                        <times/>
+                        <ci>alpha_n</ci>
+                        <apply>
+                            <minus/>
+                            <cn cellml:units="dimensionless">1</cn>
+                            <ci>n</ci>
+                        </apply>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <ci>beta_n</ci>
+                        <ci>n</ci>
+                    </apply>
+                </apply>
+            </apply>
+        </math>
+    </component>
+    <connection>
+        <map_components component_1="environment" component_2="potassium_channel"/>
+        <map_variables variable_1="V" variable_2="V"/>
+        <map_variables variable_1="t" variable_2="t"/>
+    </connection>
+    <connection>
+        <map_components component_1="potassium_channel" component_2="potassium_channel_n_gate"/>
+        <map_variables variable_1="V" variable_2="V"/>
+        <map_variables variable_1="t" variable_2="t"/>
+        <map_variables variable_1="n" variable_2="n"/>
+    </connection>
+    <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+        <rdf:Description xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" rdf:about="#id_000000001">
+            <isVersionOf xmlns="http://biomodels.net/biology-qualifiers/">
+                <rdf:Description xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" rdf:about="http://identifiers.org/go/GO:0008076"/>
+            </isVersionOf>
+        </rdf:Description>
+        <rdf:Description xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" rdf:about="#id_000000002">
+            <isVersionOf xmlns="http://biomodels.net/biology-qualifiers/">
+                <rdf:Description xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" rdf:about="http://identifiers.org/chebi/CHEBI:29103"/>
+            </isVersionOf>
+        </rdf:Description>
+        <rdf:Description xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" rdf:about="#id_000000003">
+            <isVersionOf xmlns="http://biomodels.net/biology-qualifiers/">
+                <rdf:Description xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" rdf:about="http://identifiers.org/chebi/CHEBI:29103"/>
+            </isVersionOf>
+        </rdf:Description>
+    </rdf:RDF>
+</model>

@@ -1,0 +1,79 @@
+<?xml version='1.0'?>
+<model name="Lorenz" xmlns="http://www.cellml.org/cellml/1.0#" xmlns:cellml="http://www.cellml.org/cellml/1.0#">
+    <component name="main">
+        <variable initial_value="0" name="t" units="dimensionless"/>
+        <variable initial_value="1" name="x" units="dimensionless"/>
+        <variable initial_value="1" name="y" units="dimensionless"/>
+        <variable initial_value="1" name="z" units="dimensionless"/>
+        <variable initial_value="10" name="sigma" units="dimensionless"/>
+        <variable initial_value="28" name="rho" units="dimensionless"/>
+        <variable initial_value="2.66667" name="beta" units="dimensionless"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>x</ci>
+                </apply>
+                <apply>
+                    <times/>
+                    <ci>sigma</ci>
+                    <apply>
+                        <minus/>
+                        <ci>y</ci>
+                        <ci>x</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>y</ci>
+                </apply>
+                <apply>
+                    <minus/>
+                    <apply>
+                        <times/>
+                        <ci>x</ci>
+                        <apply>
+                            <minus/>
+                            <ci>rho</ci>
+                            <ci>z</ci>
+                        </apply>
+                    </apply>
+                    <ci>y</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>z</ci>
+                </apply>
+                <apply>
+                    <minus/>
+                    <apply>
+                        <times/>
+                        <ci>x</ci>
+                        <ci>y</ci>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <ci>beta</ci>
+                        <ci>z</ci>
+                    </apply>
+                </apply>
+            </apply>
+        </math>
+    </component>
+</model>

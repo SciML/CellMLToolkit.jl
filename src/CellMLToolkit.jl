@@ -7,10 +7,6 @@ using SymbolicUtils: FnType, Sym, operation, arguments
 using EzXML
 using Memoize
 
-# include("utils.jl")
-# export curl_exposures
-
-# include("cellml.jl")
 include("structures.jl")
 include("accessors.jl")
 include("components.jl")
