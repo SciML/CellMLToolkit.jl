@@ -1,0 +1,484 @@
+<?xml version='1.0'?>
+<model name="Noble_1962" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <import xlink:href="Noble62_Na_channel.cellml">
+        <component component_ref="sodium_channel" name="Na_channel"/>
+    </import>
+    <import xlink:href="Noble62_K_channel.cellml">
+        <component component_ref="potassium_channel" name="K_channel"/>
+    </import>
+    <import xlink:href="Noble62_L_channel.cellml">
+        <component component_ref="leakage_channel" name="L_channel"/>
+    </import>
+    <import xlink:href="Noble62_units.cellml">
+        <units name="mV" units_ref="mV"/>
+        <units name="ms" units_ref="ms"/>
+        <units name="mM" units_ref="mM"/>
+        <units name="microF" units_ref="microF"/>
+        <units name="microA" units_ref="microA"/>
+        <units name="mS" units_ref="mS"/>
+    </import>
+    <import xlink:href="Noble62_parameters.cellml">
+        <component component_ref="parameters" name="parameters"/>
+    </import>
+    <connection>
+        <map_components component_1="parameters" component_2="membrane"/>
+        <map_variables variable_1="Ki" variable_2="Ki"/>
+        <map_variables variable_1="Ko" variable_2="Ko"/>
+        <map_variables variable_1="Nai" variable_2="Nai"/>
+        <map_variables variable_1="Nao" variable_2="Nao"/>
+    </connection>
+    <component name="environment">
+        <variable initial_value="0" name="t" public_interface="out" units="ms"/>
+    </component>
+    <group>
+        <relationship_ref relationship="encapsulation"/>
+        <component_ref component="membrane">
+            <component_ref component="Na_channel"/>
+            <component_ref component="K_channel"/>
+            <component_ref component="L_channel"/>
+        </component_ref>
+    </group>
+    <component name="membrane">
+        <variable initial_value="-85" name="V" private_interface="out" public_interface="out" units="mV"/>
+        <variable name="t" private_interface="out" public_interface="in" units="ms"/>
+        <variable initial_value="12" name="Cm" units="microF"/>
+        <variable name="Ki" private_interface="out" public_interface="in" units="mM"/>
+        <variable name="Ko" private_interface="out" public_interface="in" units="mM"/>
+        <variable name="Nai" private_interface="out" public_interface="in" units="mM"/>
+        <variable name="Nao" private_interface="out" public_interface="in" units="mM"/>
+        <variable name="i_Na" private_interface="in" public_interface="out" units="microA"/>
+        <variable name="i_K" private_interface="in" public_interface="out" units="microA"/>
+        <variable name="i_L" private_interface="in" public_interface="out" units="microA"/>
+        <variable name="g_Na" private_interface="in" units="mS"/>
+        <variable name="h" private_interface="in" units="dimensionless"/>
+        <variable name="m" private_interface="in" units="dimensionless"/>
+        <variable name="g_K1" private_interface="in" units="mS"/>
+        <variable name="g_K2" private_interface="in" units="mS"/>
+        <variable name="n" private_interface="in" units="dimensionless"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>V</ci>
+                </apply>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <plus/>
+                            <ci>i_Na</ci>
+                            <ci>i_K</ci>
+                            <ci>i_L</ci>
+                        </apply>
+                    </apply>
+                    <ci>Cm</ci>
+                </apply>
+            </apply>
+        </math>
+    </component>
+    <connection>
+        <map_components component_1="environment" component_2="membrane"/>
+        <map_variables variable_1="t" variable_2="t"/>
+    </connection>
+    <connection>
+        <map_components component_1="membrane" component_2="Na_channel"/>
+        <map_variables variable_1="V" variable_2="V"/>
+        <map_variables variable_1="t" variable_2="t"/>
+        <map_variables variable_1="Nai" variable_2="Nai"/>
+        <map_variables variable_1="Nao" variable_2="Nao"/>
+        <map_variables variable_1="i_Na" variable_2="i_Na"/>
+        <map_variables variable_1="g_Na" variable_2="g_Na"/>
+        <map_variables variable_1="h" variable_2="h"/>
+        <map_variables variable_1="m" variable_2="m"/>
+    </connection>
+    <connection>
+        <map_components component_1="membrane" component_2="K_channel"/>
+        <map_variables variable_1="V" variable_2="V"/>
+        <map_variables variable_1="t" variable_2="t"/>
+        <map_variables variable_1="Ki" variable_2="Ki"/>
+        <map_variables variable_1="Ko" variable_2="Ko"/>
+        <map_variables variable_1="i_K" variable_2="i_K"/>
+        <map_variables variable_1="g_K1" variable_2="g_K1"/>
+        <map_variables variable_1="g_K2" variable_2="g_K2"/>
+        <map_variables variable_1="n" variable_2="n"/>
+    </connection>
+    <connection>
+        <map_components component_1="membrane" component_2="L_channel"/>
+        <map_variables variable_1="V" variable_2="V"/>
+        <map_variables variable_1="i_L" variable_2="i_L"/>
+    </connection>
+    <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+        <rdf:Description rdf:about="rdf:#bde132e3-049c-4da1-8e0a-b4d71b59075d" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+            <rdf:type xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+                <rdf:Description rdf:about="http://www.w3.org/1999/02/22-rdf-syntax-ns#Seq" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+            </rdf:type>
+            <rdf:_1 xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+                <rdf:Description rdf:about="rdf:#da0ccc23-6611-4043-a2fa-3c4c3c5cd673" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+            </rdf:_1>
+        </rdf:Description>
+        <rdf:Description rdf:about="rdf:#da0ccc23-6611-4043-a2fa-3c4c3c5cd673" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+            <rdf:type xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+                <rdf:Description rdf:about="http://www.cellml.org/bqs/1.0#Person" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+            </rdf:type>
+            <vCard:N xmlns:vCard="http://www.w3.org/2001/vcard-rdf/3.0#">
+                <rdf:Description rdf:about="rdf:#668ac89a-7e3f-4741-b844-d9fccc1d635d" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+            </vCard:N>
+        </rdf:Description>
+        <rdf:Description rdf:about="rdf:#e5a5bd71-3824-4f00-a109-83d494a47634" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+            <vCard:FN xml:lang="en" xmlns:vCard="http://www.w3.org/2001/vcard-rdf/3.0#" xmlns:xml="http://www.w3.org/XML/1998/namespace">Catherine Lloyd</vCard:FN>
+        </rdf:Description>
+        <rdf:Description rdf:about="rdf:#e56a5760-9087-425d-add3-5226ae63d572" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+            <dc:title xml:lang="en" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:xml="http://www.w3.org/XML/1998/namespace">Journal of Physiology</dc:title>
+        </rdf:Description>
+        <rdf:Description rdf:about="rdf:#668ac89a-7e3f-4741-b844-d9fccc1d635d" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+            <vCard:Given xml:lang="en" xmlns:vCard="http://www.w3.org/2001/vcard-rdf/3.0#" xmlns:xml="http://www.w3.org/XML/1998/namespace">D</vCard:Given>
+            <vCard:Family xml:lang="en" xmlns:vCard="http://www.w3.org/2001/vcard-rdf/3.0#" xmlns:xml="http://www.w3.org/XML/1998/namespace">Noble</vCard:Family>
+        </rdf:Description>
+        <rdf:Description rdf:about="rdf:#bab8bf9e-26fc-484f-a5b4-2c4a97a1d123" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+            <dcterms:W3CDTF xml:lang="en" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:xml="http://www.w3.org/XML/1998/namespace">1962-01-01</dcterms:W3CDTF>
+        </rdf:Description>
+        <rdf:Description rdf:about="rdf:#aea6598d-b850-4aa6-9bb7-76452adba692" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+            <bqs:Pubmed_id xml:lang="en" xmlns:bqs="http://www.cellml.org/bqs/1.0#" xmlns:xml="http://www.w3.org/XML/1998/namespace">14480151</bqs:Pubmed_id>
+            <bqs:JournalArticle xmlns:bqs="http://www.cellml.org/bqs/1.0#">
+                <rdf:Description rdf:about="rdf:#9e8fe311-1b9c-477b-a358-d83c2537bbf3" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+            </bqs:JournalArticle>
+        </rdf:Description>
+        <rdf:Description rdf:about="rdf:#9e8fe311-1b9c-477b-a358-d83c2537bbf3" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+            <dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">
+                <rdf:Description rdf:about="rdf:#bde132e3-049c-4da1-8e0a-b4d71b59075d" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+            </dc:creator>
+            <dc:title xml:lang="en" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:xml="http://www.w3.org/XML/1998/namespace">A Modification of the Hodgkin-Huxley Equations Applicable to Purkinje Fibre Action and Pace-Maker Potentials</dc:title>
+            <bqs:volume xml:lang="en" xmlns:bqs="http://www.cellml.org/bqs/1.0#" xmlns:xml="http://www.w3.org/XML/1998/namespace">160</bqs:volume>
+            <bqs:first_page xml:lang="en" xmlns:bqs="http://www.cellml.org/bqs/1.0#" xmlns:xml="http://www.w3.org/XML/1998/namespace">317</bqs:first_page>
+            <bqs:Journal xmlns:bqs="http://www.cellml.org/bqs/1.0#">
+                <rdf:Description rdf:about="rdf:#e56a5760-9087-425d-add3-5226ae63d572" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+            </bqs:Journal>
+            <dcterms:issued xmlns:dcterms="http://purl.org/dc/terms/">
+                <rdf:Description rdf:about="rdf:#bab8bf9e-26fc-484f-a5b4-2c4a97a1d123" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+            </dcterms:issued>
+            <bqs:last_page xml:lang="en" xmlns:bqs="http://www.cellml.org/bqs/1.0#" xmlns:xml="http://www.w3.org/XML/1998/namespace">352</bqs:last_page>
+        </rdf:Description>
+        <rdf:Description rdf:about="rdf:#017e298c-f99c-41cf-8439-d6a0723656eb" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+            <dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">
+                <rdf:Description rdf:about="rdf:#e5a5bd71-3824-4f00-a109-83d494a47634" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+            </dc:creator>
+            <rdf:value xml:lang="en" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xml="http://www.w3.org/XML/1998/namespace">This is the CellML description of Noble's 1962 mathematical model of Purkinje fibre action and pace-maker potentials.  The equations formulated by Hodgkin and Huxley (1952) to describe the electrical activity of squid nerve have been modified to describe the action and pace-maker potentials of the Purkinje fibres of the heart.</rdf:value>
+        </rdf:Description>
+        <rdf:Description rdf:about="#noble_1962" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+            <cmeta:comment xmlns:cmeta="http://www.cellml.org/metadata/1.0#">
+                <rdf:Description rdf:about="rdf:#017e298c-f99c-41cf-8439-d6a0723656eb" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+            </cmeta:comment>
+            <bqs:reference xmlns:bqs="http://www.cellml.org/bqs/1.0#">
+                <rdf:Description rdf:about="rdf:#aea6598d-b850-4aa6-9bb7-76452adba692" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+            </bqs:reference>
+            <bqs:reference xmlns:bqs="http://www.cellml.org/bqs/1.0#">
+                <rdf:Description rdf:nodeID="n1" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+            </bqs:reference>
+        </rdf:Description>
+        <rdf:Description rdf:about="#id_00001" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+            <isVersionOf xmlns="http://biomodels.net/biology-qualifiers/">
+                <rdf:Description rdf:about="http://identifiers.org/go/GO:0042391" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+            </isVersionOf>
+            <isVersionOf xmlns="http://biomodels.net/biology-qualifiers/">
+                <rdf:Description rdf:about="http://identifiers.org/go/GO:0060075" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+            </isVersionOf>
+            <isVersionOf xmlns="http://biomodels.net/biology-qualifiers/">
+                <rdf:Description rdf:about="http://identifiers.org/go/GO:0030322" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+            </isVersionOf>
+            <isVersionOf xmlns="http://biomodels.net/biology-qualifiers/">
+                <rdf:Description rdf:about="http://identifiers.org/go/GO:0005272" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+            </isVersionOf>
+            <isVersionOf xmlns="http://biomodels.net/biology-qualifiers/">
+                <rdf:Description rdf:about="http://identifiers.org/go/GO:0034706" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+            </isVersionOf>
+            <isVersionOf xmlns="http://biomodels.net/biology-qualifiers/">
+                <rdf:Description rdf:about="http://identifiers.org/go/GO:0005248" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+            </isVersionOf>
+            <isVersionOf xmlns="http://biomodels.net/biology-qualifiers/">
+                <rdf:Description rdf:about="http://identifiers.org/go/GO:0001518" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+            </isVersionOf>
+            <isVersionOf xmlns="http://biomodels.net/biology-qualifiers/">
+                <rdf:Description rdf:about="http://identifiers.org/go/GO:0005267" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+            </isVersionOf>
+            <isVersionOf xmlns="http://biomodels.net/biology-qualifiers/">
+                <rdf:Description rdf:about="http://identifiers.org/go/GO:0034705" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+            </isVersionOf>
+            <isVersionOf xmlns="http://biomodels.net/biology-qualifiers/">
+                <rdf:Description rdf:about="http://identifiers.org/go/GO:0005249" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+            </isVersionOf>
+            <isVersionOf xmlns="http://biomodels.net/biology-qualifiers/">
+                <rdf:Description rdf:about="http://identifiers.org/go/GO:0008076" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+            </isVersionOf>
+        </rdf:Description>
+        <rdf:Description rdf:about="#id_00002" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+            <isVersionOf xmlns="http://biomodels.net/biology-qualifiers/">
+                <rdf:Description rdf:about="http://identifiers.org/go/GO:0005272" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+            </isVersionOf>
+            <isVersionOf xmlns="http://biomodels.net/biology-qualifiers/">
+                <rdf:Description rdf:about="http://identifiers.org/go/GO:0034706" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+            </isVersionOf>
+            <isVersionOf xmlns="http://biomodels.net/biology-qualifiers/">
+                <rdf:Description rdf:about="http://identifiers.org/go/GO:0005248" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+            </isVersionOf>
+            <isVersionOf xmlns="http://biomodels.net/biology-qualifiers/">
+                <rdf:Description rdf:about="http://identifiers.org/go/GO:0001518" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+            </isVersionOf>
+        </rdf:Description>
+        <rdf:Description rdf:about="#id_00003" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+            <isVersionOf xmlns="http://biomodels.net/biology-qualifiers/">
+                <rdf:Description rdf:about="http://identifiers.org/go/GO:0005272" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+            </isVersionOf>
+            <isVersionOf xmlns="http://biomodels.net/biology-qualifiers/">
+                <rdf:Description rdf:about="http://identifiers.org/go/GO:0034706" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+            </isVersionOf>
+            <isVersionOf xmlns="http://biomodels.net/biology-qualifiers/">
+                <rdf:Description rdf:about="http://identifiers.org/go/GO:0005248" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+            </isVersionOf>
+            <isVersionOf xmlns="http://biomodels.net/biology-qualifiers/">
+                <rdf:Description rdf:about="http://identifiers.org/go/GO:0001518" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+            </isVersionOf>
+        </rdf:Description>
+        <rdf:Description rdf:about="#id_00004" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+            <isVersionOf xmlns="http://biomodels.net/biology-qualifiers/">
+                <rdf:Description rdf:about="http://identifiers.org/go/GO:0005272" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+            </isVersionOf>
+            <isVersionOf xmlns="http://biomodels.net/biology-qualifiers/">
+                <rdf:Description rdf:about="http://identifiers.org/go/GO:0034706" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+            </isVersionOf>
+            <isVersionOf xmlns="http://biomodels.net/biology-qualifiers/">
+                <rdf:Description rdf:about="http://identifiers.org/go/GO:0005248" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+            </isVersionOf>
+            <isVersionOf xmlns="http://biomodels.net/biology-qualifiers/">
+                <rdf:Description rdf:about="http://identifiers.org/go/GO:0001518" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+            </isVersionOf>
+        </rdf:Description>
+        <rdf:Description rdf:about="#id_00005" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+            <isVersionOf xmlns="http://biomodels.net/biology-qualifiers/">
+                <rdf:Description rdf:about="http://identifiers.org/go/GO:0005267" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+            </isVersionOf>
+            <isVersionOf xmlns="http://biomodels.net/biology-qualifiers/">
+                <rdf:Description rdf:about="http://identifiers.org/go/GO:0034705" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+            </isVersionOf>
+            <isVersionOf xmlns="http://biomodels.net/biology-qualifiers/">
+                <rdf:Description rdf:about="http://identifiers.org/go/GO:0005249" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+            </isVersionOf>
+            <isVersionOf xmlns="http://biomodels.net/biology-qualifiers/">
+                <rdf:Description rdf:about="http://identifiers.org/go/GO:0008076" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+            </isVersionOf>
+        </rdf:Description>
+        <rdf:Description rdf:about="#id_00006" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+            <isVersionOf xmlns="http://biomodels.net/biology-qualifiers/">
+                <rdf:Description rdf:about="http://identifiers.org/go/GO:0005267" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+            </isVersionOf>
+            <isVersionOf xmlns="http://biomodels.net/biology-qualifiers/">
+                <rdf:Description rdf:about="http://identifiers.org/go/GO:0034705" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+            </isVersionOf>
+            <isVersionOf xmlns="http://biomodels.net/biology-qualifiers/">
+                <rdf:Description rdf:about="http://identifiers.org/go/GO:0005249" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+            </isVersionOf>
+            <isVersionOf xmlns="http://biomodels.net/biology-qualifiers/">
+                <rdf:Description rdf:about="http://identifiers.org/go/GO:0008076" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+            </isVersionOf>
+        </rdf:Description>
+        <rdf:Description rdf:about="#id_00007" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+            <isVersionOf xmlns="http://biomodels.net/biology-qualifiers/">
+                <rdf:Description rdf:about="http://identifiers.org/go/GO:0022840" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+            </isVersionOf>
+            <isVersionOf xmlns="http://biomodels.net/biology-qualifiers/">
+                <rdf:Description rdf:about="http://identifiers.org/go/GO:0005254" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+            </isVersionOf>
+            <isVersionOf xmlns="http://biomodels.net/biology-qualifiers/">
+                <rdf:Description rdf:about="http://identifiers.org/go/GO:0034707" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+            </isVersionOf>
+        </rdf:Description>
+        <rdf:Description rdf:about="#id_00008" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+            <isVersionOf xmlns="http://biomodels.net/biology-qualifiers/">
+                <rdf:Description rdf:about="http://identifiers.org/go/GO:0022840" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+            </isVersionOf>
+            <isVersionOf xmlns="http://biomodels.net/biology-qualifiers/">
+                <rdf:Description rdf:about="http://identifiers.org/go/GO:0005254" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+            </isVersionOf>
+            <isVersionOf xmlns="http://biomodels.net/biology-qualifiers/">
+                <rdf:Description rdf:about="http://identifiers.org/go/GO:0034707" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+            </isVersionOf>
+        </rdf:Description>
+        <rdf:Description rdf:about="#id_00009" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+            <isVersionOf xmlns="http://biomodels.net/biology-qualifiers/">
+                <rdf:Description rdf:about="http://identifiers.org/go/GO:0042391" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+            </isVersionOf>
+            <isVersionOf xmlns="http://biomodels.net/biology-qualifiers/">
+                <rdf:Description rdf:about="http://identifiers.org/go/GO:0060075" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+            </isVersionOf>
+            <isVersionOf xmlns="http://biomodels.net/biology-qualifiers/">
+                <rdf:Description rdf:about="http://identifiers.org/go/GO:0030322" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+            </isVersionOf>
+            <isVersionOf xmlns="http://biomodels.net/biology-qualifiers/">
+                <rdf:Description rdf:about="http://identifiers.org/go/GO:0005272" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+            </isVersionOf>
+            <isVersionOf xmlns="http://biomodels.net/biology-qualifiers/">
+                <rdf:Description rdf:about="http://identifiers.org/go/GO:0034706" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+            </isVersionOf>
+            <isVersionOf xmlns="http://biomodels.net/biology-qualifiers/">
+                <rdf:Description rdf:about="http://identifiers.org/go/GO:0005248" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+            </isVersionOf>
+            <isVersionOf xmlns="http://biomodels.net/biology-qualifiers/">
+                <rdf:Description rdf:about="http://identifiers.org/go/GO:0001518" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+            </isVersionOf>
+            <isVersionOf xmlns="http://biomodels.net/biology-qualifiers/">
+                <rdf:Description rdf:about="http://identifiers.org/go/GO:0005267" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+            </isVersionOf>
+            <isVersionOf xmlns="http://biomodels.net/biology-qualifiers/">
+                <rdf:Description rdf:about="http://identifiers.org/go/GO:0034705" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+            </isVersionOf>
+            <isVersionOf xmlns="http://biomodels.net/biology-qualifiers/">
+                <rdf:Description rdf:about="http://identifiers.org/go/GO:0005249" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+            </isVersionOf>
+            <isVersionOf xmlns="http://biomodels.net/biology-qualifiers/">
+                <rdf:Description rdf:about="http://identifiers.org/go/GO:0008076" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+            </isVersionOf>
+        </rdf:Description>
+        <rdf:Description rdf:about="#id_00010" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+            <isVersionOf xmlns="http://biomodels.net/biology-qualifiers/">
+                <rdf:Description rdf:about="http://identifiers.org/go/GO:0005272" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+            </isVersionOf>
+            <isVersionOf xmlns="http://biomodels.net/biology-qualifiers/">
+                <rdf:Description rdf:about="http://identifiers.org/go/GO:0034706" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+            </isVersionOf>
+            <isVersionOf xmlns="http://biomodels.net/biology-qualifiers/">
+                <rdf:Description rdf:about="http://identifiers.org/go/GO:0005248" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+            </isVersionOf>
+            <isVersionOf xmlns="http://biomodels.net/biology-qualifiers/">
+                <rdf:Description rdf:about="http://identifiers.org/go/GO:0001518" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+            </isVersionOf>
+        </rdf:Description>
+        <rdf:Description rdf:about="#id_00011" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+            <isVersionOf xmlns="http://biomodels.net/biology-qualifiers/">
+                <rdf:Description rdf:about="http://identifiers.org/go/GO:0005272" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+            </isVersionOf>
+            <isVersionOf xmlns="http://biomodels.net/biology-qualifiers/">
+                <rdf:Description rdf:about="http://identifiers.org/go/GO:0034706" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+            </isVersionOf>
+            <isVersionOf xmlns="http://biomodels.net/biology-qualifiers/">
+                <rdf:Description rdf:about="http://identifiers.org/go/GO:0005248" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+            </isVersionOf>
+            <isVersionOf xmlns="http://biomodels.net/biology-qualifiers/">
+                <rdf:Description rdf:about="http://identifiers.org/go/GO:0001518" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+            </isVersionOf>
+        </rdf:Description>
+        <rdf:Description rdf:about="#id_00012" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+            <isVersionOf xmlns="http://biomodels.net/biology-qualifiers/">
+                <rdf:Description rdf:about="http://identifiers.org/go/GO:0005272" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+            </isVersionOf>
+            <isVersionOf xmlns="http://biomodels.net/biology-qualifiers/">
+                <rdf:Description rdf:about="http://identifiers.org/go/GO:0034706" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+            </isVersionOf>
+            <isVersionOf xmlns="http://biomodels.net/biology-qualifiers/">
+                <rdf:Description rdf:about="http://identifiers.org/go/GO:0005248" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+            </isVersionOf>
+            <isVersionOf xmlns="http://biomodels.net/biology-qualifiers/">
+                <rdf:Description rdf:about="http://identifiers.org/go/GO:0001518" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+            </isVersionOf>
+        </rdf:Description>
+        <rdf:Description rdf:about="#id_00013" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+            <isVersionOf xmlns="http://biomodels.net/biology-qualifiers/">
+                <rdf:Description rdf:about="http://identifiers.org/go/GO:0005272" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+            </isVersionOf>
+            <isVersionOf xmlns="http://biomodels.net/biology-qualifiers/">
+                <rdf:Description rdf:about="http://identifiers.org/go/GO:0034706" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+            </isVersionOf>
+            <isVersionOf xmlns="http://biomodels.net/biology-qualifiers/">
+                <rdf:Description rdf:about="http://identifiers.org/go/GO:0005248" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+            </isVersionOf>
+            <isVersionOf xmlns="http://biomodels.net/biology-qualifiers/">
+                <rdf:Description rdf:about="http://identifiers.org/go/GO:0001518" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+            </isVersionOf>
+            <isVersionOf xmlns="http://biomodels.net/biology-qualifiers/">
+                <rdf:Description rdf:about="http://identifiers.org/go/GO:0005267" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+            </isVersionOf>
+            <isVersionOf xmlns="http://biomodels.net/biology-qualifiers/">
+                <rdf:Description rdf:about="http://identifiers.org/go/GO:0034705" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+            </isVersionOf>
+            <isVersionOf xmlns="http://biomodels.net/biology-qualifiers/">
+                <rdf:Description rdf:about="http://identifiers.org/go/GO:0005249" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+            </isVersionOf>
+            <isVersionOf xmlns="http://biomodels.net/biology-qualifiers/">
+                <rdf:Description rdf:about="http://identifiers.org/go/GO:0008076" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+            </isVersionOf>
+        </rdf:Description>
+        <rdf:Description rdf:about="#id_00014" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+            <isVersionOf xmlns="http://biomodels.net/biology-qualifiers/">
+                <rdf:Description rdf:about="http://identifiers.org/go/GO:0005272" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+            </isVersionOf>
+            <isVersionOf xmlns="http://biomodels.net/biology-qualifiers/">
+                <rdf:Description rdf:about="http://identifiers.org/go/GO:0034706" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+            </isVersionOf>
+            <isVersionOf xmlns="http://biomodels.net/biology-qualifiers/">
+                <rdf:Description rdf:about="http://identifiers.org/go/GO:0005248" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+            </isVersionOf>
+            <isVersionOf xmlns="http://biomodels.net/biology-qualifiers/">
+                <rdf:Description rdf:about="http://identifiers.org/go/GO:0001518" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+            </isVersionOf>
+        </rdf:Description>
+        <rdf:Description rdf:about="#id_00015" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+            <isVersionOf xmlns="http://biomodels.net/biology-qualifiers/">
+                <rdf:Description rdf:about="http://identifiers.org/go/GO:0005272" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+            </isVersionOf>
+            <isVersionOf xmlns="http://biomodels.net/biology-qualifiers/">
+                <rdf:Description rdf:about="http://identifiers.org/go/GO:0034706" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+            </isVersionOf>
+            <isVersionOf xmlns="http://biomodels.net/biology-qualifiers/">
+                <rdf:Description rdf:about="http://identifiers.org/go/GO:0005248" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+            </isVersionOf>
+            <isVersionOf xmlns="http://biomodels.net/biology-qualifiers/">
+                <rdf:Description rdf:about="http://identifiers.org/go/GO:0001518" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+            </isVersionOf>
+        </rdf:Description>
+        <rdf:Description rdf:about="#id_00016" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+            <isVersionOf xmlns="http://biomodels.net/biology-qualifiers/">
+                <rdf:Description rdf:about="http://identifiers.org/go/GO:0005267" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+            </isVersionOf>
+            <isVersionOf xmlns="http://biomodels.net/biology-qualifiers/">
+                <rdf:Description rdf:about="http://identifiers.org/go/GO:0034705" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+            </isVersionOf>
+            <isVersionOf xmlns="http://biomodels.net/biology-qualifiers/">
+                <rdf:Description rdf:about="http://identifiers.org/go/GO:0005249" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+            </isVersionOf>
+            <isVersionOf xmlns="http://biomodels.net/biology-qualifiers/">
+                <rdf:Description rdf:about="http://identifiers.org/go/GO:0008076" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+            </isVersionOf>
+        </rdf:Description>
+        <rdf:Description rdf:about="#id_00017" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+            <isVersionOf xmlns="http://biomodels.net/biology-qualifiers/">
+                <rdf:Description rdf:about="http://identifiers.org/go/GO:0005267" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+            </isVersionOf>
+            <isVersionOf xmlns="http://biomodels.net/biology-qualifiers/">
+                <rdf:Description rdf:about="http://identifiers.org/go/GO:0034705" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+            </isVersionOf>
+            <isVersionOf xmlns="http://biomodels.net/biology-qualifiers/">
+                <rdf:Description rdf:about="http://identifiers.org/go/GO:0005249" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+            </isVersionOf>
+            <isVersionOf xmlns="http://biomodels.net/biology-qualifiers/">
+                <rdf:Description rdf:about="http://identifiers.org/go/GO:0008076" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+            </isVersionOf>
+        </rdf:Description>
+        <rdf:Description rdf:about="#id_00018" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+            <isVersionOf xmlns="http://biomodels.net/biology-qualifiers/">
+                <rdf:Description rdf:about="http://identifiers.org/go/GO:0005267" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+            </isVersionOf>
+            <isVersionOf xmlns="http://biomodels.net/biology-qualifiers/">
+                <rdf:Description rdf:about="http://identifiers.org/go/GO:0034705" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+            </isVersionOf>
+            <isVersionOf xmlns="http://biomodels.net/biology-qualifiers/">
+                <rdf:Description rdf:about="http://identifiers.org/go/GO:0005249" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+            </isVersionOf>
+            <isVersionOf xmlns="http://biomodels.net/biology-qualifiers/">
+                <rdf:Description rdf:about="http://identifiers.org/go/GO:0008076" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+            </isVersionOf>
+        </rdf:Description>
+    </rdf:RDF>
+</model>

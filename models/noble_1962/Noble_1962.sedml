@@ -1,0 +1,219 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<sedML level="1" version="2" xmlns="http://sed-ml.org/sed-ml/level1/version2" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <listOfSimulations>
+        <uniformTimeCourse id="simulation1" initialTime="0" numberOfPoints="5000" outputEndTime="5000" outputStartTime="0">
+            <algorithm kisaoID="KISAO:0000019">
+                <listOfAlgorithmParameters>
+                    <algorithmParameter kisaoID="KISAO:0000211" value="1e-07"/>
+                    <algorithmParameter kisaoID="KISAO:0000475" value="BDF"/>
+                    <algorithmParameter kisaoID="KISAO:0000481" value="true"/>
+                    <algorithmParameter kisaoID="KISAO:0000476" value="Newton"/>
+                    <algorithmParameter kisaoID="KISAO:0000477" value="Dense"/>
+                    <algorithmParameter kisaoID="KISAO:0000480" value="0"/>
+                    <algorithmParameter kisaoID="KISAO:0000415" value="500"/>
+                    <algorithmParameter kisaoID="KISAO:0000467" value="0"/>
+                    <algorithmParameter kisaoID="KISAO:0000478" value="Banded"/>
+                    <algorithmParameter kisaoID="KISAO:0000209" value="1e-07"/>
+                    <algorithmParameter kisaoID="KISAO:0000479" value="0"/>
+                </listOfAlgorithmParameters>
+            </algorithm>
+        </uniformTimeCourse>
+    </listOfSimulations>
+    <listOfModels>
+        <model id="model" language="urn:sedml:language:cellml.1_1" source="Noble_1962.cellml"/>
+    </listOfModels>
+    <listOfTasks>
+        <repeatedTask id="repeatedTask" range="once" resetModel="true">
+            <listOfRanges>
+                <vectorRange id="once">
+                    <value> 1 </value>
+                </vectorRange>
+            </listOfRanges>
+            <listOfSubTasks>
+                <subTask order="1" task="task1"/>
+            </listOfSubTasks>
+        </repeatedTask>
+        <task id="task1" modelReference="model" simulationReference="simulation1"/>
+    </listOfTasks>
+    <listOfDataGenerators>
+        <dataGenerator id="xDataGenerator1_1">
+            <listOfVariables>
+                <variable id="xVariable1_1" target="/cellml:model/cellml:component[@name='environment']/cellml:variable[@name='t']" taskReference="repeatedTask"/>
+            </listOfVariables>
+            <math xmlns="http://www.w3.org/1998/Math/MathML">
+                <ci> xVariable1_1 </ci>
+            </math>
+        </dataGenerator>
+        <dataGenerator id="yDataGenerator1_1">
+            <listOfVariables>
+                <variable id="yVariable1_1" target="/cellml:model/cellml:component[@name='membrane']/cellml:variable[@name='V']" taskReference="repeatedTask"/>
+            </listOfVariables>
+            <math xmlns="http://www.w3.org/1998/Math/MathML">
+                <ci> yVariable1_1 </ci>
+            </math>
+        </dataGenerator>
+        <dataGenerator id="xDataGenerator2_1">
+            <listOfVariables>
+                <variable id="xVariable2_1" target="/cellml:model/cellml:component[@name='environment']/cellml:variable[@name='t']" taskReference="repeatedTask"/>
+            </listOfVariables>
+            <math xmlns="http://www.w3.org/1998/Math/MathML">
+                <ci> xVariable2_1 </ci>
+            </math>
+        </dataGenerator>
+        <dataGenerator id="yDataGenerator2_1">
+            <listOfVariables>
+                <variable id="yVariable2_1" target="/cellml:model/cellml:component[@name='membrane']/cellml:variable[@name='i_Na']" taskReference="repeatedTask"/>
+            </listOfVariables>
+            <math xmlns="http://www.w3.org/1998/Math/MathML">
+                <ci> yVariable2_1 </ci>
+            </math>
+        </dataGenerator>
+        <dataGenerator id="xDataGenerator2_2">
+            <listOfVariables>
+                <variable id="xVariable2_2" target="/cellml:model/cellml:component[@name='environment']/cellml:variable[@name='t']" taskReference="repeatedTask"/>
+            </listOfVariables>
+            <math xmlns="http://www.w3.org/1998/Math/MathML">
+                <ci> xVariable2_2 </ci>
+            </math>
+        </dataGenerator>
+        <dataGenerator id="yDataGenerator2_2">
+            <listOfVariables>
+                <variable id="yVariable2_2" target="/cellml:model/cellml:component[@name='membrane']/cellml:variable[@name='i_K']" taskReference="repeatedTask"/>
+            </listOfVariables>
+            <math xmlns="http://www.w3.org/1998/Math/MathML">
+                <ci> yVariable2_2 </ci>
+            </math>
+        </dataGenerator>
+        <dataGenerator id="xDataGenerator3_1">
+            <listOfVariables>
+                <variable id="xVariable3_1" target="/cellml:model/cellml:component[@name='environment']/cellml:variable[@name='t']" taskReference="repeatedTask"/>
+            </listOfVariables>
+            <math xmlns="http://www.w3.org/1998/Math/MathML">
+                <ci> xVariable3_1 </ci>
+            </math>
+        </dataGenerator>
+        <dataGenerator id="yDataGenerator3_1">
+            <listOfVariables>
+                <variable id="yVariable3_1" target="/cellml:model/cellml:component[@name='membrane']/cellml:variable[@name='g_Na']" taskReference="repeatedTask"/>
+            </listOfVariables>
+            <math xmlns="http://www.w3.org/1998/Math/MathML">
+                <ci> yVariable3_1 </ci>
+            </math>
+        </dataGenerator>
+        <dataGenerator id="xDataGenerator4_1">
+            <listOfVariables>
+                <variable id="xVariable4_1" target="/cellml:model/cellml:component[@name='environment']/cellml:variable[@name='t']" taskReference="repeatedTask"/>
+            </listOfVariables>
+            <math xmlns="http://www.w3.org/1998/Math/MathML">
+                <ci> xVariable4_1 </ci>
+            </math>
+        </dataGenerator>
+        <dataGenerator id="yDataGenerator4_1">
+            <listOfVariables>
+                <variable id="yVariable4_1" target="/cellml:model/cellml:component[@name='membrane']/cellml:variable[@name='g_K1']" taskReference="repeatedTask"/>
+            </listOfVariables>
+            <math xmlns="http://www.w3.org/1998/Math/MathML">
+                <ci> yVariable4_1 </ci>
+            </math>
+        </dataGenerator>
+        <dataGenerator id="xDataGenerator4_2">
+            <listOfVariables>
+                <variable id="xVariable4_2" target="/cellml:model/cellml:component[@name='environment']/cellml:variable[@name='t']" taskReference="repeatedTask"/>
+            </listOfVariables>
+            <math xmlns="http://www.w3.org/1998/Math/MathML">
+                <ci> xVariable4_2 </ci>
+            </math>
+        </dataGenerator>
+        <dataGenerator id="yDataGenerator4_2">
+            <listOfVariables>
+                <variable id="yVariable4_2" target="/cellml:model/cellml:component[@name='membrane']/cellml:variable[@name='g_K2']" taskReference="repeatedTask"/>
+            </listOfVariables>
+            <math xmlns="http://www.w3.org/1998/Math/MathML">
+                <ci> yVariable4_2 </ci>
+            </math>
+        </dataGenerator>
+        <dataGenerator id="xDataGenerator5_1">
+            <listOfVariables>
+                <variable id="xVariable5_1" target="/cellml:model/cellml:component[@name='environment']/cellml:variable[@name='t']" taskReference="repeatedTask"/>
+            </listOfVariables>
+            <math xmlns="http://www.w3.org/1998/Math/MathML">
+                <ci> xVariable5_1 </ci>
+            </math>
+        </dataGenerator>
+        <dataGenerator id="yDataGenerator5_1">
+            <listOfVariables>
+                <variable id="yVariable5_1" target="/cellml:model/cellml:component[@name='membrane']/cellml:variable[@name='h']" taskReference="repeatedTask"/>
+            </listOfVariables>
+            <math xmlns="http://www.w3.org/1998/Math/MathML">
+                <ci> yVariable5_1 </ci>
+            </math>
+        </dataGenerator>
+        <dataGenerator id="xDataGenerator5_2">
+            <listOfVariables>
+                <variable id="xVariable5_2" target="/cellml:model/cellml:component[@name='environment']/cellml:variable[@name='t']" taskReference="repeatedTask"/>
+            </listOfVariables>
+            <math xmlns="http://www.w3.org/1998/Math/MathML">
+                <ci> xVariable5_2 </ci>
+            </math>
+        </dataGenerator>
+        <dataGenerator id="yDataGenerator5_2">
+            <listOfVariables>
+                <variable id="yVariable5_2" target="/cellml:model/cellml:component[@name='membrane']/cellml:variable[@name='m']" taskReference="repeatedTask"/>
+            </listOfVariables>
+            <math xmlns="http://www.w3.org/1998/Math/MathML">
+                <ci> yVariable5_2 </ci>
+            </math>
+        </dataGenerator>
+        <dataGenerator id="xDataGenerator6_1">
+            <listOfVariables>
+                <variable id="xVariable6_1" target="/cellml:model/cellml:component[@name='environment']/cellml:variable[@name='t']" taskReference="repeatedTask"/>
+            </listOfVariables>
+            <math xmlns="http://www.w3.org/1998/Math/MathML">
+                <ci> xVariable6_1 </ci>
+            </math>
+        </dataGenerator>
+        <dataGenerator id="yDataGenerator6_1">
+            <listOfVariables>
+                <variable id="yVariable6_1" target="/cellml:model/cellml:component[@name='membrane']/cellml:variable[@name='n']" taskReference="repeatedTask"/>
+            </listOfVariables>
+            <math xmlns="http://www.w3.org/1998/Math/MathML">
+                <ci> yVariable6_1 </ci>
+            </math>
+        </dataGenerator>
+    </listOfDataGenerators>
+    <listOfOutputs>
+        <plot2D id="plot1">
+            <listOfCurves>
+                <curve id="curve1_1" logX="false" logY="false" xDataReference="xDataGenerator1_1" yDataReference="yDataGenerator1_1"/>
+            </listOfCurves>
+        </plot2D>
+        <plot2D id="plot2">
+            <listOfCurves>
+                <curve id="curve2_1" logX="false" logY="false" xDataReference="xDataGenerator2_1" yDataReference="yDataGenerator2_1"/>
+                <curve id="curve2_2" logX="false" logY="false" xDataReference="xDataGenerator2_2" yDataReference="yDataGenerator2_2"/>
+            </listOfCurves>
+        </plot2D>
+        <plot2D id="plot3">
+            <listOfCurves>
+                <curve id="curve3_1" logX="false" logY="false" xDataReference="xDataGenerator3_1" yDataReference="yDataGenerator3_1"/>
+            </listOfCurves>
+        </plot2D>
+        <plot2D id="plot4">
+            <listOfCurves>
+                <curve id="curve4_1" logX="false" logY="false" xDataReference="xDataGenerator4_1" yDataReference="yDataGenerator4_1"/>
+                <curve id="curve4_2" logX="false" logY="false" xDataReference="xDataGenerator4_2" yDataReference="yDataGenerator4_2"/>
+            </listOfCurves>
+        </plot2D>
+        <plot2D id="plot5">
+            <listOfCurves>
+                <curve id="curve5_1" logX="false" logY="false" xDataReference="xDataGenerator5_1" yDataReference="yDataGenerator5_1"/>
+                <curve id="curve5_2" logX="false" logY="false" xDataReference="xDataGenerator5_2" yDataReference="yDataGenerator5_2"/>
+            </listOfCurves>
+        </plot2D>
+        <plot2D id="plot6">
+            <listOfCurves>
+                <curve id="curve6_1" logX="false" logY="false" xDataReference="xDataGenerator6_1" yDataReference="yDataGenerator6_1"/>
+            </listOfCurves>
+        </plot2D>
+    </listOfOutputs>
+</sedML>

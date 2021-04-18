@@ -1,0 +1,31 @@
+<?xml version='1.0'?>
+<model name="Noble62_units" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <units name="ms">
+        <unit prefix="milli" units="second"/>
+    </units>
+    <units name="per_ms">
+        <unit exponent="-1" prefix="milli" units="second"/>
+    </units>
+    <units name="mV">
+        <unit prefix="milli" units="volt"/>
+    </units>
+    <units name="mM">
+        <unit prefix="milli" units="mole"/>
+    </units>
+    <units name="per_mV">
+        <unit exponent="-1" prefix="milli" units="volt"/>
+    </units>
+    <units name="per_mV_ms">
+        <unit exponent="-1" units="mV"/>
+        <unit exponent="-1" units="ms"/>
+    </units>
+    <units name="mS">
+        <unit prefix="milli" units="siemens"/>
+    </units>
+    <units name="microF">
+        <unit prefix="micro" units="farad"/>
+    </units>
+    <units name="microA">
+        <unit prefix="micro" units="ampere"/>
+    </units>
+</model>

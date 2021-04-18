@@ -1,0 +1,50 @@
+<?xml version='1.0'?>
+<model name="van_der_pol_model" xmlns="http://www.cellml.org/cellml/1.0#" xmlns:cellml="http://www.cellml.org/cellml/1.0#">
+    <component name="main">
+        <variable initial_value="0" name="t" units="dimensionless"/>
+        <variable initial_value="-2" name="x" units="dimensionless"/>
+        <variable initial_value="0" name="y" units="dimensionless"/>
+        <variable initial_value="1" name="mu" units="dimensionless"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>x</ci>
+                </apply>
+                <ci>y</ci>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>y</ci>
+                </apply>
+                <apply>
+                    <minus/>
+                    <apply>
+                        <times/>
+                        <ci>mu</ci>
+                        <apply>
+                            <minus/>
+                            <cn cellml:units="dimensionless">1</cn>
+                            <apply>
+                                <power/>
+                                <ci>x</ci>
+                                <cn cellml:units="dimensionless">2</cn>
+                            </apply>
+                        </apply>
+                        <ci>y</ci>
+                    </apply>
+                    <ci>x</ci>
+                </apply>
+            </apply>
+        </math>
+    </component>
+</model>

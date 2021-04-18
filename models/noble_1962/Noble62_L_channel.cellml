@@ -1,0 +1,38 @@
+<?xml version='1.0'?>
+<model name="leakage_ion_channel" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <import xlink:href="Noble62_units.cellml">
+        <units name="mV" units_ref="mV"/>
+        <units name="ms" units_ref="ms"/>
+        <units name="mS" units_ref="mS"/>
+        <units name="microA" units_ref="microA"/>
+    </import>
+    <!--    def comp environment as
+        var V: mV {init: 0, pub: out};
+        var t: ms {pub: out};
+        ode(V,t) = 1{dimensionless};
+    enddef;-->
+    <component name="leakage_channel">
+        <variable name="V" public_interface="in" units="mV"/>
+        <variable initial_value="0.075" name="g_L" units="mS"/>
+        <variable initial_value="-60" name="E_L" units="mV"/>
+        <variable name="i_L" public_interface="out" units="microA"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>i_L</ci>
+                <apply>
+                    <times/>
+                    <ci>g_L</ci>
+                    <apply>
+                        <minus/>
+                        <ci>V</ci>
+                        <ci>E_L</ci>
+                    </apply>
+                </apply>
+            </apply>
+        </math>
+    </component>
+    <!--    def map between environment and leakage_channel for
+        vars V and V;
+    enddef;-->
+</model>

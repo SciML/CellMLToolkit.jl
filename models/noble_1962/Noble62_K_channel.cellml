@@ -1,0 +1,255 @@
+<?xml version='1.0'?>
+<model name="potassium_ion_channel" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <import xlink:href="Noble62_units.cellml">
+        <units name="mV" units_ref="mV"/>
+        <units name="ms" units_ref="ms"/>
+        <units name="mM" units_ref="mM"/>
+        <units name="per_ms" units_ref="per_ms"/>
+        <units name="per_mV" units_ref="per_mV"/>
+        <units name="per_mV_ms" units_ref="per_mV_ms"/>
+        <units name="mS" units_ref="mS"/>
+        <units name="microA" units_ref="microA"/>
+    </import>
+    <!--    def comp environment as
+        var V: mV {pub: out};
+        var t: ms {pub: out};
+        V = sel
+            case (t > 5{ms}) and (t < 15{ms}):
+                -85.0{mV};
+            otherwise:
+                0.0{mV};
+        endsel;
+    enddef;-->
+    <group>
+        <relationship_ref relationship="encapsulation"/>
+        <component_ref component="potassium_channel">
+            <component_ref component="potassium_channel_n_gate"/>
+        </component_ref>
+    </group>
+    <component name="potassium_channel">
+        <variable name="V" private_interface="out" public_interface="in" units="mV"/>
+        <variable name="t" private_interface="out" public_interface="in" units="ms"/>
+        <variable name="n" private_interface="in" public_interface="out" units="dimensionless"/>
+        <variable name="Ki" public_interface="in" units="mM"/>
+        <variable name="Ko" public_interface="in" units="mM"/>
+        <variable initial_value="25" name="RTF" units="mV"/>
+        <variable name="E_K" units="mV"/>
+        <variable name="g_K1" public_interface="out" units="mS"/>
+        <variable name="g_K2" public_interface="out" units="mS"/>
+        <variable name="i_K" public_interface="out" units="microA"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>E_K</ci>
+                <apply>
+                    <times/>
+                    <ci>RTF</ci>
+                    <apply>
+                        <ln/>
+                        <apply>
+                            <divide/>
+                            <ci>Ko</ci>
+                            <ci>Ki</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>g_K1</ci>
+                <apply>
+                    <plus/>
+                    <apply>
+                        <times/>
+                        <cn cellml:units="mS">1.2</cn>
+                        <apply>
+                            <exp/>
+                            <apply>
+                                <divide/>
+                                <apply>
+                                    <minus/>
+                                    <apply>
+                                        <plus/>
+                                        <ci>V</ci>
+                                        <cn cellml:units="mV">90</cn>
+                                    </apply>
+                                </apply>
+                                <cn cellml:units="mV">50</cn>
+                            </apply>
+                        </apply>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <cn cellml:units="mS">0.015</cn>
+                        <apply>
+                            <exp/>
+                            <apply>
+                                <divide/>
+                                <apply>
+                                    <plus/>
+                                    <ci>V</ci>
+                                    <cn cellml:units="mV">90</cn>
+                                </apply>
+                                <cn cellml:units="mV">60</cn>
+                            </apply>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>g_K2</ci>
+                <apply>
+                    <times/>
+                    <cn cellml:units="mS">1.2</cn>
+                    <apply>
+                        <power/>
+                        <ci>n</ci>
+                        <cn cellml:units="dimensionless">4</cn>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>i_K</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <plus/>
+                        <ci>g_K1</ci>
+                        <ci>g_K2</ci>
+                    </apply>
+                    <apply>
+                        <minus/>
+                        <ci>V</ci>
+                        <ci>E_K</ci>
+                    </apply>
+                </apply>
+            </apply>
+        </math>
+    </component>
+    <component name="potassium_channel_n_gate">
+        <variable name="V" public_interface="in" units="mV"/>
+        <variable name="t" public_interface="in" units="ms"/>
+        <variable initial_value="0.01" name="n" public_interface="out" units="dimensionless"/>
+        <variable name="alpha_n" units="per_ms"/>
+        <variable name="beta_n" units="per_ms"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>alpha_n</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <apply>
+                            <minus/>
+                            <cn cellml:units="per_mV_ms">0.0001</cn>
+                        </apply>
+                        <apply>
+                            <plus/>
+                            <ci>V</ci>
+                            <cn cellml:units="mV">50</cn>
+                        </apply>
+                    </apply>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <exp/>
+                            <apply>
+                                <divide/>
+                                <apply>
+                                    <minus/>
+                                    <apply>
+                                        <plus/>
+                                        <ci>V</ci>
+                                        <cn cellml:units="mV">50</cn>
+                                    </apply>
+                                </apply>
+                                <cn cellml:units="mV">10</cn>
+                            </apply>
+                        </apply>
+                        <cn cellml:units="dimensionless">1</cn>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>beta_n</ci>
+                <apply>
+                    <times/>
+                    <cn cellml:units="per_ms">0.0020</cn>
+                    <apply>
+                        <exp/>
+                        <apply>
+                            <divide/>
+                            <apply>
+                                <minus/>
+                                <apply>
+                                    <plus/>
+                                    <ci>V</ci>
+                                    <cn cellml:units="mV">90</cn>
+                                </apply>
+                            </apply>
+                            <cn cellml:units="mV">80</cn>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>n</ci>
+                </apply>
+                <apply>
+                    <minus/>
+                    <apply>
+                        <times/>
+                        <ci>alpha_n</ci>
+                        <apply>
+                            <minus/>
+                            <cn cellml:units="dimensionless">1</cn>
+                            <ci>n</ci>
+                        </apply>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <ci>beta_n</ci>
+                        <ci>n</ci>
+                    </apply>
+                </apply>
+            </apply>
+        </math>
+    </component>
+    <!--    def map between environment and potassium_channel for
+        vars V and V;
+        vars t and t;
+    enddef;-->
+    <connection>
+        <map_components component_1="potassium_channel" component_2="potassium_channel_n_gate"/>
+        <map_variables variable_1="V" variable_2="V"/>
+        <map_variables variable_1="t" variable_2="t"/>
+        <map_variables variable_1="n" variable_2="n"/>
+    </connection>
+    <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+        <rdf:Description xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" rdf:about="#id_000000001">
+            <isVersionOf xmlns="http://biomodels.net/biology-qualifiers/">
+                <rdf:Description xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" rdf:about="http://identifiers.org/go/GO:0008076"/>
+            </isVersionOf>
+        </rdf:Description>
+        <rdf:Description xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" rdf:about="#id_000000002">
+            <isVersionOf xmlns="http://biomodels.net/biology-qualifiers/">
+                <rdf:Description xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" rdf:about="http://identifiers.org/chebi/CHEBI:29103"/>
+            </isVersionOf>
+        </rdf:Description>
+        <rdf:Description xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" rdf:about="#id_000000003">
+            <isVersionOf xmlns="http://biomodels.net/biology-qualifiers/">
+                <rdf:Description xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" rdf:about="http://identifiers.org/chebi/CHEBI:29103"/>
+            </isVersionOf>
+        </rdf:Description>
+    </rdf:RDF>
+</model>

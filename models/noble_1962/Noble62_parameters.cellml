@@ -1,0 +1,12 @@
+<?xml version='1.0'?>
+<model name="Noble62_parameters" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <import xlink:href="Noble62_units.cellml">
+        <units name="mM" units_ref="mM"/>
+    </import>
+    <component name="parameters">
+        <variable initial_value="140" name="Ki" public_interface="out" units="mM"/>
+        <variable initial_value="2.5" name="Ko" public_interface="out" units="mM"/>
+        <variable initial_value="30" name="Nai" public_interface="out" units="mM"/>
+        <variable initial_value="140" name="Nao" public_interface="out" units="mM"/>
+    </component>
+</model>

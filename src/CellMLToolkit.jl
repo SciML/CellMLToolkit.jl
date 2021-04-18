@@ -7,10 +7,6 @@ using SymbolicUtils: FnType, Sym, operation, arguments
 using EzXML
 using Memoize
 
-# include("utils.jl")
-# export curl_exposures
-
-# include("cellml.jl")
 include("structures.jl")
 include("accessors.jl")
 include("components.jl")
@@ -41,7 +37,7 @@ export read_cellml, parse_cellml
 export list_params, list_states
 export readxml, getxml, getsys
 export update_list!
-
+ 
 getsys(ml::CellModel) = ml.sys
 
 """

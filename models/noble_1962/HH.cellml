@@ -1,0 +1,126 @@
+<?xml version='1.0'?>
+<model name="HH" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <import xlink:href="sodium_ion_channel.cellml">
+        <component component_ref="sodium_channel" name="Na_channel"/>
+    </import>
+    <import xlink:href="potassium_ion_channel.cellml">
+        <component component_ref="potassium_channel" name="K_channel"/>
+    </import>
+    <import xlink:href="leakage_ion_channel.cellml">
+        <component component_ref="leakage_channel" name="L_channel"/>
+    </import>
+    <units name="millisec">
+        <unit prefix="milli" units="second"/>
+    </units>
+    <units name="millivolt">
+        <unit prefix="milli" units="volt"/>
+    </units>
+    <units name="microA_per_cm2">
+        <unit prefix="micro" units="ampere"/>
+        <unit exponent="-2" prefix="centi" units="metre"/>
+    </units>
+    <units name="microF_per_cm2">
+        <unit prefix="micro" units="farad"/>
+        <unit exponent="-2" prefix="centi" units="metre"/>
+    </units>
+    <component name="environment">
+        <variable initial_value="-85.0" name="V" public_interface="out" units="millivolt"/>
+        <variable name="t" public_interface="out" units="millisec"/>
+    </component>
+    <group>
+        <relationship_ref relationship="encapsulation"/>
+        <component_ref component="membrane">
+            <component_ref component="Na_channel"/>
+            <component_ref component="K_channel"/>
+            <component_ref component="L_channel"/>
+        </component_ref>
+    </group>
+    <connection>
+        <map_components component_1="environment" component_2="membrane"/>
+        <map_variables variable_1="V" variable_2="V"/>
+        <map_variables variable_1="t" variable_2="t"/>
+    </connection>
+    <connection>
+        <map_components component_1="membrane" component_2="Na_channel"/>
+        <map_variables variable_1="V" variable_2="V"/>
+        <map_variables variable_1="t" variable_2="t"/>
+        <map_variables variable_1="i_Na" variable_2="i_Na"/>
+    </connection>
+    <connection>
+        <map_components component_1="membrane" component_2="K_channel"/>
+        <map_variables variable_1="V" variable_2="V"/>
+        <map_variables variable_1="t" variable_2="t"/>
+        <map_variables variable_1="i_K" variable_2="i_K"/>
+    </connection>
+    <connection>
+        <map_components component_1="membrane" component_2="L_channel"/>
+        <map_variables variable_1="V" variable_2="V"/>
+        <map_variables variable_1="i_L" variable_2="i_L"/>
+    </connection>
+    <component name="membrane">
+        <variable name="V" private_interface="out" public_interface="in" units="millivolt"/>
+        <variable name="t" private_interface="out" public_interface="in" units="millisec"/>
+        <variable name="i_Na" private_interface="in" public_interface="out" units="microA_per_cm2"/>
+        <variable name="i_K" private_interface="in" public_interface="out" units="microA_per_cm2"/>
+        <variable name="i_L" private_interface="in" public_interface="out" units="microA_per_cm2"/>
+        <variable initial_value="1" name="Cm" units="microF_per_cm2"/>
+        <variable name="i_Stim" units="microA_per_cm2"/>
+        <variable name="i_Tot" units="microA_per_cm2"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>i_Stim</ci>
+                <piecewise>
+                    <piece>
+                        <cn cellml:units="microA_per_cm2">200</cn>
+                        <apply>
+                            <and/>
+                            <apply>
+                                <geq/>
+                                <ci>t</ci>
+                                <cn cellml:units="millisec">1</cn>
+                            </apply>
+                            <apply>
+                                <leq/>
+                                <ci>t</ci>
+                                <cn cellml:units="millisec">1.2</cn>
+                            </apply>
+                        </apply>
+                    </piece>
+                    <otherwise>
+                        <cn cellml:units="microA_per_cm2">0</cn>
+                    </otherwise>
+                </piecewise>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>i_Tot</ci>
+                <apply>
+                    <plus/>
+                    <ci>i_Stim</ci>
+                    <ci>i_Na</ci>
+                    <ci>i_K</ci>
+                    <ci>i_L</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>V</ci>
+                </apply>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <minus/>
+                        <ci>i_Tot</ci>
+                    </apply>
+                    <ci>Cm</ci>
+                </apply>
+            </apply>
+        </math>
+    </component>
+</model>
