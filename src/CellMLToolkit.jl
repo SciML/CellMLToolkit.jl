@@ -1,4 +1,4 @@
-# module CellMLToolkit
+module CellMLToolkit
 
 using MathML
 
@@ -37,7 +37,7 @@ export read_cellml, parse_cellml
 export list_params, list_states
 export readxml, getxml, getsys
 export update_list!
- 
+
 getsys(ml::CellModel) = ml.sys
 
 """
@@ -70,4 +70,4 @@ function update_list!(l, sym, val)
     end
 end
 
-# end # module
+end # module
