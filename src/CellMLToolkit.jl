@@ -19,7 +19,7 @@ function read_cellml(path::AbstractString, tspan)
 end
 
 ##############################################################################
-x
+
 export CellModel, ODEProblem
 export read_cellml, parse_cellml
 export list_params, list_states
