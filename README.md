@@ -23,7 +23,8 @@ To install, run
 ```Julia
   using CellMLToolkit, OrdinaryDiffEq, Plots
 
-  prob = read_cellml("models/lorenz.cellml.xml", (0,100.0))
+  ml = CellModel("models/lorenz.cellml.xml")
+  prob = ODEProblem(ml, (0,100.0))
   sol = solve(prob)
   plot(sol, vars=(1,3))
 ```
@@ -38,22 +39,28 @@ and then
 
 ```julia
   model_path = joinpath(model_root, "lorenz.cellml.xml")
-  prob = read_cellml(model_path, (0,100.0))
+  ml = CellModel(model_path)
 ```
 
 ## Tutorial
 
-The models directory contains a few CellML model examples. Let's start with a simple one, the famous Lorenz equations!
+The models directory contains a few CellML model examples. Let's start with a simple one, the famous Lorenz equations.
 
 ```Julia
   using CellMLToolkit
 
-  prob = read_cellml("models/lorenz.cellml.xml", (0,100.0))
+  ml = CellModel("models/lorenz.cellml.xml")
 ```
 
-Now, `prob` is an `ODEProblem` ready for integration. Here, `(0,100.0)` is the `tspan` parameter, describing the integration range of the independent variable.
-In addition to the model equations, the initial conditions and parameters are also read from the XML file and are available as `prob.u0` and `prob.p`, respectively.
-We can solve and visualize `prob` as
+Now, `ml` is a `CellModel` structure that contains both a list of the loaded XML files and their components (accessible as `ml.doc`) and a ModelingToolkit `ODESystem` that defines variables and dynamics and can be accessed as `getsys(ml)`.
+
+The next step is to convert `ml` into an `ODEProblem`, ready to be solved.
+
+```Julia
+  prob = ODEProblem(ml, (0,100.0))
+```
+Here, `(0,100.0)` is the `tspan` parameter, describing the integration range of the independent variable.
+In addition to the model equations, the initial conditions and parameters are also read from the XML file(s) and are available as `prob.u0` and `prob.ps`, respectively. We can solve and visualize `prob` as
 
 ```Julia
   using DifferentialEquations, Plots
@@ -69,31 +76,17 @@ As expected,
 Let's look at more complicated examples. The next one is the [ten Tusscher-Noble-Noble-Panfilov human left ventricular action potential model](https://journals.physiology.org/doi/full/10.1152/ajpheart.00794.2003). This is a mid-range electrophysiology model with 17 states variables and relatively good numerical stability.
 
 ```Julia
-  prob = read_cellml("models/tentusscher_noble_noble_panfilov_2004_a.cellml.xml", (0, 10000.0))
+  ml = CellModel("models/tentusscher_noble_noble_panfilov_2004_a.cellml.xml")
+  prob = ODEProblem(ml, (0, 10000.0))
   sol = solve(prob, TRBDF2(), dtmax=1.0)
   plot(sol, vars=12)
 ```
 
 ![](figures/ten.png)
 
-We can tell which variable to plot (vars=12, here) by looking at the output of 'list_states' (see below).
+We can tell which variable to plot (vars=12, here) by looking at the output of `list_states(ml)` (see below).
 
-Instead of directly generating an `ODEProblem` by calling `read_cellml`, we can use a two-step process with more control by first calling `CellModel` factory function:
-
-```Julia
-  ml = CellModel("models/tentusscher_noble_noble_panfilov_2004_a.cellml.xml")
-```
-
-`CellModel` is a light wrapper around an `ODESystem`. We can access the underlying `ODESystem` as `getsys(ml)` and the model XML as `getxml(ml)` (as an [EzXML](https://github.com/JuliaIO/EzXML.jl) tree). We can then generate an `ODEProblem` as
-
-```Julia
-  tspan = (0, 10000)
-  prob = ODEProblem(ml, tspan)
-  sol = solve(prob, TRBDF2(), dtmax=1.0)
-  plot(sol, vars=1)
-```
-
-One benefit of going through `CellModel` instead of direct `ODEProblem` generation is the ability to modify initial values and parameters. Let's look at the Beeler-Reuter model with 8 state variables:
+Let's see how we can modify the initial values and parameters. We will use the Beeler-Reuter model with 8 state variables as an example:
 
 ```Julia
   ml = CellModel("models/beeler_reuter_1977.cellml.xml")
@@ -161,7 +154,7 @@ For the next example, we chose a complex model to stress the ODE solvers: [the O
 
 ## Multi-file Models (Import)
 
-CellML specification allows for multi-file models. In these models, the top level CellML XML file imports components from other CellML files, which in turn may import from other files. CellMLToolkit supports this functionality. It assumes that *the top-level file and all the imported files reside in the same directory*. `models/noble_1962` contained one such example:
+CellML specification allows for models spanning multiple XML files. In these models, the top level CellML XML file imports components from other CellML files, which in turn may import from other files. CellMLToolkit supports this functionality. It assumes that *the top-level file and all the imported files reside in the same directory*. `models/noble_1962` contained one such example:
 
 ```julia
   ml = CellModel("models/noble_1962/Noble_1962.cellml")
