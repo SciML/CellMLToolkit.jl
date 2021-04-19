@@ -12,26 +12,14 @@ include("accessors.jl")
 include("components.jl")
 include("import.jl")
 
-"""
-    reads a CellML path or io and returns an ODEProblem
-"""
-function read_cellml(path, tspan)
-    xml = read_full_xml(path)
-    ml = CellModel(xml, process_components(xml))
-    ODEProblem(ml, tspan)
-end
-
-"""
-    parses a CellML XML string and returns an ODEProblem
-"""
-function parse_cellml(xmlstr::AbstractString, tspan)
-    xml = parsexml(xmlstr)
-    ml = CellModel(xml, process_components(xml))
+function read_cellml(path::AbstractString, tspan)
+    @warn "read_cellml is deprecated, please use CellModel"
+    ml = CellModel(path)
     ODEProblem(ml, tspan)
 end
 
 ##############################################################################
-
+x
 export CellModel, ODEProblem
 export read_cellml, parse_cellml
 export list_params, list_states
