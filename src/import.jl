@@ -136,3 +136,32 @@ function find_closure(doc::Document, l)
 
     [x for x in n if x ∉ l]
 end
+
+"""
+Given a path to a directory containing multiple CellML files.
+
+Returns the top level files.
+
+Used as a helper function with the CellML Physiome Model repositories.
+"""
+function list_top_cellml_files(dir)
+    files = filter(f->endswith(f, ".cellml"), readdir(dir))
+
+    if length(files) == 1
+        return joinpath.(dir, files)
+    end
+
+    imported = Set{String}()
+    for f in files
+        xml = readxml(joinpath(dir, f))
+        for n in CellMLToolkit.list_imports(xml)
+            push!(imported, n["xlink:href"])
+        end
+    end
+
+    if !isempty(imported)
+        printstyled("imported files are $imported\n"; color=:yellow)
+    end
+
+    joinpath.(dir, [f for f in files if f ∉ imported])
+end
