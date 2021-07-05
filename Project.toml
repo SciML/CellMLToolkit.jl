@@ -1,7 +1,7 @@
 name = "CellMLToolkit"
 uuid = "03cb29e0-1ef4-4721-aa24-cf58a006576f"
 authors = ["Shahriar Iravanian <siravan@svtsim.com>"]
-version = "2.4.5"
+version = "2.4.6"
 
 [deps]
 EzXML = "8f5d6c58-4d21-5cfd-889c-e3ad7ee6a615"
@@ -17,16 +17,15 @@ Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 EzXML = "1.1"
 MathML = "0.1"
 Memoize = "0.4"
-ModelingToolkit = "5.14.1"
+ModelingToolkit = "5.14.1, 5.21"
 Setfield = "0.7"
 SymbolicUtils = "0.10.2, 0.11, 0.12, 0.13"
 julia = "1.5"
 
 [extras]
-JSON3 = "0f8b85d8-7281-11e9-16c2-39a750bddbf1"
 ModelingToolkit = "961ee093-0014-501f-94e3-6117800e7a78"
 OrdinaryDiffEq = "1dea7af3-3e70-54e6-95c3-0bf5283fa5ed"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [targets]
-test = ["Test", "ModelingToolkit", "OrdinaryDiffEq", "JSON3"]
+test = ["Test", "ModelingToolkit", "OrdinaryDiffEq"]
