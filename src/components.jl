@@ -4,31 +4,13 @@ const cellml_ns(xml::EzXML.Document) = namespace(root(xml))
 const cellml_ns(node::EzXML.Node) = namespace(node)
 const mathml_ns = "http://www.w3.org/1998/Math/MathML"
 
-# create_var(x) = Num(Sym{Real}(Symbol(x))).val  # Num(Variable(Symbol(x))).val
-# create_var(x, iv) = Num(Sym{Symbolics.FnType{Tuple{Any},Real}}(Symbol(x)))(iv).val  # Num(Variable{Symbolics.FnType{Tuple{Any},Real}}(Symbol(x)))(iv).val
-
-create_var(x) = Num(Variable(Symbol(x))).val
-create_var(x, iv) = Num(Variable{Symbolics.FnType{Tuple{Any},Real}}(Symbol(x)))(iv).val
+create_var(x) = Symbolics.unwrap((@variables $x)[1])
+create_var(x, iv) = Symbolics.unwrap((@variables $x(iv))[1])
 
 function create_param(x)
-  p = Sym{Real}(Symbol(x))
-  ModelingToolkit.toparam(p)
+  y = Symbol(x)
+  first(@parameters $y)
 end
-
-# function create_var(x)
-#     @variables v
-#     ModelingToolkit.rename(v.val, Symbol(x))
-# end
-#
-# function create_var(x, iv)
-#     @variables v(iv)
-#     ModelingToolkit.rename(v.val, Symbol(x))
-# end
-#
-# function create_param(x)
-#     @parameters p
-#     ModelingToolkit.rename(p.val, Symbol(x))
-# end
 
 to_symbol(x::Symbol) = x
 to_symbol(x::AbstractString) = Symbol(x)
@@ -36,7 +18,7 @@ to_symbol(x::EzXML.Node) = Symbol(x["name"])
 to_symbol(comp::Component) = comp.name
 
 """
-    find_iv finds the unique independent variable    
+    find_iv finds the unique independent variable
 """
 find_iv(doc::Document) = infer_iv(doc)[:β]
 
@@ -245,8 +227,8 @@ function process_components(doc::Document; simplify=true)
     sys = ODESystem(
         translate_connections(doc, systems, class),
         get_ivₚ(doc),
-        systems=collect(values(systems))
-    )
+        systems=collect(values(systems)),
+        name = gensym(:cellml))
 
     if simplify
         sys = structural_simplify(sys)
@@ -289,9 +271,8 @@ function process_component(doc::Document, comp, class)
     end
 
     ivₚ = get_ivₚ(doc)
-    ps = [last(x) for x in values(pre_sub) if last(x) isa Sym && !isequal(last(x), ivₚ)]
-    states = [last(x) for x in values(pre_sub) if !(last(x) isa Sym)]
-
+    ps = [last(x) for x in values(pre_sub) if ModelingToolkit.isparameter(last(x)) && !isequal(last(x), ivₚ)]
+    states = [last(x) for x in values(pre_sub) if !ModelingToolkit.isparameter(last(x)) && !isequal(last(x), ivₚ)]
     ODESystem(eqs, ivₚ, states, ps; name=to_symbol(comp))
 end
 
