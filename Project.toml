@@ -19,7 +19,7 @@ MathML = "0.1.9"
 Memoize = "0.4"
 ModelingToolkit = "6"
 Setfield = "0.7"
-SymbolicUtils = "0.16"
+SymbolicUtils = "0.16, 0.17"
 julia = "1.6"
 
 [extras]
