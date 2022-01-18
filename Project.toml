@@ -1,7 +1,7 @@
 name = "CellMLToolkit"
 uuid = "03cb29e0-1ef4-4721-aa24-cf58a006576f"
 authors = ["Shahriar Iravanian <siravan@svtsim.com>"]
-version = "2.7.0"
+version = "2.7.1"
 
 [deps]
 EzXML = "8f5d6c58-4d21-5cfd-889c-e3ad7ee6a615"
@@ -18,7 +18,7 @@ EzXML = "1.1"
 MathML = "0.1.9"
 Memoize = "0.4"
 ModelingToolkit = "7, 8"
-Setfield = "0.7"
+Setfield = "0.8"
 SymbolicUtils = "0.16, 0.18, 0.19"
 julia = "1.6"
 
