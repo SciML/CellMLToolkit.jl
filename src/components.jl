@@ -8,8 +8,8 @@ create_var(x) = Symbolics.unwrap((@variables $x)[1])
 create_var(x, iv) = Symbolics.unwrap((@variables $x(iv))[1])
 
 function create_param(x)
-  y = Symbol(x)
-  first(@parameters $y)
+    y = Symbol(x)
+    first(@parameters $y)
 end
 
 to_symbol(x::Symbol) = x
@@ -63,7 +63,7 @@ end
     end
 
     groups = find_equivalence_groups(doc)
-    V = ∪([groups[Var(first(x),last(x))] for x in dv]...)
+    V = ∪([groups[Var(first(x), last(x))] for x in dv]...)
     syms = unique([v.var for v in V])
 
     if length(syms) == 1
@@ -90,7 +90,8 @@ names_to_varset(comp, l) = Set([make_var(comp, x) for x in l])
     comp that occur on the left-hand-side of an ODE or algebraic equation
 """
 function list_component_lhs(comp)
-    names_to_varset(comp, find_state_names(comp)) ∪ names_to_varset(comp, find_alg_names(comp))
+    names_to_varset(comp, find_state_names(comp)) ∪
+    names_to_varset(comp, find_alg_names(comp))
 end
 
 """
@@ -117,7 +118,7 @@ list_all_lhs(doc::Document) = ∪([list_component_lhs(c) for c in components(doc
 
     # phase 2: equivalence groups (sets) are merged according to the connections
     for conn in connections(doc)
-        for (u1,u2) in variables(conn)
+        for (u1, u2) in variables(conn)
             s = groups[u1] ∪ groups[u2]
             for x in s
                 groups[x] = s
@@ -156,7 +157,7 @@ end
 function translate_connections(doc::Document, systems, class)
     a = []
     for conn in connections(doc)
-        for (u1,u2) in variables(conn)
+        for (u1, u2) in variables(conn)
             if class[u1] && class[u2]
                 var1 = getproperty(systems[u1.comp], u1.var)
                 var2 = getproperty(systems[u2.comp], u2.var)
@@ -180,9 +181,10 @@ function pre_substitution(doc::Document, comp, class)
 
     vars = to_symbol.(list_component_variables(comp))
 
-    states = [create_var(x) => create_var(x, ivₚ) for x in vars if class[make_var(comp,x)]]
-    params = [create_var(x) => create_param(x) for x in vars if !class[make_var(comp,x)] && !isequal(x, ivₘ)]
-    ivsub =  [create_var(ivₘ) => ivₚ]
+    states = [create_var(x) => create_var(x, ivₚ) for x in vars if class[make_var(comp, x)]]
+    params = [create_var(x) => create_param(x)
+              for x in vars if !class[make_var(comp, x)] && !isequal(x, ivₘ)]
+    ivsub = [create_var(ivₘ) => ivₚ]
 
     return states ∪ params ∪ ivsub
 end
@@ -216,7 +218,7 @@ substitute_eqs(eqs, s) = [substitute(eq.lhs, s) ~ substitute(eq.rhs, s) for eq i
 
     use simplify=false only for debugging purposes!
 """
-function process_components(doc::Document; simplify=true)
+function process_components(doc::Document; simplify = true)
     extract_mathml.(doc.xmls)     # this is called here for the side-effect of disambiguiting equals
     infer_iv(doc)
 
@@ -224,11 +226,10 @@ function process_components(doc::Document; simplify=true)
     systems = subsystems(doc, class)
     post_sub = post_substitution(doc, systems)
 
-    sys = ODESystem(
-        translate_connections(doc, systems, class),
-        get_ivₚ(doc),
-        systems=collect(values(systems)),
-        name = gensym(:cellml))
+    sys = ODESystem(translate_connections(doc, systems, class),
+                    get_ivₚ(doc),
+                    systems = collect(values(systems)),
+                    name = gensym(:cellml))
 
     if simplify
         sys = structural_simplify(sys)
@@ -245,10 +246,8 @@ end
     class is the output of classify_variables
 """
 function subsystems(doc::Document, class)
-    Dict{Symbol,ODESystem}(
-        to_symbol(comp) => process_component(doc, comp, class)
-        for comp in components(doc)
-    )
+    Dict{Symbol, ODESystem}(to_symbol(comp) => process_component(doc, comp, class)
+                            for comp in components(doc))
 end
 
 """
@@ -271,9 +270,13 @@ function process_component(doc::Document, comp, class)
     end
 
     ivₚ = get_ivₚ(doc)
-    ps = [last(x) for x in values(pre_sub) if ModelingToolkit.isparameter(last(x)) && !isequal(last(x), ivₚ)]
-    states = [last(x) for x in values(pre_sub) if !ModelingToolkit.isparameter(last(x)) && !isequal(last(x), ivₚ)]
-    ODESystem(eqs, ivₚ, states, ps; name=to_symbol(comp))
+    ps = [last(x)
+          for x in values(pre_sub)
+          if ModelingToolkit.isparameter(last(x)) && !isequal(last(x), ivₚ)]
+    states = [last(x)
+              for x in values(pre_sub)
+              if !ModelingToolkit.isparameter(last(x)) && !isequal(last(x), ivₚ)]
+    ODESystem(eqs, ivₚ, states, ps; name = to_symbol(comp))
 end
 
 ###############################################################################
@@ -313,13 +316,12 @@ function find_list_value(doc::Document, names)
 
     for x in names
         u = split_sym(x)
-        u = haskey(syms,u) ? syms[u] : u
+        u = haskey(syms, u) ? syms[u] : u
         var = groups[u] ∩ varkeys
         if length(var) == 0
             error("value of $x is not found")
         end
         push!(vals, x => vars[first(var)])
-
     end
     return vals
 end

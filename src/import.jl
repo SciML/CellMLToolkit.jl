@@ -9,7 +9,7 @@ function populate_dependency!(doc, comp)
     end
 end
 
-function add_component!(doc, name, node, populate=true)
+function add_component!(doc, name, node, populate = true)
     comp = Component(name, node, Set{Symbol}())
     populate && populate_dependency!(doc, comp)
     push!(doc.comps, comp)
@@ -28,7 +28,7 @@ end
 
     If resolve = true, load_cellml also resolve the imported components.
 """
-function load_cellml(path; resolve=true)
+function load_cellml(path; resolve = true)
     xml = readxml(path)
     doc = Document(path, [xml], Component[], Connection[])
 
@@ -38,8 +38,8 @@ function load_cellml(path; resolve=true)
 
     for conn in list_connections(xml)
         c1, c2 = sym.(components_of(get_connection_component(conn)))
-        vars = [make_var(c1,v1) => make_var(c2,v2)
-                for (v1,v2) in variables_of.(list_connection_variables(conn))]
+        vars = [make_var(c1, v1) => make_var(c2, v2)
+                for (v1, v2) in variables_of.(list_connection_variables(conn))]
         add_connection!(doc, c1, c2, vars)
     end
 
@@ -103,9 +103,9 @@ function resolve_imports!(doc::Document)
         # third, we also need to import connections from the child CellML file
         for conn in connections(child)
             c1, c2 = components(conn)
-            if haskey(L,c1) && haskey(L,c2)
+            if haskey(L, c1) && haskey(L, c2)
                 d1, d2 = L[c1], L[c2]
-                vars = [Var(d1,v1.var) => Var(d2,v2.var) for (v1,v2) in conn.vars]
+                vars = [Var(d1, v1.var) => Var(d2, v2.var) for (v1, v2) in conn.vars]
                 add_connection!(doc, d1, d2, vars)
             end
         end
@@ -123,7 +123,7 @@ function find_closure(doc::Document, l)
     done = false
     while !done
         done = true
-        for (c1,c2) in components.(connections(doc))
+        for (c1, c2) in components.(connections(doc))
             if c1 ∈ n && c2 ∉ n
                 push!(n, c2)
                 done = false
@@ -145,7 +145,7 @@ Returns the top level files.
 Used as a helper function with the CellML Physiome Model repositories.
 """
 function list_top_cellml_files(dir)
-    files = filter(f->endswith(f, ".cellml"), readdir(dir))
+    files = filter(f -> endswith(f, ".cellml"), readdir(dir))
 
     if length(files) == 1
         return joinpath.(dir, files)
@@ -160,7 +160,7 @@ function list_top_cellml_files(dir)
     end
 
     if !isempty(imported)
-        printstyled("imported files are $imported\n"; color=:yellow)
+        printstyled("imported files are $imported\n"; color = :yellow)
     end
 
     joinpath.(dir, [f for f in files if f ∉ imported])

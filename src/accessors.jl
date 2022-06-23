@@ -16,36 +16,42 @@ nodeof(comp::Component) = comp.node
 """
     list_components returns the list of CellML <Component>s
 """
-list_components(xml) = findall("//x:model/x:component", root(xml), ["x"=>cellml_ns(xml)])
+list_components(xml) = findall("//x:model/x:component", root(xml), ["x" => cellml_ns(xml)])
 
 """
     get_model returns the single <model> element of a CellML file
 """
-get_model(xml) = findfirst("//x:model", root(xml), ["x"=>cellml_ns(xml)])
+get_model(xml) = findfirst("//x:model", root(xml), ["x" => cellml_ns(xml)])
 
 """
     get_component_variables returns the list of the variables of a component
     comp is an Ezxml(doc) as returned by list_components
 """
-list_component_variables(comp) = findall("./x:variable", nodeof(comp), ["x"=>cellml_ns(comp)])
+function list_component_variables(comp)
+    findall("./x:variable", nodeof(comp), ["x" => cellml_ns(comp)])
+end
 
 """
     list_initiated_variables returns all variables that have an initial_value
 """
 # list_initiated_variables(xml::EzXML.Document) = findall("//x:component/x:variable[@initial_value]", root(xml), ["x"=>cellml_ns(xml)])
 
-list_initiated_variables(comp::Component) = findall("./x:variable[@initial_value]", nodeof(comp), ["x"=>cellml_ns(comp)])
+function list_initiated_variables(comp::Component)
+    findall("./x:variable[@initial_value]", nodeof(comp), ["x" => cellml_ns(comp)])
+end
 
 """
     list_connections returns the list of <connection> nodes in the CellML document
 """
-list_connections(xml) = findall("//x:connection", root(xml), ["x"=>cellml_ns(xml)])
+list_connections(xml) = findall("//x:connection", root(xml), ["x" => cellml_ns(xml)])
 
 """
     get_connection_variables returns the pair of components for the given connection
     conn is an Ezxml(doc) node as returned by list_connections
 """
-get_connection_component(conn) = findfirst("./x:map_components", nodeof(conn), ["x"=>cellml_ns(conn)])
+function get_connection_component(conn)
+    findfirst("./x:map_components", nodeof(conn), ["x" => cellml_ns(conn)])
+end
 
 """
     components_of converts the output of get_connection_component to a pair
@@ -58,7 +64,9 @@ components_of(x) = (x["component_1"], x["component_2"])
     for the given connection
     conn is an Ezxml(doc) node as returned by list_connections
 """
-list_connection_variables(conn) = findall("./x:map_variables", nodeof(conn), ["x"=>cellml_ns(conn)])
+function list_connection_variables(conn)
+    findall("./x:map_variables", nodeof(conn), ["x" => cellml_ns(conn)])
+end
 
 """
     components_of converts the output of list_connection_variables to a pair
@@ -72,7 +80,7 @@ variables_of(x) = (x["variable_1"], x["variable_2"])
     comp is an Ezxml(doc) as returned by list_components
 """
 function find_state_names(comp)
-    nodes = findall("./y:math/y:apply", nodeof(comp), ["y"=>mathml_ns])
+    nodes = findall("./y:math/y:apply", nodeof(comp), ["y" => mathml_ns])
     names = String[]
     for n in nodes
         e = elements(n)
@@ -92,7 +100,7 @@ end
     comp is an Ezxml(doc) as returned by list_components
 """
 function find_alg_names(comp)
-    nodes = findall("./y:math/y:apply", nodeof(comp), ["y"=>mathml_ns])
+    nodes = findall("./y:math/y:apply", nodeof(comp), ["y" => mathml_ns])
     names = String[]
     for n in nodes
         e = elements(n)
@@ -107,31 +115,38 @@ end
     list_component_math returns a list of the math elements in the
     given component
 """
-list_component_math(comp) = findall("./y:math", nodeof(comp), ["y"=>mathml_ns])
+list_component_math(comp) = findall("./y:math", nodeof(comp), ["y" => mathml_ns])
 
-list_component_bvar(comp) = findall(".//y:math//y:bvar/y:ci", nodeof(comp), ["y"=>mathml_ns])
+function list_component_bvar(comp)
+    findall(".//y:math//y:bvar/y:ci", nodeof(comp), ["y" => mathml_ns])
+end
 
 """
     list_imports returns the list of <import> nodes in the CellML document
 """
-list_imports(xml) = findall("//x:import", get_model(xml), ["x"=>cellml_ns(xml)])
+list_imports(xml) = findall("//x:import", get_model(xml), ["x" => cellml_ns(xml)])
 
 """
     list_import_components returns the list of component nodes of the given
     import element
     node: an import node as returned by list_imports
 """
-list_import_components(node) = findall("./x:component", nodeof(node), ["x"=>cellml_ns(node)])
+function list_import_components(node)
+    findall("./x:component", nodeof(node), ["x" => cellml_ns(node)])
+end
 
 function list_encapsulation(doc, comp)
     name = string(nameof(comp))
     ns = cellml_ns(doc)
-    groups = parentnode.(findall("//x:group/x:relationship_ref[@relationship='encapsulation']", root(doc), ["x"=>ns]))
+    groups = parentnode.(findall("//x:group/x:relationship_ref[@relationship='encapsulation']",
+                                 root(doc), ["x" => ns]))
     if isempty(groups)  # CellML ver 2.0
-        return findall("//x:encapsulation//x:component_ref[@component='$name']//x:component_ref", root(doc), ["x"=>ns])
+        return findall("//x:encapsulation//x:component_ref[@component='$name']//x:component_ref",
+                       root(doc), ["x" => ns])
     else                # CellML ver 1.0 and 1.1
         for g in groups
-            nodes = findall(".//x:component_ref[@component='$name']//x:component_ref", g, ["x"=>ns])
+            nodes = findall(".//x:component_ref[@component='$name']//x:component_ref", g,
+                            ["x" => ns])
             if !isempty(nodes)
                 return nodes
             end

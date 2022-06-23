@@ -45,8 +45,9 @@ import ModelingToolkit.ODEProblem
     ODEProblem constructs an ODEProblem from a CellModel
 """
 function ODEProblem(ml::CellModel, tspan;
-        jac=false, level=1, p=last.(list_params(ml)), u0=last.(list_states(ml)))
-    ODEProblem(ml.sys, u0, tspan, p; jac=jac)
+                    jac = false, level = 1, p = last.(list_params(ml)),
+                    u0 = last.(list_states(ml)))
+    ODEProblem(ml.sys, u0, tspan, p; jac = jac)
 end
 
 function update_list!(l, sym, val)
