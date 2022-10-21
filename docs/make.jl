@@ -12,7 +12,7 @@ mathengine = MathJax3(Dict(:loader => Dict("load" => ["[tex]/require", "[tex]/ma
 
 makedocs(sitename = "CellMLToolkit.jl",
          authors = "Chris Rackauckas",
-         modules = [ModelingToolkit],
+         modules = [],
          clean = true, doctest = false,
          strict = [
              :doctest,
@@ -32,5 +32,5 @@ makedocs(sitename = "CellMLToolkit.jl",
              "Tutorial" => "tutorial.md",
          ])
 
-deploydocs(repo = "github.com/SciML/ModelingToolkit.jl.git";
+deploydocs(repo = "github.com/SciML/CellMLToolkit.jl.git";
            push_preview = true)
