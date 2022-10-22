@@ -1,6 +1,22 @@
 # CellMLToolkit.jl
 
+[![Join the chat at https://julialang.zulipchat.com #sciml-bridged](https://img.shields.io/static/v1?label=Zulip&message=chat&color=9558b2&labelColor=389826)](https://julialang.zulipchat.com/#narrow/stream/279055-sciml-bridged)
+[![Global Docs](https://img.shields.io/badge/docs-SciML-blue.svg)](https://docs.sciml.ai/CellMLToolkit/stable/)
+
+[![codecov](https://codecov.io/gh/SciML/CellMLToolkit.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/SciML/CellMLToolkit.jl)
+[![Build Status](https://github.com/SciML/CellMLToolkit.jl/workflows/CI/badge.svg)](https://github.com/SciML/CellMLToolkit.jl/actions?query=workflow%3ACI)
+
+[![ColPrac: Contributor's Guide on Collaborative Practices for Community Packages](https://img.shields.io/badge/ColPrac-Contributor's%20Guide-blueviolet)](https://github.com/SciML/ColPrac)
+[![SciML Code Style](https://img.shields.io/static/v1?label=code%20style&message=SciML&color=9558b2&labelColor=389826)](https://github.com/SciML/SciMLStyle)
+
 CellMLToolkit.jl is a Julia library that connects [CellML](http://cellml.org) models to [SciML](http://github.com/SciML), the Scientific Julia ecosystem. CellMLToolkit.jl acts as a bridge between CellML and ModelingToolkit.jl. It imports a CellML model (in XML) and emits a ModelingToolkit.jl intermediate representation (IR), which can then enter the SciML ecosystem.
+
+## Tutorials and Documentation
+
+For information on using the package,
+[see the stable documentation](https://docs.sciml.ai/CellMLToolkit/stable/). Use the
+[in-development documentation](https://docs.sciml.ai/CellMLToolkit/dev/) for the version of
+the documentation, which contains the unreleased features.
 
 ## CellML
 
@@ -10,12 +26,13 @@ CellMLToolkit.jl is a Julia library that connects [CellML](http://cellml.org) mo
 
 [SciML](http://github.com/SciML) is a collection of Julia libraries for open source scientific computing and machine learning. The centerpiece of SciML is [DifferentialEquations.jl](https://github.com/SciML/DifferentialEquations.jl), which provides a rich set of ordinary differential equations (ODE) solvers. One major peripheral component of SciML is [ModelingToolkit.jl](https://github.com/SciML/ModelingToolkit.jl). It is a modeling framework for high-performance symbolic-numeric computation in scientific computing and scientific machine learning. The core of ModelingToolkit.jl is an IR language to code the scientific problems of interest in a high level. Automatic code generation and differentiation allow for the generation of a usable model for the other components of SciML, such as DifferentialEquations.jl.
 
-## Install
+## Installation
 
-To install, run
+To install CellMLToolkit.jl, use the Julia package manager:
 
 ```julia
-  ] add CellMLToolkit
+using Pkg
+Pkg.add("CellMLToolkit")
 ```
 
 ## Simple Example
