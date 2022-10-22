@@ -25,7 +25,7 @@ makedocs(sitename = "CellMLToolkit.jl",
          format = Documenter.HTML(; analytics = "UA-90474609-3",
                                   assets = ["assets/favicon.ico"],
                                   mathengine,
-                                  canonical = "https://docs.sciml.ai/CellMLToolkit/stable",
+                                  canonical = "https://docs.sciml.ai/CellMLToolkit/stable/",
                                   prettyurls = (get(ENV, "CI", nothing) == "true")),
          pages = [
              "Home" => "index.md",
