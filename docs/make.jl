@@ -1,5 +1,8 @@
 using Documenter
 
+cp("./docs/Manifest.toml", "./docs/src/assets/Manifest.toml", force = true)
+cp("./docs/Project.toml", "./docs/src/assets/Project.toml", force = true)
+
 mathengine = MathJax3(Dict(:loader => Dict("load" => ["[tex]/require", "[tex]/mathtools"]),
                            :tex => Dict("inlineMath" => [["\$", "\$"], ["\\(", "\\)"]],
                                         "packages" => [
