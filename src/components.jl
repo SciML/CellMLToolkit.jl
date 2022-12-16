@@ -234,6 +234,11 @@ function process_components(doc::Document; simplify = true)
     if simplify
         sys = structural_simplify(sys)
         @set! sys.eqs = substitute_eqs(equations(sys), post_sub)
+
+        # Defaults need to be set after simplifying as otherwise parameters and
+        # states for which no defaults are available may still be present in
+        # the system
+        @set! sys.defaults = Dict(find_list_value(doc, vcat(parameters(sys), states(sys))))
     end
 
     return sys
