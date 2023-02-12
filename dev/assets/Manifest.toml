@@ -100,7 +100,7 @@ version = "0.5.1"
 deps = ["EzXML", "MathML", "Memoize", "ModelingToolkit", "Random", "Setfield", "SymbolicUtils", "Test"]
 path = "/home/runner/work/CellMLToolkit.jl/CellMLToolkit.jl"
 uuid = "03cb29e0-1ef4-4721-aa24-cf58a006576f"
-version = "2.9.2"
+version = "2.10.0"
 
 [[ChainRulesCore]]
 deps = ["Compat", "LinearAlgebra", "SparseArrays"]
