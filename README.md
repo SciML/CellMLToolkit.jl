@@ -6,10 +6,10 @@
 [![codecov](https://codecov.io/gh/SciML/CellMLToolkit.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/SciML/CellMLToolkit.jl)
 [![Build Status](https://github.com/SciML/CellMLToolkit.jl/workflows/CI/badge.svg)](https://github.com/SciML/CellMLToolkit.jl/actions?query=workflow%3ACI)
 
-[![ColPrac: Contributor's Guide on Collaborative Practices for Community Packages](https://img.shields.io/badge/ColPrac-Contributor's%20Guide-blueviolet)](https://github.com/SciML/ColPrac)
+[![ColPrac: Contributor's Guide on Collaborative Practices for Community Packages](https://img.shields.io/badge/ColPrac-Contributor%27s%20Guide-blueviolet)](https://github.com/SciML/ColPrac)
 [![SciML Code Style](https://img.shields.io/static/v1?label=code%20style&message=SciML&color=9558b2&labelColor=389826)](https://github.com/SciML/SciMLStyle)
 
-CellMLToolkit.jl is a Julia library that connects [CellML](http://cellml.org) models to [SciML](http://github.com/SciML), the Scientific Julia ecosystem. CellMLToolkit.jl acts as a bridge between CellML and ModelingToolkit.jl. It imports a CellML model (in XML) and emits a ModelingToolkit.jl intermediate representation (IR), which can then enter the SciML ecosystem.
+CellMLToolkit.jl is a Julia library that connects [CellML](https://cellml.org/) models to [SciML](http://github.com/SciML/), the Scientific Julia ecosystem. CellMLToolkit.jl acts as a bridge between CellML and ModelingToolkit.jl. It imports a CellML model (in XML) and emits a ModelingToolkit.jl intermediate representation (IR), which can then enter the SciML ecosystem.
 
 ## Tutorials and Documentation
 
@@ -55,8 +55,8 @@ Note that `model` is a directory of the CellMLToolkit package. You can find its 
 and then
 
 ```julia
-  model_path = joinpath(model_root, "lorenz.cellml.xml")
-  ml = CellModel(model_path)
+model_path = joinpath(model_root, "lorenz.cellml.xml")
+ml = CellModel(model_path)
 ```
 
 ## Tutorial
@@ -76,6 +76,7 @@ The next step is to convert `ml` into an `ODEProblem`, ready to be solved.
 ```Julia
   prob = ODEProblem(ml, (0,100.0))
 ```
+
 Here, `(0,100.0)` is the `tspan` parameter, describing the integration range of the independent variable.
 In addition to the model equations, the initial conditions and parameters are also read from the XML file(s) and are available as `prob.u0` and `prob.ps`, respectively. We can solve and visualize `prob` as
 
@@ -174,9 +175,9 @@ For the next example, we chose a complex model to stress the ODE solvers: [the O
 CellML specification allows for models spanning multiple XML files. In these models, the top level CellML XML file imports components from other CellML files, which in turn may import from other files. CellMLToolkit supports this functionality. It assumes that *the top-level file and all the imported files reside in the same directory*. `models/noble_1962` contained one such example:
 
 ```julia
-  ml = CellModel("models/noble_1962/Noble_1962.cellml")
-  prob = ODEProblem(ml, tspan)
-  sol = solve(prob, TRBDF2(), dtmax=0.5)
+ml = CellModel("models/noble_1962/Noble_1962.cellml")
+prob = ODEProblem(ml, tspan)
+sol = solve(prob, TRBDF2(), dtmax = 0.5)
 ```
 
 Note that the syntax is exactly the same as before. However, the list of the imported files are printed during `CellModel` generation:
@@ -196,7 +197,7 @@ Note that the syntax is exactly the same as before. However, the list of the imp
 Same as before, we can plot the output as
 
 ```julia
-  plot(sol, vars=2)
+plot(sol, vars = 2)
 ```
 
 ![](figures/noble_1962.png)

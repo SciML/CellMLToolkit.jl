@@ -16,7 +16,10 @@ mathengine = MathJax3(Dict(:loader => Dict("load" => ["[tex]/require", "[tex]/ma
 makedocs(sitename = "CellMLToolkit.jl",
          authors = "Chris Rackauckas",
          modules = Module[],
-         clean = true, doctest = false,
+         clean = true, doctest = false, linkcheck = true,
+         linkcheck_ignore = [
+             "https://journals.physiology.org/doi/full/10.1152/ajpheart.00794.2003",
+         ],
          strict = [
              :doctest,
              :linkcheck,

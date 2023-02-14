@@ -67,14 +67,14 @@ There are three `list` functions: `list_states`, `list_params`, and `list_initia
 Here, we are interested in `list_params`. Let's go back to the ten Tusscher-Noble-Noble-Panfilov model and list its params:
 
 ```julia
-  ml = CellModel("models/tentusscher_noble_noble_panfilov_2004_a.cellml.xml")
-  p = list_params(ml)
-  display(p)
+ml = CellModel("models/tentusscher_noble_noble_panfilov_2004_a.cellml.xml")
+p = list_params(ml)
+display(p)
 ```
 
 We get a list of the 45 parameters:
 
-```julia
+```
 45-element Array{Pair{Operation,Float64},1}:
  stim_start => 10.0
        g_pK => 0.0146
@@ -92,17 +92,17 @@ We get a list of the 45 parameters:
 To modify a parameter, we use `update_list!` function. For example, the following code changes the stimulation period (`stim_period`) from its default of 1000 ms to 400 ms
 
 ```julia
-  update_list!(p, "stim_period", 400.0)
+update_list!(p, "stim_period", 400.0)
 ```
 
 We need to pass the new `p` to `ODEProblem` constructor as a keyword parameter. The rest of the code remains the same.
 
 ```julia
-  tspan = (0, 5000.0)
-  prob = ODEProblem(ml, tspan; p=p)
-  sol = solve(prob, TRBDF2(), dtmax=1.0)
-  V = map(x -> x[1], sol.u)
-  plot(sol.t, V)
+tspan = (0, 5000.0)
+prob = ODEProblem(ml, tspan; p = p)
+sol = solve(prob, TRBDF2(), dtmax = 1.0)
+V = map(x -> x[1], sol.u)
+plot(sol.t, V)
 ```
 
 ![](../../../figures/ten_400.png)
