@@ -38,11 +38,11 @@ Pkg.add("CellMLToolkit")
 ## Simple Example
 
 ```Julia
-  using CellMLToolkit, OrdinaryDiffEq, Plots
+  using CellMLToolkit, DifferentialEquations, Plots
 
   ml = CellModel("models/lorenz.cellml.xml")
   prob = ODEProblem(ml, (0,100.0))
-  sol = solve(prob, RK4())    # fourth-order Runge-Kutta method
+  sol = solve(prob)
   plot(sol, idxs=(1,3))       # idxs keyword has superceded vars keyword
 ```
 
@@ -83,7 +83,7 @@ In addition to the model equations, the initial conditions and parameters are al
 ```Julia
   using DifferentialEquations, Plots
 
-  sol = solve(prob, RK4())    # fourth-order Runge-Kutta method
+  sol = solve(prob)
   plot(sol, idxs=(1,3))       # idxs keyword has superceded vars keyword
 ```
 
@@ -96,7 +96,7 @@ Let's look at more complicated examples. The next one is the [ten Tusscher-Noble
 ```Julia
   ml = CellModel("models/tentusscher_noble_noble_panfilov_2004_a.cellml.xml")
   prob = ODEProblem(ml, (0, 10000.0))
-  sol = solve(prob, TRBDF2(), dtmax=1.0)    # it is a stiff system requiring an implcit solver (TRBDF2 instead of RK4)
+  sol = solve(prob, dtmax=1.0)    # we need to set dtmax to allow for on-time stimulation 
   plot(sol, idxs=12)
 ```
 
@@ -133,12 +133,12 @@ Similarly, we can list the state variables by calling `list_states(ml)`:
 ```Julia
               slow_inward_current_d_gate₊d(time) => 0.003
               slow_inward_current_f_gate₊f(time) => 0.994
-                   sodium_current_j_gate₊j(time) => 0.975
                    slow_inward_current₊Cai(time) => 0.0001
- time_dependent_outward_current_x1_gate₊x1(time) => 0.0001
+ time_dependent_outward_current_x1_gate₊x1(time) => 0.0001   
                    sodium_current_m_gate₊m(time) => 0.011
                    sodium_current_h_gate₊h(time) => 0.988
                                 membrane₊V(time) => -84.624
+                   sodium_current_j_gate₊j(time) => 0.975
 ```
 
 Assume we want to change `IstimPeriod`. We can easily do this with the help of `update_list!` utility function provided:
@@ -152,19 +152,17 @@ Assume we want to change `IstimPeriod`. We can easily do this with the help of `
 The rest is the same as before.
 
 ```Julia
-  sol = solve(prob, TRBDF2(), dtmax=1.0)
+  sol = solve(prob, dtmax=1.0)
   plot(sol, idxs=8)   # 8 is the index of membrane₊V
 ```
 
-For the next example, we chose a complex model to stress the ODE solvers: [the O'Hara-Rudy left ventricular model](https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1002061). This model has 49 state variables, is very stiff, and is prone to oscillation. The best solver for this model is `CVODE_BDF` from the Sundial suite.
+For the next example, we chose a complex model to stress the ODE solvers: [the O'Hara-Rudy left ventricular model](https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1002061). This model has 49 state variables, is very stiff, and is prone to oscillation. In the previous versions of this document, we used `CVODE_BDF` from the Sundial suite (`using Sundials`) to solve this problem. Fortunatelly, DifferentialEquations.jl has advanced signigficantly such that an efficient and pure Julia solution to the O'Hara-Rudy model is possible.
 
 ```Julia
-  using Sundials
-
   ml = CellModel("models/ohara_rudy_cipa_v1_2017.cellml.xml")
   tspan = (0, 5000.0)
   prob = ODEProblem(ml, tspan);
-  sol = solve(prob, CVODE_BDF(), dtmax=0.5)
+  sol = solve(prob, dtmax=1.0)
   plot(sol, idxs=49)  # membrane₊v
 ```
 
