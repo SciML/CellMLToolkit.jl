@@ -153,7 +153,7 @@ The rest is the same as before.
 
 ```Julia
   sol = solve(prob, dtmax=1.0)
-  plot(sol, idxs=8)   # 8 is the index of membrane₊V
+  plot(sol, idxs=7)   # 7 is the index of membrane₊V
 ```
 
 For the next example, we chose a complex model to stress the ODE solvers: [the O'Hara-Rudy left ventricular model](https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1002061). This model has 49 state variables, is very stiff, and is prone to oscillation. In the previous versions of this document, we used `CVODE_BDF` from the Sundial suite (`using Sundials`) to solve this problem. Fortunatelly, DifferentialEquations.jl has advanced signigficantly such that an efficient and pure Julia solution to the O'Hara-Rudy model is possible.
@@ -175,7 +175,7 @@ CellML specification allows for models spanning multiple XML files. In these mod
 ```julia
 ml = CellModel("models/noble_1962/Noble_1962.cellml")
 prob = ODEProblem(ml, tspan)
-sol = solve(prob, TRBDF2(), dtmax = 0.5)
+sol = solve(prob, dtmax=0.5)
 ```
 
 Note that the syntax is exactly the same as before. However, the list of the imported files are printed during `CellModel` generation:
@@ -195,7 +195,7 @@ Note that the syntax is exactly the same as before. However, the list of the imp
 Same as before, we can plot the output as
 
 ```julia
-plot(sol, idxs = 2)
+plot(sol, idxs=2)
 ```
 
 ![](figures/noble_1962.png)
