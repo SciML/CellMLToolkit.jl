@@ -42,8 +42,8 @@ Pkg.add("CellMLToolkit")
 
   ml = CellModel("models/lorenz.cellml.xml")
   prob = ODEProblem(ml, (0,100.0))
-  sol = solve(prob)
-  plot(sol, vars=(1,3))
+  sol = solve(prob, RK4())    # fourth-order Runge-Kutta method
+  plot(sol, idxs=(1,3))       # idxs keyword has superceded vars keyword
 ```
 
 Note that `model` is a directory of the CellMLToolkit package. You can find its path as
@@ -83,8 +83,8 @@ In addition to the model equations, the initial conditions and parameters are al
 ```Julia
   using DifferentialEquations, Plots
 
-  sol = solve(prob)
-  plot(sol, vars=(1,3))
+  sol = solve(prob, RK4())    # fourth-order Runge-Kutta method
+  plot(sol, idxs=(1,3))       # idxs keyword has superceded vars keyword
 ```
 
 As expected,
@@ -96,13 +96,13 @@ Let's look at more complicated examples. The next one is the [ten Tusscher-Noble
 ```Julia
   ml = CellModel("models/tentusscher_noble_noble_panfilov_2004_a.cellml.xml")
   prob = ODEProblem(ml, (0, 10000.0))
-  sol = solve(prob, TRBDF2(), dtmax=1.0)
-  plot(sol, vars=12)
+  sol = solve(prob, TRBDF2(), dtmax=1.0)    # it is a stiff system requiring an implcit solver (TRBDF2 instead of RK4)
+  plot(sol, idxs=12)
 ```
 
 ![](figures/ten.png)
 
-We can tell which variable to plot (vars=12, here) by looking at the output of `list_states(ml)` (see below).
+We can tell which variable to plot (`idxs=12` here) by looking at the output of `list_states(ml)` (see below).
 
 Let's see how we can modify the initial values and parameters. We will use the Beeler-Reuter model with 8 state variables as an example:
 
@@ -144,16 +144,16 @@ Similarly, we can list the state variables by calling `list_states(ml)`:
 Assume we want to change `IstimPeriod`. We can easily do this with the help of `update_list!` utility function provided:
 
 ```Julia
-  p = list_params(ml)
-  update_list!(p, :stimulus_protocol₊IstimPeriod, 250.0)
-  prob = ODEProblem(ml, (0, 10000.0); p=p)
+  params = list_params(ml)
+  update_list!(params, :stimulus_protocol₊IstimPeriod, 250.0)
+  prob = ODEProblem(ml, (0, 10000.0); p=last.(params))  # note that you need to pass last.(params) and not params itself to ODEProblem
 ```
 
 The rest is the same as before.
 
 ```Julia
   sol = solve(prob, TRBDF2(), dtmax=1.0)
-  plot(sol, vars=8)   # 8 is the index of membrane₊V
+  plot(sol, idxs=8)   # 8 is the index of membrane₊V
 ```
 
 For the next example, we chose a complex model to stress the ODE solvers: [the O'Hara-Rudy left ventricular model](https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1002061). This model has 49 state variables, is very stiff, and is prone to oscillation. The best solver for this model is `CVODE_BDF` from the Sundial suite.
@@ -165,7 +165,7 @@ For the next example, we chose a complex model to stress the ODE solvers: [the O
   tspan = (0, 5000.0)
   prob = ODEProblem(ml, tspan);
   sol = solve(prob, CVODE_BDF(), dtmax=0.5)
-  plot(sol, vars=49)  # membrane₊v
+  plot(sol, idxs=49)  # membrane₊v
 ```
 
 ![](figures/ohara_rudy.png)
@@ -197,7 +197,7 @@ Note that the syntax is exactly the same as before. However, the list of the imp
 Same as before, we can plot the output as
 
 ```julia
-plot(sol, vars = 2)
+plot(sol, idxs = 2)
 ```
 
 ![](figures/noble_1962.png)
