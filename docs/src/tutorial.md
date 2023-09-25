@@ -1,6 +1,6 @@
 # Tutorial
 
-The models directory contains few CellML model examples. Let's start with a simple one, the famous Lorenz equations!
+The models directory contains a few CellML model examples. Let's start with a simple one, the famous Lorenz equations!
 
 ```Julia
   using CellMLToolkit
@@ -11,7 +11,7 @@ The models directory contains few CellML model examples. Let's start with a simp
   prob = ODEProblem(ml, tspan)
 ```
 
-Now, `ml` points to a `CellModel` struct that contains the details of the model and `prob` is an `ODEProblem` ready for integration. We can solve and visualize `prob` as
+Now, `ml` points to a `CellModel` struct that contains the details of the model, and `prob` is an `ODEProblem` ready for integration. We can solve and visualize `prob` as
 
 ```Julia
   using DifferentialEquations, Plots
@@ -26,7 +26,7 @@ As expected,
 
 ![](assets/lorenz.png)
 
-Let's look at more complicated examples. The next one is the [ten Tusscher-Noble-Noble-Panfilov human left ventricular action potential model](https://journals.physiology.org/doi/full/10.1152/ajpheart.00794.2003). This is a mid-range electrophysiology model with 17 states variables and relatively good numerical stability.
+Let's look at more complicated examples. The next one is the [ten Tusscher-Noble-Noble-Panfilov human left ventricular action potential model](https://journals.physiology.org/doi/full/10.1152/ajpheart.00794.2003). This is a mid-range electrophysiology model with 17 state variables and relatively good numerical stability.
 
 ```Julia
   ml = CellModel("models/tentusscher_noble_noble_panfilov_2004_a.cellml.xml")
