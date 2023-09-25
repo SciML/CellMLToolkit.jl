@@ -1,6 +1,6 @@
 # Tutorial
 
-The models directory contains few CellML model examples. Let's start with a simple one, the famous Lorenz equations!
+The models directory contains a few CellML model examples. Let's start with a simple one, the famous Lorenz equations!
 
 ```Julia
   using CellMLToolkit
@@ -11,7 +11,7 @@ The models directory contains few CellML model examples. Let's start with a simp
   prob = ODEProblem(ml, tspan)
 ```
 
-Now, `ml` points to a `CellModel` struct that contains the details of the model and `prob` is an `ODEProblem` ready for integration. We can solve and visualize `prob` as
+Now, `ml` points to a `CellModel` struct that contains the details of the model, and `prob` is an `ODEProblem` ready for integration. We can solve and visualize `prob` as
 
 ```Julia
   using DifferentialEquations, Plots
@@ -24,9 +24,9 @@ Now, `ml` points to a `CellModel` struct that contains the details of the model 
 
 As expected,
 
-![](../../../figures/lorenz.png)
+![](assets/lorenz.png)
 
-Let's look at more complicated examples. The next one is the [ten Tusscher-Noble-Noble-Panfilov human left ventricular action potential model](https://journals.physiology.org/doi/full/10.1152/ajpheart.00794.2003). This is a mid-range electrophysiology model with 17 states variables and relatively good numerical stability.
+Let's look at more complicated examples. The next one is the [ten Tusscher-Noble-Noble-Panfilov human left ventricular action potential model](https://journals.physiology.org/doi/full/10.1152/ajpheart.00794.2003). This is a mid-range electrophysiology model with 17 state variables and relatively good numerical stability.
 
 ```Julia
   ml = CellModel("models/tentusscher_noble_noble_panfilov_2004_a.cellml.xml")
@@ -37,7 +37,7 @@ Let's look at more complicated examples. The next one is the [ten Tusscher-Noble
   plot(sol.t, V)
 ```
 
-![](../../../figures/ten.png)
+![](assets/ten.png)
 
 We can also enhance the model by asking ModelingToolkit.jl to generate a Jacobian by passing `jac=true` to the `ODEProblem` constructor.
 
@@ -56,7 +56,7 @@ The rest remains the same. For the last example, we chose a complex model to str
   plot(sol.t, V)
 ```
 
-![](../../../figures/ohara_rudy.png)
+![](assets/ohara_rudy.png)
 
 ## Changing Parameters
 
@@ -105,6 +105,6 @@ V = map(x -> x[1], sol.u)
 plot(sol.t, V)
 ```
 
-![](../../../figures/ten_400.png)
+![](assets/ten_400.png)
 
 `ODEProblem` also accepts a `u0` parameter to change the initial conditions (remember `u0 = list_initial_conditions(ml)`).
