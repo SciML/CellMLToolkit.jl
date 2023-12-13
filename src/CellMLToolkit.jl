@@ -21,9 +21,9 @@ end
 ##############################################################################
 
 export CellModel, ODEProblem
-export read_cellml, parse_cellml
+export read_cellml
 export list_params, list_states
-export readxml, getxml, getsys
+export readxml, getsys
 export update_list!
 
 getsys(ml::CellModel) = ml.sys
