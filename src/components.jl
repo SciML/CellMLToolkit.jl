@@ -102,7 +102,7 @@ list_all_lhs(doc::Document) = ∪([list_component_lhs(c) for c in components(doc
 
 """
     find_equivalence_groups categorizes all the variables in the doc document
-    based on the connections into equivalnce groups
+    based on the connections into equivalence groups
     it returns a Dictionary of Var to groups (Set of Vars)
 """
 @memoize function find_equivalence_groups(doc::Document)
@@ -197,7 +197,7 @@ end
     post_substitution generates the substitution rules to be applied to
     the merged system after structural_simplify is applied
 
-    if changes the names of the indepedent variable (iv) in each system
+    if changes the names of the independent variable (iv) in each system
     to the global iv name
 
     TODO: this function assumes the basic iv name is the same among all systems
