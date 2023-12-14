@@ -43,7 +43,7 @@ Pkg.add("CellMLToolkit")
   ml = CellModel("models/lorenz.cellml.xml")
   prob = ODEProblem(ml, (0,100.0))
   sol = solve(prob)
-  plot(sol, idxs=(1,3))       # idxs keyword has superceded vars keyword
+  plot(sol, idxs=(1,3))       # idxs keyword has superseded vars keyword
 ```
 
 Note that `model` is a directory of the CellMLToolkit package. You can find its path as
@@ -84,7 +84,7 @@ In addition to the model equations, the initial conditions and parameters are al
   using DifferentialEquations, Plots
 
   sol = solve(prob)
-  plot(sol, idxs=(1,3))       # idxs keyword has superceded vars keyword
+  plot(sol, idxs=(1,3))       # idxs keyword has superseded vars keyword
 ```
 
 As expected,
@@ -156,7 +156,7 @@ The rest is the same as before.
   plot(sol, idxs=7)   # 7 is the index of membrane₊V
 ```
 
-For the next example, we chose a complex model to stress the ODE solvers: [the O'Hara-Rudy left ventricular model](https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1002061). This model has 49 state variables, is very stiff, and is prone to oscillation. In the previous versions of this document, we used `CVODE_BDF` from the Sundial suite (`using Sundials`) to solve this problem. Fortunatelly, DifferentialEquations.jl has advanced signigficantly such that an efficient and pure Julia solution to the O'Hara-Rudy model is possible.
+For the next example, we chose a complex model to stress the ODE solvers: [the O'Hara-Rudy left ventricular model](https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1002061). This model has 49 state variables, is very stiff, and is prone to oscillation. In the previous versions of this document, we used `CVODE_BDF` from the Sundial suite (`using Sundials`) to solve this problem. Fortunately, DifferentialEquations.jl has advanced signigficantly such that an efficient and pure Julia solution to the O'Hara-Rudy model is possible.
 
 ```Julia
   ml = CellModel("models/ohara_rudy_cipa_v1_2017.cellml.xml")

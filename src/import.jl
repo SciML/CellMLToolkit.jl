@@ -62,7 +62,7 @@ find_component(doc::Document, name) = find_component(doc.comps, name)
 implicit_name(sym) = Symbol("$(string(sym))")
 
 """
-    resolve_imports recursivelly resolves the imported components of doc.
+    resolve_imports recursively resolves the imported components of doc.
 """
 function resolve_imports!(doc::Document)
     for ϵ in list_imports(doc)  # εισαγωγή == import
@@ -113,7 +113,7 @@ function resolve_imports!(doc::Document)
 end
 
 """
-    find_closure finds the transitive closure of a list of componenets (l) minus
+    find_closure finds the transitive closure of a list of components (l) minus
     the list itself, i.e., it returns the list of components in doc which are
     reachable through a chain of connections starting from any component in l.
 """

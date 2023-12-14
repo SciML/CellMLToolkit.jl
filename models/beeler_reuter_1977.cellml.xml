@@ -1347,7 +1347,7 @@ The breakdown of the model into components and the definition of encapsulation a
   </rdf:Description>
   <rdf:Description rdf:about="rdf:#77f98dda-c979-49f1-9bcf-da4944906f91">
     <dcterms:modified rdf:resource="rdf:#e7527bce-f615-4263-afc0-c075d70b6e23"/>
-    <rdf:value>Added an intial value for X1 to enable the model to run.</rdf:value>
+    <rdf:value>Added an initial value for X1 to enable the model to run.</rdf:value>
     <cmeta:modifier rdf:resource="rdf:#baef8605-6d17-47bc-b214-261f23273934"/>
   </rdf:Description>
   <rdf:Description rdf:about="rdf:#9c5e9628-92e3-4989-a4b1-21fce295ab89">
