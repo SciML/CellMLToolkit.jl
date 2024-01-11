@@ -1,10 +1,5 @@
-using Test
-using CellMLToolkit
-using OrdinaryDiffEq
-using ModelingToolkit
+using SafeTestsets, Test
 
-@testset "CellMLToolkit.jl" begin
-    @testset "Quality Assurance" begin include("qa.jl") end
-    @testset "beeler.jl" begin include("beeler.jl") end
-    @testset "noble_1962.jl" begin include("noble_1962.jl") end
-end
+@time @safetestset "Quality Assurance" include("qa.jl")
+@time @safetestset "beeler.jl" include("beeler.jl")
+@time @safetestset "noble_1962.jl" include("noble_1962.jl")
