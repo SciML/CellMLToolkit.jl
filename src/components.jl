@@ -317,7 +317,7 @@ function find_list_value(doc::Document, names)
     varkeys = Set(keys(vars))
     groups = find_equivalence_groups(doc)
 
-    vals = []
+    vals = Pair{Num, Float64}[]
 
     for x in names
         u = split_sym(x)
