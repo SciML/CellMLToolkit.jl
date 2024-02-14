@@ -175,7 +175,7 @@ CellML specification allows for models spanning multiple XML files. In these mod
 ```julia
 ml = CellModel("models/noble_1962/Noble_1962.cellml")
 prob = ODEProblem(ml, tspan)
-sol = solve(prob, dtmax=0.5)
+sol = solve(prob, dtmax = 0.5)
 ```
 
 Note that the syntax is exactly the same as before. However, the list of the imported files are printed during `CellModel` generation:
@@ -195,7 +195,7 @@ Note that the syntax is exactly the same as before. However, the list of the imp
 Same as before, we can plot the output as
 
 ```julia
-plot(sol, idxs=2)
+plot(sol, idxs = 2)
 ```
 
 ![](docs/src/assets/noble_1962.png)
