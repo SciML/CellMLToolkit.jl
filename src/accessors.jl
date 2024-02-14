@@ -138,15 +138,17 @@ end
 function list_encapsulation(doc, comp)
     name = string(nameof(comp))
     ns = cellml_ns(doc)
-    groups = parentnode.(findall("//x:group/x:relationship_ref[@relationship='encapsulation']",
-                                 root(doc), ["x" => ns]))
+    groups = parentnode.(findall(
+        "//x:group/x:relationship_ref[@relationship='encapsulation']",
+        root(doc), ["x" => ns]))
     if isempty(groups)  # CellML ver 2.0
-        return findall("//x:encapsulation//x:component_ref[@component='$name']//x:component_ref",
-                       root(doc), ["x" => ns])
+        return findall(
+            "//x:encapsulation//x:component_ref[@component='$name']//x:component_ref",
+            root(doc), ["x" => ns])
     else                # CellML ver 1.0 and 1.1
         for g in groups
             nodes = findall(".//x:component_ref[@component='$name']//x:component_ref", g,
-                            ["x" => ns])
+                ["x" => ns])
             if !isempty(nodes)
                 return nodes
             end

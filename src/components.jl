@@ -227,9 +227,9 @@ function process_components(doc::Document; simplify = true)
     post_sub = post_substitution(doc, systems)
 
     sys = ODESystem(translate_connections(doc, systems, class),
-                    get_ivₚ(doc),
-                    systems = collect(values(systems)),
-                    name = gensym(:cellml))
+        get_ivₚ(doc),
+        systems = collect(values(systems)),
+        name = gensym(:cellml))
 
     if simplify
         sys = structural_simplify(sys)
@@ -252,7 +252,7 @@ end
 """
 function subsystems(doc::Document, class)
     Dict{Symbol, ODESystem}(to_symbol(comp) => process_component(doc, comp, class)
-                            for comp in components(doc))
+    for comp in components(doc))
 end
 
 """
