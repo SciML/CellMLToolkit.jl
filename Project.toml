@@ -1,7 +1,7 @@
 name = "CellMLToolkit"
 uuid = "03cb29e0-1ef4-4721-aa24-cf58a006576f"
 authors = ["Shahriar Iravanian <siravan@svtsim.com>"]
-version = "2.9.2"
+version = "2.11.0"
 
 [deps]
 EzXML = "8f5d6c58-4d21-5cfd-889c-e3ad7ee6a615"
@@ -14,18 +14,25 @@ SymbolicUtils = "d1185830-fcd6-423d-90d6-eec64667417b"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [compat]
+Aqua = "0.8"
 EzXML = "1.1"
-MathML = "0.1.9"
-Memoize = "0.4"
+MathML = "0.1.14"
+Memoize = "0.4.2"
 ModelingToolkit = "9"
+OrdinaryDiffEq = "6"
+Random = "1.10"
+SafeTestsets = "0.1"
 Setfield = "0.8, 1"
-SymbolicUtils = "2"
-julia = "1.6"
+SymbolicUtils = "1.2, 2"
+Test = "1.10"
+julia = "1.10"
 
 [extras]
+Aqua = "4c88cf16-eb10-579e-8560-4a9242c79595"
 ModelingToolkit = "961ee093-0014-501f-94e3-6117800e7a78"
 OrdinaryDiffEq = "1dea7af3-3e70-54e6-95c3-0bf5283fa5ed"
+SafeTestsets = "1bc83da4-3b8d-516f-aca4-4fe02f6d838f"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [targets]
-test = ["Test", "ModelingToolkit", "OrdinaryDiffEq"]
+test = ["Aqua", "Test", "ModelingToolkit", "OrdinaryDiffEq", "SafeTestsets"]

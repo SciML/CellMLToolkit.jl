@@ -1,3 +1,7 @@
+using CellMLToolkit
+using OrdinaryDiffEq
+using ModelingToolkit
+
 path = @__DIR__
 ml = CellModel(path * "/../models/beeler_reuter_1977.cellml.xml")
 

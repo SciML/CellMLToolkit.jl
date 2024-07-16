@@ -21,9 +21,9 @@ end
 ##############################################################################
 
 export CellModel, ODEProblem
-export read_cellml, parse_cellml
+export read_cellml
 export list_params, list_states
-export readxml, getxml, getsys
+export readxml, getsys
 export update_list!
 
 getsys(ml::CellModel) = ml.sys
@@ -45,8 +45,8 @@ import ModelingToolkit.ODEProblem
     ODEProblem constructs an ODEProblem from a CellModel
 """
 function ODEProblem(ml::CellModel, tspan;
-                    jac = false, level = 1, p = last.(list_params(ml)),
-                    u0 = last.(list_states(ml)))
+        jac = false, level = 1, p = last.(list_params(ml)),
+        u0 = last.(list_states(ml)))
     ODEProblem(ml.sys, u0, tspan, p; jac = jac)
 end
 
