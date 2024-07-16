@@ -17,9 +17,9 @@ Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 EzXML = "1.1"
 MathML = "0.1.9"
 Memoize = "0.4"
-ModelingToolkit = "7, 8"
+ModelingToolkit = "9"
 Setfield = "0.8, 1"
-SymbolicUtils = "0.16, 0.18, 0.19"
+SymbolicUtils = "2"
 julia = "1.6"
 
 [extras]

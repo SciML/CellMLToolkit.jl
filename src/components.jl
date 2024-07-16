@@ -238,7 +238,7 @@ function process_components(doc::Document; simplify = true)
         # Defaults need to be set after simplifying as otherwise parameters and
         # states for which no defaults are available may still be present in
         # the system
-        @set! sys.defaults = Dict(find_list_value(doc, vcat(parameters(sys), states(sys))))
+        @set! sys.defaults = Dict(find_list_value(doc, vcat(parameters(sys), unknowns(sys))))
     end
 
     return sys
@@ -310,7 +310,7 @@ function split_sym(sym)
 end
 
 find_sys_p(doc::Document, sys) = find_list_value(doc, parameters(sys))
-find_sys_u0(doc::Document, sys) = find_list_value(doc, states(sys))
+find_sys_u0(doc::Document, sys) = find_list_value(doc, unknowns(sys))
 
 function find_list_value(doc::Document, names)
     vars, syms = collect_initiated_values(doc)
