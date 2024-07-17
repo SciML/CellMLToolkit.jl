@@ -18,7 +18,7 @@ Memoize = "0.4.2"
 ModelingToolkit = "9"
 OrdinaryDiffEq = "6.56"
 SafeTestsets = "0.1"
-Setfield = "0.8, 1"
+Setfield = "1"
 Test = "1.10"
 julia = "1.10"
 
