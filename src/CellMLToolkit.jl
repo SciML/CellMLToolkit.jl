@@ -3,7 +3,8 @@ module CellMLToolkit
 using EzXML: EzXML, elements, namespace, nodecontent, parentnode, readxml, root
 using MathML: extract_mathml, parse_node
 using Memoize: @memoize
-using ModelingToolkit: @parameters, @variables, Differential,
+using SymbolicUtils: operation
+using ModelingToolkit: ModelingToolkit, @parameters, @variables, Differential,
                        Equation, ODEProblem, ODESystem,
                        Symbolics, equations, parameters, structural_simplify,
                        substitute, unknowns
