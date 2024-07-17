@@ -1,5 +1,3 @@
-using Random
-
 sym(x) = Symbol(x)
 
 function populate_dependency!(doc, comp)
@@ -154,7 +152,7 @@ function list_top_cellml_files(dir)
     imported = Set{String}()
     for f in files
         xml = readxml(joinpath(dir, f))
-        for n in CellMLToolkit.list_imports(xml)
+        for n in list_imports(xml)
             push!(imported, n["xlink:href"])
         end
     end
