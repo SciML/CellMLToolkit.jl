@@ -1,11 +1,13 @@
 module CellMLToolkit
 
-using MathML
-
-using ModelingToolkit
-using SymbolicUtils: FnType, Sym, operation, arguments
-using EzXML
-using Memoize
+using EzXML: EzXML, elements, namespace, nodecontent, parentnode, readxml, root
+using MathML: extract_mathml, parse_node
+using Memoize: @memoize
+using ModelingToolkit: @parameters, @variables, Differential,
+                       Equation, ODEProblem, ODESystem,
+                       Symbolics, equations, parameters, structural_simplify,
+                       substitute, unknowns
+using Setfield: @set!
 
 include("structures.jl")
 include("accessors.jl")

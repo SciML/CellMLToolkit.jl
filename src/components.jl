@@ -1,5 +1,3 @@
-using Setfield
-
 const cellml_ns(xml::EzXML.Document) = namespace(root(xml))
 const cellml_ns(node::EzXML.Node) = namespace(node)
 const mathml_ns = "http://www.w3.org/1998/Math/MathML"
