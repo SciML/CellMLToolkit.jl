@@ -236,7 +236,8 @@ function process_components(doc::Document; simplify = true)
         # Defaults need to be set after simplifying as otherwise parameters and
         # states for which no defaults are available may still be present in
         # the system
-        @set! sys.defaults = Dict(find_list_value(doc, vcat(parameters(sys), unknowns(sys))))
+        @set! sys.defaults = Dict(find_list_value(
+            doc, vcat(parameters(sys), unknowns(sys))))
     end
 
     return sys
