@@ -1,5 +1,7 @@
 using SafeTestsets, Test
 
+const GROUP = get(ENV, "GROUP", "All")
+
 if GROUP == "All" || GROUP == "QA"
   @time @safetestset "Quality Assurance" include("qa.jl")
 end
