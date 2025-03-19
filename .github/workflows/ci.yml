@@ -20,6 +20,7 @@ jobs:
       matrix:
         group:
           - Core
+          - QA
         version:
           - '1'
         os:
