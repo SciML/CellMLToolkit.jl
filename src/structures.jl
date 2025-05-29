@@ -32,5 +32,5 @@ connections(doc::Document) = doc.conns
 
 struct CellModel
     doc::Document
-    sys::ODESystem
+    sys::System
 end

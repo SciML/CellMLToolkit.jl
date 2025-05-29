@@ -24,7 +24,7 @@ err = sum(abs.(V1 .- V2)) / length(V1)
 # Ensure defaults are set and that generating an `ODEProblem` directly from the
 # `ODESystem` is equivalent to doing so from a `CellModel`
 @test length(ModelingToolkit.defaults(ml.sys)) > 0
-sys_prob = ODEProblem(ml.sys; tspan = (0, 10000.0))
+sys_prob = ODEProblem(ml.sys, nothing, (0, 10000.0))
 sol3 = solve(prob, Euler(), dt = 0.01, saveat = 1.0)
 V3 = map(x -> x[1], sol3.u)
 err2 = sum(abs.(V1 .- V3)) / length(V1)

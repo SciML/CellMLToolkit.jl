@@ -168,7 +168,7 @@ end
 
 """
     pre_substitution generates the substitution rules to be applied to
-    individual systems before structural_simplify merges them together
+    individual systems before mtkcompile merges them together
 
     it morphes variables and parameters to their correct form for ModelingToolkit
     based on the global CellML doc information
@@ -193,7 +193,7 @@ end
 
 """
     post_substitution generates the substitution rules to be applied to
-    the merged system after structural_simplify is applied
+    the merged system after mtkcompile is applied
 
     if changes the names of the independent variable (iv) in each system
     to the global iv name
@@ -212,7 +212,7 @@ substitute_eqs(eqs, s) = [substitute(eq.lhs, s) ~ substitute(eq.rhs, s) for eq i
 
 """
     process_components is the main entry point
-    it processes an doc document and returns a merged ODESystem
+    it processes an doc document and returns a merged System
 
     use simplify=false only for debugging purposes!
 """
@@ -224,13 +224,13 @@ function process_components(doc::Document; simplify = true)
     systems = subsystems(doc, class)
     post_sub = post_substitution(doc, systems)
 
-    sys = ODESystem(translate_connections(doc, systems, class),
+    sys = System(Vector{Equation}(translate_connections(doc, systems, class)),
         get_ivₚ(doc),
         systems = collect(values(systems)),
         name = gensym(:cellml))
 
     if simplify
-        sys = structural_simplify(sys)
+        sys = mtkcompile(sys)
         @set! sys.eqs = substitute_eqs(equations(sys), post_sub)
 
         # Defaults need to be set after simplifying as otherwise parameters and
@@ -250,12 +250,12 @@ end
     class is the output of classify_variables
 """
 function subsystems(doc::Document, class)
-    Dict{Symbol, ODESystem}(to_symbol(comp) => process_component(doc, comp, class)
+    Dict{Symbol, System}(to_symbol(comp) => process_component(doc, comp, class)
     for comp in components(doc))
 end
 
 """
-    process_component converts a single CellML component to an ODESystem
+    process_component converts a single CellML component to an System
 
     comp in the name of the component
     class is the output of classify_variables
@@ -270,7 +270,7 @@ function process_component(doc::Document, comp, class)
         eqs = vcat(parse_node.(math)...)
         eqs = substitute_eqs(eqs, pre_sub)
         sub_rhs = remove_rhs_diff(eqs)
-        eqs = [eq.lhs ~ substitute(eq.rhs, sub_rhs) for eq in eqs]
+        eqs = Equation[eq.lhs ~ substitute(eq.rhs, sub_rhs) for eq in eqs]
     end
 
     ivₚ = get_ivₚ(doc)
@@ -280,7 +280,7 @@ function process_component(doc::Document, comp, class)
     states = [last(x)
               for x in values(pre_sub)
               if !ModelingToolkit.isparameter(last(x)) && !isequal(last(x), ivₚ)]
-    ODESystem(eqs, ivₚ, states, ps; name = to_symbol(comp))
+    System(eqs, ivₚ, states, ps; name = to_symbol(comp))
 end
 
 ###############################################################################
