@@ -69,7 +69,7 @@ The models directory contains a few CellML model examples. Let's start with a si
   ml = CellModel("models/lorenz.cellml.xml")
 ```
 
-Now, `ml` is a `CellModel` structure that contains both a list of the loaded XML files and their components (accessible as `ml.doc`) and a ModelingToolkit `ODESystem` that defines variables and dynamics and can be accessed as `getsys(ml)`.
+Now, `ml` is a `CellModel` structure that contains both a list of the loaded XML files and their components (accessible as `ml.doc`) and a ModelingToolkit `System` that defines variables and dynamics and can be accessed as `getsys(ml)`.
 
 The next step is to convert `ml` into an `ODEProblem`, ready to be solved.
 
