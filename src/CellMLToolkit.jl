@@ -50,7 +50,8 @@ import ModelingToolkit.ODEProblem
 function ODEProblem(ml::CellModel, tspan;
         jac = false, level = 1, p = last.(list_params(ml)),
         u0 = last.(list_states(ml)))
-    ODEProblem(ml.sys, Pair[unknowns(ml.sys) .=> u0; parameters(ml.sys) .=> p], tspan; jac = jac)
+    ODEProblem(
+        ml.sys, Pair[unknowns(ml.sys) .=> u0; parameters(ml.sys) .=> p], tspan; jac = jac)
 end
 
 function update_list!(l, sym, val)
