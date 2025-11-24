@@ -9,19 +9,19 @@ Pkg.add(&quot;CellMLToolkit&quot;)</code></pre><h2 id="Contributing"><a class="d
   sol = solve(prob, TRBDF2(), dtmax=0.01)
   X = map(x -&gt; x[1], sol.u)
   Z = map(x -&gt; x[3], sol.u)
-  plot(X, Z)</code></pre><h2 id="Reproducibility"><a class="docs-heading-anchor" href="#Reproducibility">Reproducibility</a><a id="Reproducibility-1"></a><a class="docs-heading-anchor-permalink" href="#Reproducibility" title="Permalink"></a></h2><details><summary>The documentation of this SciML package was built using these direct dependencies,</summary><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Status `~/work/CellMLToolkit.jl/CellMLToolkit.jl/docs/Project.toml`
-  [03cb29e0] CellMLToolkit v2.15.0 `~/work/CellMLToolkit.jl/CellMLToolkit.jl`
-  [e30172f5] Documenter v1.16.0</code></pre></details><details><summary>and using this machine and Julia version.</summary><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Julia Version 1.12.1
-Commit ba1e628ee49 (2025-10-17 13:02 UTC)
+  plot(X, Z)</code></pre><h2 id="Reproducibility"><a class="docs-heading-anchor" href="#Reproducibility">Reproducibility</a><a id="Reproducibility-1"></a><a class="docs-heading-anchor-permalink" href="#Reproducibility" title="Permalink"></a></h2><details><summary>The documentation of this SciML package was built using these direct dependencies,</summary><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Status `~/github-runners/demeter4-4/_work/CellMLToolkit.jl/CellMLToolkit.jl/docs/Project.toml`
+  [03cb29e0] CellMLToolkit v2.15.0 `~/github-runners/demeter4-4/_work/CellMLToolkit.jl/CellMLToolkit.jl`
+  [e30172f5] Documenter v1.16.1</code></pre></details><details><summary>and using this machine and Julia version.</summary><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Julia Version 1.12.2
+Commit ca9b6662be4 (2025-11-20 16:25 UTC)
 Build Info:
   Official https://julialang.org release
 Platform Info:
   OS: Linux (x86_64-linux-gnu)
-  CPU: 4 × AMD EPYC 7763 64-Core Processor
+  CPU: 64 × AMD EPYC 9354 32-Core Processor
   WORD_SIZE: 64
-  LLVM: libLLVM-18.1.7 (ORCJIT, znver3)
+  LLVM: libLLVM-18.1.7 (ORCJIT, znver4)
   GC: Built with stock GC
-Threads: 1 default, 1 interactive, 1 GC (on 4 virtual cores)</code></pre></details><details><summary>A more complete overview of all dependencies and their versions is also provided.</summary><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Status `~/work/CellMLToolkit.jl/CellMLToolkit.jl/docs/Manifest.toml`
+Threads: 1 default, 1 interactive, 1 GC (on 64 virtual cores)</code></pre></details><details><summary>A more complete overview of all dependencies and their versions is also provided.</summary><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Status `~/github-runners/demeter4-4/_work/CellMLToolkit.jl/CellMLToolkit.jl/docs/Manifest.toml`
   [47edcb42] ADTypes v1.19.0
   [a4c015fc] ANSIColoredPrinters v0.0.1
   [1520ce14] AbstractTrees v0.4.5
@@ -36,7 +36,7 @@ Threads: 1 default, 1 interactive, 1 GC (on 4 virtual cores)</code></pre></detai
   [8e7c35d0] BlockArrays v1.9.3
   [70df07ce] BracketingNonlinearSolve v1.6.0
   [2a0fbf3d] CPUSummary v0.2.7
-  [03cb29e0] CellMLToolkit v2.15.0 `~/work/CellMLToolkit.jl/CellMLToolkit.jl`
+  [03cb29e0] CellMLToolkit v2.15.0 `~/github-runners/demeter4-4/_work/CellMLToolkit.jl/CellMLToolkit.jl`
   [d360d2e6] ChainRulesCore v1.26.0
   [fb6a15b2] CloseOpenIntervals v0.1.13
   [944b1d66] CodecZlib v0.7.8
@@ -53,7 +53,7 @@ Threads: 1 default, 1 interactive, 1 GC (on 4 virtual cores)</code></pre></detai
   [adafc99b] CpuId v0.3.1
   [9a962f9c] DataAPI v1.16.0
   [864edb3b] DataStructures v0.19.3
-  [2b5f629d] DiffEqBase v6.191.0
+  [2b5f629d] DiffEqBase v6.192.0
   [459566f4] DiffEqCallbacks v4.10.1
   [77a26b50] DiffEqNoiseProcess v5.24.1
   [163ba53b] DiffResults v1.1.0
@@ -62,7 +62,7 @@ Threads: 1 default, 1 interactive, 1 GC (on 4 virtual cores)</code></pre></detai
   [8d63f2c5] DispatchDoctor v0.4.26
   [31c24e10] Distributions v0.25.122
   [ffbed154] DocStringExtensions v0.9.5
-  [e30172f5] Documenter v1.16.0
+  [e30172f5] Documenter v1.16.1
   [5b8099bc] DomainSets v0.7.16
   [7c1d4256] DynamicPolynomials v0.6.4
   [06fc5a27] DynamicQuantities v1.10.0
@@ -100,7 +100,7 @@ Threads: 1 default, 1 interactive, 1 GC (on 4 virtual cores)</code></pre></detai
   [ae98c720] Jieko v0.2.1
   [98e50ef6] JuliaFormatter v2.2.0
 ⌅ [70703baa] JuliaSyntax v0.4.10
-  [ccbc3e58] JumpProcesses v9.19.1
+  [ccbc3e58] JumpProcesses v9.19.2
   [b964fa9f] LaTeXStrings v1.4.0
   [23fbe1c1] Latexify v0.16.10
   [10f19ff3] LayoutPointers v0.1.17
@@ -207,7 +207,7 @@ Threads: 1 default, 1 interactive, 1 GC (on 4 virtual cores)</code></pre></detai
   [2a0f44e3] Base64 v1.11.0
   [ade2ca70] Dates v1.11.0
   [8ba89e20] Distributed v1.11.0
-  [f43a241f] Downloads v1.6.0
+  [f43a241f] Downloads v1.7.0
   [7b1f6079] FileWatching v1.11.0
   [9fa8497b] Future v1.11.0
   [b77e0a4c] InteractiveUtils v1.11.0
@@ -237,17 +237,17 @@ Threads: 1 default, 1 interactive, 1 GC (on 4 virtual cores)</code></pre></detai
   [cf7118a7] UUIDs v1.11.0
   [4ec0a83e] Unicode v1.11.0
   [e66e0078] CompilerSupportLibraries_jll v1.3.0+1
-  [deac9b47] LibCURL_jll v8.11.1+1
+  [deac9b47] LibCURL_jll v8.15.0+0
   [e37daf67] LibGit2_jll v1.9.0+0
   [29816b5a] LibSSH2_jll v1.11.3+1
   [14a3606d] MozillaCACerts_jll v2025.5.20
   [4536629a] OpenBLAS_jll v0.3.29+0
   [05823500] OpenLibm_jll v0.8.7+0
-  [458c3c95] OpenSSL_jll v3.5.1+0
+  [458c3c95] OpenSSL_jll v3.5.4+0
   [efcefdf7] PCRE2_jll v10.44.0+1
   [bea87d4a] SuiteSparse_jll v7.8.3+2
   [83775a58] Zlib_jll v1.3.1+2
   [8e850b90] libblastrampoline_jll v5.15.0+0
   [8e850ede] nghttp2_jll v1.64.0+1
-  [3f19e933] p7zip_jll v17.5.0+2
-Info Packages marked with ⌃ and ⌅ have new versions available. Those with ⌃ may be upgradable, but those with ⌅ are restricted by compatibility constraints from upgrading. To see why use `status --outdated -m`</code></pre></details><p>You can also download the <a href="https://github.com/SciML/CellMLToolkit.jl/tree/gh-pages/v2.15.0/assets/Manifest.toml">manifest</a> file and the <a href="https://github.com/SciML/CellMLToolkit.jl/tree/gh-pages/v2.15.0/assets/Project.toml">project</a> file.</p></article><nav class="docs-footer"><a class="docs-footer-nextpage" href="tutorial/">Tutorial »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.16.0 on <span class="colophon-date" title="Friday 21 November 2025 09:02">Friday 21 November 2025</span>. Using Julia version 1.12.1.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+  [3f19e933] p7zip_jll v17.7.0+0
+Info Packages marked with ⌃ and ⌅ have new versions available. Those with ⌃ may be upgradable, but those with ⌅ are restricted by compatibility constraints from upgrading. To see why use `status --outdated -m`</code></pre></details><p>You can also download the <a href="https://github.com/SciML/CellMLToolkit.jl/tree/gh-pages/v2.15.0/assets/Manifest.toml">manifest</a> file and the <a href="https://github.com/SciML/CellMLToolkit.jl/tree/gh-pages/v2.15.0/assets/Project.toml">project</a> file.</p></article><nav class="docs-footer"><a class="docs-footer-nextpage" href="tutorial/">Tutorial »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.16.1 on <span class="colophon-date" title="Monday 24 November 2025 13:59">Monday 24 November 2025</span>. Using Julia version 1.12.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
