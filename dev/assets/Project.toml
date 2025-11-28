@@ -3,7 +3,7 @@ CellMLToolkit = "03cb29e0-1ef4-4721-aa24-cf58a006576f"
 Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
 
 [sources]
-CellMLToolkit = {path = "/home/chrisrackauckas/github-runners/demeter4-4/_work/CellMLToolkit.jl/CellMLToolkit.jl"}
+CellMLToolkit = {path = "/home/runner/work/CellMLToolkit.jl/CellMLToolkit.jl"}
 
 [compat]
 CellMLToolkit = "2.9"
