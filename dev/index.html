@@ -17,9 +17,9 @@ Build Info:
   Official https://julialang.org release
 Platform Info:
   OS: Linux (x86_64-linux-gnu)
-  CPU: 4 × Intel(R) Xeon(R) Platinum 8370C CPU @ 2.80GHz
+  CPU: 4 × AMD EPYC 7763 64-Core Processor
   WORD_SIZE: 64
-  LLVM: libLLVM-18.1.7 (ORCJIT, icelake-server)
+  LLVM: libLLVM-18.1.7 (ORCJIT, znver3)
   GC: Built with stock GC
 Threads: 1 default, 1 interactive, 1 GC (on 4 virtual cores)</code></pre></details><details><summary>A more complete overview of all dependencies and their versions is also provided.</summary><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Status `~/work/CellMLToolkit.jl/CellMLToolkit.jl/docs/Manifest.toml`
   [47edcb42] ADTypes v1.20.0
@@ -34,7 +34,7 @@ Threads: 1 default, 1 interactive, 1 GC (on 4 virtual cores)</code></pre></detai
   [e2ed5e7c] Bijections v0.2.2
   [62783981] BitTwiddlingConvenienceFunctions v0.1.6
   [8e7c35d0] BlockArrays v1.9.3
-  [70df07ce] BracketingNonlinearSolve v1.6.0
+  [70df07ce] BracketingNonlinearSolve v1.6.1
   [2a0fbf3d] CPUSummary v0.2.7
   [03cb29e0] CellMLToolkit v2.15.0 `~/work/CellMLToolkit.jl/CellMLToolkit.jl`
   [d360d2e6] ChainRulesCore v1.26.0
@@ -129,7 +129,7 @@ Threads: 1 default, 1 interactive, 1 GC (on 4 virtual cores)</code></pre></detai
   [429524aa] Optim v1.13.3
   [bac558e1] OrderedCollections v1.8.1
   [bbf590c4] OrdinaryDiffEqCore v2.1.0
-  [90014a1f] PDMats v0.11.36
+  [90014a1f] PDMats v0.11.37
   [69de0a69] Parsers v2.8.3
   [e409e4f3] PoissonRandom v0.4.7
   [f517fe37] Polyester v0.7.18
@@ -144,16 +144,16 @@ Threads: 1 default, 1 interactive, 1 GC (on 4 virtual cores)</code></pre></detai
   [74087812] Random123 v1.7.1
   [e6cf234a] RandomNumbers v1.6.0
   [3cdcf5f2] RecipesBase v1.3.4
-  [731186ca] RecursiveArrayTools v3.41.0
+  [731186ca] RecursiveArrayTools v3.42.1
   [189a3867] Reexport v1.2.2
   [2792f1a3] RegistryInstances v0.1.0
   [ae029012] Requires v1.3.1
   [ae5879a3] ResettableStacks v1.1.1
   [79098fc4] Rmath v0.9.0
   [7e49a35a] RuntimeGeneratedFunctions v0.5.16
-  [9dfe8606] SCCNonlinearSolve v1.6.0
+  [9dfe8606] SCCNonlinearSolve v1.8.0
   [94e857df] SIMDTypes v0.1.0
-  [0bca4576] SciMLBase v2.128.0
+  [0bca4576] SciMLBase v2.130.0
   [19f34311] SciMLJacobianOperators v0.1.12
   [a6db7da4] SciMLLogging v1.7.1
   [c0aeaf25] SciMLOperators v1.14.1
@@ -246,4 +246,4 @@ Threads: 1 default, 1 interactive, 1 GC (on 4 virtual cores)</code></pre></detai
   [8e850b90] libblastrampoline_jll v5.15.0+0
   [8e850ede] nghttp2_jll v1.64.0+1
   [3f19e933] p7zip_jll v17.7.0+0
-Info Packages marked with ⌃ and ⌅ have new versions available. Those with ⌃ may be upgradable, but those with ⌅ are restricted by compatibility constraints from upgrading. To see why use `status --outdated -m`</code></pre></details><p>You can also download the <a href="https://github.com/SciML/CellMLToolkit.jl/tree/gh-pages/v2.15.0/assets/Manifest.toml">manifest</a> file and the <a href="https://github.com/SciML/CellMLToolkit.jl/tree/gh-pages/v2.15.0/assets/Project.toml">project</a> file.</p></article><nav class="docs-footer"><a class="docs-footer-nextpage" href="tutorial/">Tutorial »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.16.1 on <span class="colophon-date" title="Friday 19 December 2025 09:21">Friday 19 December 2025</span>. Using Julia version 1.12.3.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+Info Packages marked with ⌃ and ⌅ have new versions available. Those with ⌃ may be upgradable, but those with ⌅ are restricted by compatibility constraints from upgrading. To see why use `status --outdated -m`</code></pre></details><p>You can also download the <a href="https://github.com/SciML/CellMLToolkit.jl/tree/gh-pages/v2.15.0/assets/Manifest.toml">manifest</a> file and the <a href="https://github.com/SciML/CellMLToolkit.jl/tree/gh-pages/v2.15.0/assets/Project.toml">project</a> file.</p></article><nav class="docs-footer"><a class="docs-footer-nextpage" href="tutorial/">Tutorial »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.16.1 on <span class="colophon-date" title="Friday 26 December 2025 09:03">Friday 26 December 2025</span>. Using Julia version 1.12.3.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>

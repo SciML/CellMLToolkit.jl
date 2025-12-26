@@ -155,9 +155,9 @@ version = "1.9.3"
 
 [[deps.BracketingNonlinearSolve]]
 deps = ["CommonSolve", "ConcreteStructs", "NonlinearSolveBase", "PrecompileTools", "Reexport", "SciMLBase"]
-git-tree-sha1 = "03100f03a58e14c60ba0a465e6f1ac9450eb495c"
+git-tree-sha1 = "96ee7f4f14b56ae718664af4ba665d83868a942b"
 uuid = "70df07ce-3d50-431d-a3e7-ca6ddb60ac1e"
-version = "1.6.0"
+version = "1.6.1"
 weakdeps = ["ChainRulesCore", "ForwardDiff"]
 
     [deps.BracketingNonlinearSolve.extensions]
@@ -1167,9 +1167,9 @@ version = "10.44.0+1"
 
 [[deps.PDMats]]
 deps = ["LinearAlgebra", "SparseArrays", "SuiteSparse"]
-git-tree-sha1 = "d922b4d80d1e12c658da7785e754f4796cc1d60d"
+git-tree-sha1 = "e4cff168707d441cd6bf3ff7e4832bdf34278e4a"
 uuid = "90014a1f-27ba-587c-ab20-58faa44d9150"
-version = "0.11.36"
+version = "0.11.37"
 weakdeps = ["StatsBase"]
 
     [deps.PDMats.extensions]
@@ -1300,9 +1300,9 @@ version = "1.3.4"
 
 [[deps.RecursiveArrayTools]]
 deps = ["Adapt", "ArrayInterface", "DocStringExtensions", "GPUArraysCore", "LinearAlgebra", "RecipesBase", "StaticArraysCore", "Statistics", "SymbolicIndexingInterface"]
-git-tree-sha1 = "66da00edb64d4b50ed9de10bc3284b2cb817dcb0"
+git-tree-sha1 = "51e1a3b5c71caf79243a98832150cad6ef125f9e"
 uuid = "731186ca-8d62-57ce-b412-fbd966d074cd"
-version = "3.41.0"
+version = "3.42.1"
 
     [deps.RecursiveArrayTools.extensions]
     RecursiveArrayToolsFastBroadcastExt = "FastBroadcast"
@@ -1373,9 +1373,13 @@ version = "0.5.16"
 
 [[deps.SCCNonlinearSolve]]
 deps = ["CommonSolve", "PrecompileTools", "Reexport", "SciMLBase", "SymbolicIndexingInterface"]
-git-tree-sha1 = "a40cbc91630ef834bc71370ed05372a20bc086c7"
+git-tree-sha1 = "6fea85394f369e2fd8061558ad9daf0aa16c91f2"
 uuid = "9dfe8606-65a1-4bb3-9748-cb89d1561431"
-version = "1.6.0"
+version = "1.8.0"
+weakdeps = ["ChainRulesCore"]
+
+    [deps.SCCNonlinearSolve.extensions]
+    SCCNonlinearSolveChainRulesCoreExt = "ChainRulesCore"
 
 [[deps.SHA]]
 uuid = "ea8e919c-243c-51af-8825-aaa63cd721ce"
@@ -1388,9 +1392,9 @@ version = "0.1.0"
 
 [[deps.SciMLBase]]
 deps = ["ADTypes", "Accessors", "Adapt", "ArrayInterface", "CommonSolve", "ConstructionBase", "Distributed", "DocStringExtensions", "EnumX", "FunctionWrappersWrappers", "IteratorInterfaceExtensions", "LinearAlgebra", "Logging", "Markdown", "Moshi", "PreallocationTools", "PrecompileTools", "Preferences", "Printf", "RecipesBase", "RecursiveArrayTools", "Reexport", "RuntimeGeneratedFunctions", "SciMLLogging", "SciMLOperators", "SciMLPublic", "SciMLStructures", "StaticArraysCore", "Statistics", "SymbolicIndexingInterface"]
-git-tree-sha1 = "b06382e2f1ff0c9aff4f88f560673c800df6099f"
+git-tree-sha1 = "e06a8b13d3e1b9f362fa4a206322c6638c707073"
 uuid = "0bca4576-84f4-4d90-8ffe-ffa030f20462"
-version = "2.128.0"
+version = "2.130.0"
 
     [deps.SciMLBase.extensions]
     SciMLBaseChainRulesCoreExt = "ChainRulesCore"
