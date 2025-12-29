@@ -199,3 +199,4 @@ plot(sol, idxs = 2)
 ```
 
 ![](docs/src/assets/noble_1962.png)
+
