@@ -45,7 +45,7 @@ We can also enhance the model by asking ModelingToolkit.jl to generate a Jacobia
   prob = ODEProblem(ml, tspan; jac=true)  
 ```
 
-The rest remains the same. For the last example, we chose a complex model to stress the ODE solvers: [the O'Hara-Rudy left ventricular model](https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1002061). This model has 49 state variables, is very stiff, and is prone to oscillation. DifferentialEquations.jl has advanced significantly such that an efficient pure Julia solution to the O'Hara-Rudy model is now possible.
+The rest remains the same. For the last example, we chose a complex model to stress the ODE solvers: [the O'Hara-Rudy left ventricular model](https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1002061). This model has 49 state variables, is very stiff, and is prone to oscillation. DifferentialEquations.jl has advanced such that an efficient, pure Julia solution to the O'Hara-Rudy model is now possible.
 
 ```Julia
   ml = CellModel("models/ohara_rudy_cipa_v1_2017.cellml.xml")

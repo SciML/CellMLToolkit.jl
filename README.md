@@ -46,7 +46,7 @@ Pkg.add("CellMLToolkit")
   plot(sol, idxs=(1,3))       # idxs keyword has superseded vars keyword
 ```
 
-Note that `model` is a directory of the CellMLToolkit package. You can find its path as
+Note that `models` is a directory of the CellMLToolkit package. You can find its path as
 
 ```Julia
   model_root = joinpath(splitdir(pathof(CellMLToolkit))[1], "..", "models")
