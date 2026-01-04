@@ -15,4 +15,5 @@ function simplify_systems(systems)
             println(e)
         end
     end
+    return
 end

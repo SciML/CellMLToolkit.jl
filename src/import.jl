@@ -5,19 +5,20 @@ function populate_dependency!(doc, comp)
     for x in list_encapsulation(doc, comp)
         push!(comp.deps, sym(x["component"]))
     end
+    return
 end
 
 function add_component!(doc, name, node, populate = true)
     comp = Component(name, node, Set{Symbol}())
     populate && populate_dependency!(doc, comp)
     push!(doc.comps, comp)
-    comp
+    return comp
 end
 
 function add_connection!(doc, c1, c2, vars)
     conn = Connection(c1, c2, vars)
     push!(doc.conns, conn)
-    conn
+    return conn
 end
 
 """
@@ -36,8 +37,10 @@ function load_cellml(path; resolve = true)
 
     for conn in list_connections(xml)
         c1, c2 = sym.(components_of(get_connection_component(conn)))
-        vars = [make_var(c1, v1) => make_var(c2, v2)
-                for (v1, v2) in variables_of.(list_connection_variables(conn))]
+        vars = [
+            make_var(c1, v1) => make_var(c2, v2)
+                for (v1, v2) in variables_of.(list_connection_variables(conn))
+        ]
         add_connection!(doc, c1, c2, vars)
     end
 
@@ -108,6 +111,7 @@ function resolve_imports!(doc::Document)
             end
         end
     end
+    return
 end
 
 """
@@ -132,7 +136,7 @@ function find_closure(doc::Document, l)
         end
     end
 
-    [x for x in n if x ∉ l]
+    return [x for x in n if x ∉ l]
 end
 
 """
@@ -161,5 +165,5 @@ function list_top_cellml_files(dir)
         printstyled("imported files are $imported\n"; color = :yellow)
     end
 
-    joinpath.(dir, [f for f in files if f ∉ imported])
+    return joinpath.(dir, [f for f in files if f ∉ imported])
 end

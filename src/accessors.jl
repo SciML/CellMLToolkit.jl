@@ -28,7 +28,7 @@ get_model(xml) = findfirst("//x:model", root(xml), ["x" => cellml_ns(xml)])
     comp is an Ezxml(doc) as returned by list_components
 """
 function list_component_variables(comp)
-    findall("./x:variable", nodeof(comp), ["x" => cellml_ns(comp)])
+    return findall("./x:variable", nodeof(comp), ["x" => cellml_ns(comp)])
 end
 
 """
@@ -37,7 +37,7 @@ end
 # list_initiated_variables(xml::EzXML.Document) = findall("//x:component/x:variable[@initial_value]", root(xml), ["x"=>cellml_ns(xml)])
 
 function list_initiated_variables(comp::Component)
-    findall("./x:variable[@initial_value]", nodeof(comp), ["x" => cellml_ns(comp)])
+    return findall("./x:variable[@initial_value]", nodeof(comp), ["x" => cellml_ns(comp)])
 end
 
 """
@@ -50,7 +50,7 @@ list_connections(xml) = findall("//x:connection", root(xml), ["x" => cellml_ns(x
     conn is an Ezxml(doc) node as returned by list_connections
 """
 function get_connection_component(conn)
-    findfirst("./x:map_components", nodeof(conn), ["x" => cellml_ns(conn)])
+    return findfirst("./x:map_components", nodeof(conn), ["x" => cellml_ns(conn)])
 end
 
 """
@@ -65,7 +65,7 @@ components_of(x) = (x["component_1"], x["component_2"])
     conn is an Ezxml(doc) node as returned by list_connections
 """
 function list_connection_variables(conn)
-    findall("./x:map_variables", nodeof(conn), ["x" => cellml_ns(conn)])
+    return findall("./x:map_variables", nodeof(conn), ["x" => cellml_ns(conn)])
 end
 
 """
@@ -118,7 +118,7 @@ end
 list_component_math(comp) = findall("./y:math", nodeof(comp), ["y" => mathml_ns])
 
 function list_component_bvar(comp)
-    findall(".//y:math//y:bvar/y:ci", nodeof(comp), ["y" => mathml_ns])
+    return findall(".//y:math//y:bvar/y:ci", nodeof(comp), ["y" => mathml_ns])
 end
 
 """
@@ -132,23 +132,29 @@ list_imports(xml) = findall("//x:import", get_model(xml), ["x" => cellml_ns(xml)
     node: an import node as returned by list_imports
 """
 function list_import_components(node)
-    findall("./x:component", nodeof(node), ["x" => cellml_ns(node)])
+    return findall("./x:component", nodeof(node), ["x" => cellml_ns(node)])
 end
 
 function list_encapsulation(doc, comp)
     name = string(nameof(comp))
     ns = cellml_ns(doc)
-    groups = parentnode.(findall(
-        "//x:group/x:relationship_ref[@relationship='encapsulation']",
-        root(doc), ["x" => ns]))
+    groups = parentnode.(
+        findall(
+            "//x:group/x:relationship_ref[@relationship='encapsulation']",
+            root(doc), ["x" => ns]
+        )
+    )
     if isempty(groups)  # CellML ver 2.0
         return findall(
             "//x:encapsulation//x:component_ref[@component='$name']//x:component_ref",
-            root(doc), ["x" => ns])
+            root(doc), ["x" => ns]
+        )
     else                # CellML ver 1.0 and 1.1
         for g in groups
-            nodes = findall(".//x:component_ref[@component='$name']//x:component_ref", g,
-                ["x" => ns])
+            nodes = findall(
+                ".//x:component_ref[@component='$name']//x:component_ref", g,
+                ["x" => ns]
+            )
             if !isempty(nodes)
                 return nodes
             end
