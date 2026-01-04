@@ -5,9 +5,9 @@ using MathML: extract_mathml, parse_node
 using Memoize: @memoize
 using SymbolicUtils: operation
 using ModelingToolkit: ModelingToolkit, @parameters, @variables, Differential,
-                       Equation, ODEProblem, System,
-                       Symbolics, equations, parameters, mtkcompile,
-                       substitute, unknowns
+    Equation, ODEProblem, System,
+    Symbolics, equations, parameters, mtkcompile,
+    substitute, unknowns
 using Setfield: @set!
 
 include("structures.jl")
@@ -18,7 +18,7 @@ include("import.jl")
 function read_cellml(path::AbstractString, tspan)
     @warn "read_cellml is deprecated, please use CellModel"
     ml = CellModel(path)
-    ODEProblem(ml, tspan)
+    return ODEProblem(ml, tspan)
 end
 
 ##############################################################################
@@ -36,7 +36,7 @@ getsys(ml::CellModel) = ml.sys
 """
 function CellModel(path::AbstractString)
     doc = load_cellml(path)
-    CellModel(doc, process_components(doc))
+    return CellModel(doc, process_components(doc))
 end
 
 list_params(ml::CellModel) = find_sys_p(ml.doc, ml.sys)
@@ -47,15 +47,17 @@ import ModelingToolkit.ODEProblem
 """
     ODEProblem constructs an ODEProblem from a CellModel
 """
-function ODEProblem(ml::CellModel, tspan;
+function ODEProblem(
+        ml::CellModel, tspan;
         jac = false, level = 1, p = last.(list_params(ml)),
-        u0 = last.(list_states(ml)))
-    ODEProblem(ml.sys, Pair[unknowns(ml.sys) .=> u0; parameters(ml.sys) .=> p], tspan; jac = jac)
+        u0 = last.(list_states(ml))
+    )
+    return ODEProblem(ml.sys, Pair[unknowns(ml.sys) .=> u0; parameters(ml.sys) .=> p], tspan; jac = jac)
 end
 
 function update_list!(l, sym, val)
     i = findfirst(isequal(sym), Symbol.(first.(l)))
-    if i != nothing
+    return if i != nothing
         l[i] = (first(l[i]) => val)
     else
         @warn "symbol $sym not found"

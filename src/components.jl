@@ -7,7 +7,7 @@ create_var(x, iv) = Symbolics.unwrap((@variables $x(iv))[1])
 
 function create_param(x)
     y = Symbol(x)
-    first(@parameters $y)
+    return first(@parameters $y)
 end
 
 to_symbol(x::Symbol) = x
@@ -22,7 +22,7 @@ find_iv(doc::Document) = infer_iv(doc)[:β]
 
 function find_iv(doc::Document, comp)
     d = infer_iv(doc)
-    haskey(d, to_symbol(comp)) ? d[to_symbol(comp)] : d[:β]
+    return haskey(d, to_symbol(comp)) ? d[to_symbol(comp)] : d[:β]
 end
 
 get_ivₚ(doc::Document) = create_param(find_iv(doc))
@@ -88,8 +88,8 @@ names_to_varset(comp, l) = Set([make_var(comp, x) for x in l])
     comp that occur on the left-hand-side of an ODE or algebraic equation
 """
 function list_component_lhs(comp)
-    names_to_varset(comp, find_state_names(comp)) ∪
-    names_to_varset(comp, find_alg_names(comp))
+    return names_to_varset(comp, find_state_names(comp)) ∪
+        names_to_varset(comp, find_alg_names(comp))
 end
 
 """
@@ -180,15 +180,17 @@ function pre_substitution(doc::Document, comp, class)
     vars = to_symbol.(list_component_variables(comp))
 
     states = [create_var(x) => create_var(x, ivₚ) for x in vars if class[make_var(comp, x)]]
-    params = [create_var(x) => create_param(x)
-              for x in vars if !class[make_var(comp, x)] && !isequal(x, ivₘ)]
+    params = [
+        create_var(x) => create_param(x)
+            for x in vars if !class[make_var(comp, x)] && !isequal(x, ivₘ)
+    ]
     ivsub = [create_var(ivₘ) => ivₚ]
 
     return states ∪ params ∪ ivsub
 end
 
 function remove_rhs_diff(eqs)
-    [eq.lhs => eq.rhs for eq in eqs if operation(eq.lhs) isa Differential]
+    return [eq.lhs => eq.rhs for eq in eqs if operation(eq.lhs) isa Differential]
 end
 
 """
@@ -203,7 +205,7 @@ end
 function post_substitution(doc, systems)
     iv = find_iv(doc)
     ivₚ = get_ivₚ(doc)
-    [create_param(string(s) * "₊" * string(iv)) => ivₚ for s in keys(systems)]
+    return [create_param(string(s) * "₊" * string(iv)) => ivₚ for s in keys(systems)]
 end
 
 ##############################################################################
@@ -224,10 +226,12 @@ function process_components(doc::Document; simplify = true)
     systems = subsystems(doc, class)
     post_sub = post_substitution(doc, systems)
 
-    sys = System(Vector{Equation}(translate_connections(doc, systems, class)),
+    sys = System(
+        Vector{Equation}(translate_connections(doc, systems, class)),
         get_ivₚ(doc),
         systems = collect(values(systems)),
-        name = gensym(:cellml))
+        name = gensym(:cellml)
+    )
 
     if simplify
         sys = mtkcompile(sys)
@@ -236,8 +240,10 @@ function process_components(doc::Document; simplify = true)
         # Defaults need to be set after simplifying as otherwise parameters and
         # states for which no defaults are available may still be present in
         # the system
-        @set! sys.defaults = merge(ModelingToolkit.defaults(sys),
-            Dict{Any, Any}(find_list_value(doc, vcat(parameters(sys), unknowns(sys)))))
+        @set! sys.defaults = merge(
+            ModelingToolkit.defaults(sys),
+            Dict{Any, Any}(find_list_value(doc, vcat(parameters(sys), unknowns(sys))))
+        )
     end
 
     return sys
@@ -250,8 +256,10 @@ end
     class is the output of classify_variables
 """
 function subsystems(doc::Document, class)
-    Dict{Symbol, System}(to_symbol(comp) => process_component(doc, comp, class)
-    for comp in components(doc))
+    return Dict{Symbol, System}(
+        to_symbol(comp) => process_component(doc, comp, class)
+            for comp in components(doc)
+    )
 end
 
 """
@@ -274,13 +282,17 @@ function process_component(doc::Document, comp, class)
     end
 
     ivₚ = get_ivₚ(doc)
-    ps = [last(x)
-          for x in values(pre_sub)
-          if ModelingToolkit.isparameter(last(x)) && !isequal(last(x), ivₚ)]
-    states = [last(x)
-              for x in values(pre_sub)
-              if !ModelingToolkit.isparameter(last(x)) && !isequal(last(x), ivₚ)]
-    System(eqs, ivₚ, states, ps; name = to_symbol(comp))
+    ps = [
+        last(x)
+            for x in values(pre_sub)
+            if ModelingToolkit.isparameter(last(x)) && !isequal(last(x), ivₚ)
+    ]
+    states = [
+        last(x)
+            for x in values(pre_sub)
+            if !ModelingToolkit.isparameter(last(x)) && !isequal(last(x), ivₚ)
+    ]
+    return System(eqs, ivₚ, states, ps; name = to_symbol(comp))
 end
 
 ###############################################################################
@@ -299,13 +311,13 @@ function collect_initiated_values(doc::Document)
             end
         end
     end
-    vars, syms
+    return vars, syms
 end
 
 function split_sym(sym)
     # # remove dependency, e.g., (time) from the end
     s = replace(string(sym), r"\([^\)]*\)" => "")
-    make_var(split(s, "₊")...)
+    return make_var(split(s, "₊")...)
 end
 
 find_sys_p(doc::Document, sys) = find_list_value(doc, parameters(sys))
