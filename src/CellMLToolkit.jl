@@ -16,7 +16,7 @@ include("components.jl")
 include("import.jl")
 
 function read_cellml(path::AbstractString, tspan)
-    @warn "read_cellml is deprecated, please use CellModel"
+    Base.depwarn("`read_cellml` is deprecated, use `CellModel` instead.", :read_cellml)
     ml = CellModel(path)
     return ODEProblem(ml, tspan)
 end
@@ -57,7 +57,7 @@ end
 
 function update_list!(l, sym, val)
     i = findfirst(isequal(sym), Symbol.(first.(l)))
-    return if i != nothing
+    return if i !== nothing
         l[i] = (first(l[i]) => val)
     else
         @warn "symbol $sym not found"
