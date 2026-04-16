@@ -210,7 +210,23 @@ end
 
 ##############################################################################
 
-substitute_eqs(eqs, s) = [substitute(eq.lhs, s) ~ substitute(eq.rhs, s) for eq in eqs]
+function _substitute_expr(expr, d)
+    result = substitute(expr, d)
+    # SymbolicUtils 4 doesn't descend into Differential arguments,
+    # so manually substitute inside them
+    if SymbolicUtils.iscall(result) && operation(result) isa Differential
+        diff_op = operation(result)
+        args = SymbolicUtils.arguments(result)
+        new_args = [substitute(a, d) for a in args]
+        result = diff_op(new_args...)
+    end
+    return result
+end
+
+function substitute_eqs(eqs, s)
+    d = Dict(s)
+    return [_substitute_expr(eq.lhs, d) ~ _substitute_expr(eq.rhs, d) for eq in eqs]
+end
 
 """
     process_components is the main entry point
@@ -240,8 +256,8 @@ function process_components(doc::Document; simplify = true)
         # Defaults need to be set after simplifying as otherwise parameters and
         # states for which no defaults are available may still be present in
         # the system
-        @set! sys.defaults = merge(
-            ModelingToolkit.defaults(sys),
+        @set! sys.initial_conditions = merge(
+            Dict{Any, Any}(initial_conditions(sys)),
             Dict{Any, Any}(find_list_value(doc, vcat(parameters(sys), unknowns(sys))))
         )
     end
@@ -278,7 +294,8 @@ function process_component(doc::Document, comp, class)
         eqs = vcat(parse_node.(math)...)
         eqs = substitute_eqs(eqs, pre_sub)
         sub_rhs = remove_rhs_diff(eqs)
-        eqs = Equation[eq.lhs ~ substitute(eq.rhs, sub_rhs) for eq in eqs]
+        sub_rhs_dict = Dict(sub_rhs)
+        eqs = Equation[eq.lhs ~ substitute(eq.rhs, sub_rhs_dict) for eq in eqs]
     end
 
     ivₚ = get_ivₚ(doc)
