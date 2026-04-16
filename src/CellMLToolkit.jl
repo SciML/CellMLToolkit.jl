@@ -3,11 +3,11 @@ module CellMLToolkit
 using EzXML: EzXML, elements, namespace, nodecontent, parentnode, readxml, root
 using MathML: extract_mathml, parse_node
 using Memoize: @memoize
-using SymbolicUtils: operation
+using SymbolicUtils: SymbolicUtils, operation
 using ModelingToolkit: ModelingToolkit, @parameters, @variables, Differential,
     Equation, ODEProblem, System,
     Symbolics, equations, parameters, mtkcompile,
-    substitute, unknowns
+    substitute, unknowns, initial_conditions
 using Setfield: @set!
 
 include("structures.jl")

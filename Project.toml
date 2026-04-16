@@ -1,7 +1,7 @@
 name = "CellMLToolkit"
 uuid = "03cb29e0-1ef4-4721-aa24-cf58a006576f"
 authors = ["Shahriar Iravanian <siravan@svtsim.com>"]
-version = "2.15.0"
+version = "2.16.0"
 
 [deps]
 EzXML = "8f5d6c58-4d21-5cfd-889c-e3ad7ee6a615"
@@ -14,13 +14,13 @@ SymbolicUtils = "d1185830-fcd6-423d-90d6-eec64667417b"
 [compat]
 Aqua = "0.8"
 EzXML = "1.1"
-MathML = "0.1.16"
+MathML = "0.1.19"
 Memoize = "0.4.2"
-ModelingToolkit = "10"
+ModelingToolkit = "11.21"
 OrdinaryDiffEq = "6.103"
 SafeTestsets = "0.1"
 Setfield = "1.1.1"
-SymbolicUtils = "3, 4"
+SymbolicUtils = "4"
 Test = "1.10"
 julia = "1.10"
 
