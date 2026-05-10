@@ -1,5 +1,7 @@
 using CellMLToolkit
 using OrdinaryDiffEq
+using OrdinaryDiffEqLowOrderRK
+using OrdinaryDiffEqSDIRK
 using ModelingToolkit
 path = @__DIR__
 ml = CellModel(path * "/../models/noble_1962/Noble_1962.cellml")
