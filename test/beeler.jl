@@ -1,5 +1,7 @@
 using CellMLToolkit
 using OrdinaryDiffEq
+using OrdinaryDiffEqLowOrderRK
+using OrdinaryDiffEqSDIRK
 using ModelingToolkit
 
 path = @__DIR__
