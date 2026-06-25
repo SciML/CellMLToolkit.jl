@@ -1,14 +1,25 @@
-using CellMLToolkit, Aqua
-@testset "Aqua" begin
-    Aqua.find_persistent_tasks_deps(CellMLToolkit)
-    Aqua.test_ambiguities(CellMLToolkit, recursive = false)
-    Aqua.test_deps_compat(CellMLToolkit)
-    Aqua.test_piracies(
-        CellMLToolkit,
-        treat_as_own = []
-    )
-    Aqua.test_project_extras(CellMLToolkit)
-    Aqua.test_stale_deps(CellMLToolkit)
-    Aqua.test_unbound_args(CellMLToolkit)
-    Aqua.test_undefined_exports(CellMLToolkit)
-end
+using SciMLTesting, CellMLToolkit, Test
+
+run_qa(
+    CellMLToolkit;
+    explicit_imports = true,
+    aqua_kwargs = (; ambiguities = (; recursive = false)),
+    ei_kwargs = (;
+        all_qualified_accesses_via_owners = (;
+            ignore = (
+                :isparameter,   # owner ModelingToolkitBase, re-exported by ModelingToolkit
+                :unwrap,        # owner SymbolicUtils, re-exported by Symbolics
+            ),
+        ),
+        all_qualified_accesses_are_public = (;
+            ignore = (
+                :Document,      # EzXML (not declared public)
+                :Node,          # EzXML (not declared public)
+                :depwarn,       # Base (internal)
+                :isparameter,   # ModelingToolkit (not declared public)
+                :parse,         # Base.Meta (not declared public)
+                :unwrap,        # Symbolics (not declared public)
+            ),
+        ),
+    ),
+)
