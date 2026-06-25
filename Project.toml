@@ -12,7 +12,6 @@ Setfield = "efcf1570-3423-57d1-acb7-fd33fddbac46"
 SymbolicUtils = "d1185830-fcd6-423d-90d6-eec64667417b"
 
 [compat]
-Aqua = "0.8"
 EzXML = "1.1"
 MathML = "0.1.19"
 Memoize = "0.4.2"
@@ -21,14 +20,13 @@ OrdinaryDiffEq = "6.103, 7"
 OrdinaryDiffEqLowOrderRK = "1.5, 2"
 OrdinaryDiffEqSDIRK = "1.5, 2"
 SafeTestsets = "0.1"
-SciMLTesting = "1"
+SciMLTesting = "1.6"
 Setfield = "1.1.1"
 SymbolicUtils = "4"
 Test = "1.10"
 julia = "1.10"
 
 [extras]
-Aqua = "4c88cf16-eb10-579e-8560-4a9242c79595"
 ModelingToolkit = "961ee093-0014-501f-94e3-6117800e7a78"
 OrdinaryDiffEq = "1dea7af3-3e70-54e6-95c3-0bf5283fa5ed"
 OrdinaryDiffEqLowOrderRK = "1344f307-1e59-4825-a18e-ace9aa3fa4c6"
@@ -38,4 +36,4 @@ SciMLTesting = "09d9d899-5365-40a9-917a-5f67fddea283"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [targets]
-test = ["Aqua", "Test", "ModelingToolkit", "OrdinaryDiffEq", "OrdinaryDiffEqLowOrderRK", "OrdinaryDiffEqSDIRK", "SafeTestsets", "SciMLTesting"]
+test = ["Test", "ModelingToolkit", "OrdinaryDiffEq", "OrdinaryDiffEqLowOrderRK", "OrdinaryDiffEqSDIRK", "SafeTestsets", "SciMLTesting"]
