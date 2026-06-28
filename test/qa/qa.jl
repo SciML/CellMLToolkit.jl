@@ -15,10 +15,6 @@ run_qa(
             ignore = (
                 :Document,      # EzXML (not declared public)
                 :Node,          # EzXML (not declared public)
-                :depwarn,       # Base (internal)
-                :isparameter,   # ModelingToolkit (not declared public)
-                :parse,         # Base.Meta (not declared public)
-                :unwrap,        # Symbolics (not declared public)
             ),
         ),
     ),
