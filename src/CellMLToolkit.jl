@@ -15,6 +15,11 @@ include("accessors.jl")
 include("components.jl")
 include("import.jl")
 
+"""
+    read_cellml(path, tspan)
+
+Deprecated alias for constructing a `CellModel` from `path` and converting it to an `ODEProblem`.
+"""
 function read_cellml(path::AbstractString, tspan)
     Base.depwarn("`read_cellml` is deprecated, use `CellModel` instead.", :read_cellml)
     ml = CellModel(path)
@@ -29,6 +34,11 @@ export list_params, list_states
 export readxml, getsys
 export update_list!
 
+"""
+    getsys(ml::CellModel)
+
+Return the ModelingToolkit system stored in `ml`.
+"""
 getsys(ml::CellModel) = ml.sys
 
 """
@@ -39,7 +49,18 @@ function CellModel(path::AbstractString)
     return CellModel(doc, process_components(doc))
 end
 
+"""
+    list_params(ml::CellModel)
+
+Return the parameter assignments found in the CellML model.
+"""
 list_params(ml::CellModel) = find_sys_p(ml.doc, ml.sys)
+
+"""
+    list_states(ml::CellModel)
+
+Return the initial state assignments found in the CellML model.
+"""
 list_states(ml::CellModel) = find_sys_u0(ml.doc, ml.sys)
 
 import ModelingToolkit.ODEProblem
@@ -55,6 +76,11 @@ function ODEProblem(
     return ODEProblem(ml.sys, Pair[unknowns(ml.sys) .=> u0; parameters(ml.sys) .=> p], tspan; jac = jac)
 end
 
+"""
+    update_list!(l, sym, val)
+
+Replace the value paired with `sym` in `l`.
+"""
 function update_list!(l, sym, val)
     i = findfirst(isequal(sym), Symbol.(first.(l)))
     return if i !== nothing
