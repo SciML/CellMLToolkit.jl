@@ -1,3 +1,4 @@
+using CellMLToolkit
 using Documenter
 
 cp("./docs/Manifest.toml", "./docs/src/assets/Manifest.toml", force = true)

@@ -30,6 +30,16 @@ end
 components(doc::Document) = doc.comps
 connections(doc::Document) = doc.conns
 
+"""
+    CellModel
+
+Parsed CellML model and generated ModelingToolkit system.
+
+# Fields
+
+  - `doc`: Parsed CellML document metadata.
+  - `sys`: ModelingToolkit system generated from the CellML components.
+"""
 struct CellModel
     doc::Document
     sys::System

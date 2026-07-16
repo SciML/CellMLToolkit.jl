@@ -2,8 +2,8 @@ const cellml_ns(xml::EzXML.Document) = namespace(root(xml))
 const cellml_ns(node::EzXML.Node) = namespace(node)
 const mathml_ns = "http://www.w3.org/1998/Math/MathML"
 
-create_var(x) = Symbolics.unwrap((@variables $x)[1])
-create_var(x, iv) = Symbolics.unwrap((@variables $x(iv))[1])
+create_var(x) = unwrap((@variables $x)[1])
+create_var(x, iv) = unwrap((@variables $x(iv))[1])
 
 function create_param(x)
     y = Symbol(x)
@@ -302,12 +302,12 @@ function process_component(doc::Document, comp, class)
     ps = [
         last(x)
             for x in values(pre_sub)
-            if ModelingToolkit.isparameter(last(x)) && !isequal(last(x), ivₚ)
+            if isparameter(last(x)) && !isequal(last(x), ivₚ)
     ]
     states = [
         last(x)
             for x in values(pre_sub)
-            if !ModelingToolkit.isparameter(last(x)) && !isequal(last(x), ivₚ)
+            if !isparameter(last(x)) && !isequal(last(x), ivₚ)
     ]
     return System(eqs, ivₚ, states, ps; name = to_symbol(comp))
 end
