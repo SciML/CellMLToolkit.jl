@@ -50,6 +50,17 @@ Pkg.add("CellMLToolkit")
   plot(X, Z)
 ```
 
+## API
+
+```@docs
+CellModel
+read_cellml
+getsys
+list_params
+list_states
+update_list!
+```
+
 ## Reproducibility
 
 ```@raw html
