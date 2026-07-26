@@ -23,8 +23,8 @@ mathengine = MathJax3(
 makedocs(
     sitename = "CellMLToolkit.jl",
     authors = "Chris Rackauckas",
-    modules = Module[],
-    clean = true, doctest = false, linkcheck = true,
+    modules = [CellMLToolkit],
+    clean = true, doctest = true, checkdocs = :exports, linkcheck = true,
     linkcheck_ignore = [
         "https://journals.physiology.org/doi/full/10.1152/ajpheart.00794.2003",
     ],

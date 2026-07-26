@@ -1,5 +1,4 @@
-const cellml_ns(xml::EzXML.Document) = namespace(root(xml))
-const cellml_ns(node::EzXML.Node) = namespace(node)
+const cellml_ns(xml) = namespace(nodeof(xml))
 const mathml_ns = "http://www.w3.org/1998/Math/MathML"
 
 create_var(x) = unwrap((@variables $x)[1])
@@ -12,7 +11,7 @@ end
 
 to_symbol(x::Symbol) = x
 to_symbol(x::AbstractString) = Symbol(x)
-to_symbol(x::EzXML.Node) = Symbol(x["name"])
+to_symbol(x) = Symbol(x["name"])
 to_symbol(comp::Component) = comp.name
 
 """

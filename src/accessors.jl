@@ -4,13 +4,12 @@
 #   get_*:          returns a single 'Ezxml(doc).Node'
 #   list_*_names:   returns a list of String
 
-EzXML.root(doc::Document) = root(doc.xmls[1])
+EzXML.root(doc::Document) = root(first(doc.xmls))
 
-cellml_ns(doc::Document) = cellml_ns(doc.xmls[1])
+cellml_ns(doc::Document) = cellml_ns(first(doc.xmls))
 cellml_ns(comp::Component) = cellml_ns(comp.node)
 
-nodeof(xml::EzXML.Document) = root(xml)
-nodeof(node::EzXML.Node) = node
+nodeof(xml) = applicable(hasroot, xml) ? root(xml) : xml
 nodeof(comp::Component) = comp.node
 
 """
@@ -34,8 +33,6 @@ end
 """
     list_initiated_variables returns all variables that have an initial_value
 """
-# list_initiated_variables(xml::EzXML.Document) = findall("//x:component/x:variable[@initial_value]", root(xml), ["x"=>cellml_ns(xml)])
-
 function list_initiated_variables(comp::Component)
     return findall("./x:variable[@initial_value]", nodeof(comp), ["x" => cellml_ns(comp)])
 end
@@ -159,6 +156,6 @@ function list_encapsulation(doc, comp)
                 return nodes
             end
         end
-        return EzXML.Node[]
+        return Any[]
     end
 end
