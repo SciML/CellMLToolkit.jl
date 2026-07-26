@@ -1,7 +1,9 @@
 [deps]
 CellMLToolkit = "03cb29e0-1ef4-4721-aa24-cf58a006576f"
 Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
+ModelingToolkit = "961ee093-0014-501f-94e3-6117800e7a78"
 
 [compat]
 CellMLToolkit = "3"
 Documenter = "1"
+ModelingToolkit = "11.21"
