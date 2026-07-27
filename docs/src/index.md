@@ -38,7 +38,7 @@ Pkg.add("CellMLToolkit")
 ## Example
 
 ```Julia
-  using CellMLToolkit, DifferentialEquations, Plots
+  using CellMLToolkit, DifferentialEquations, ModelingToolkit, Plots
 
   ml = CellModel("models/lorenz.cellml.xml")
 

@@ -5,7 +5,7 @@ end
 
 struct Component
     name::Symbol
-    node::EzXML.Node
+    node
     deps::Set{Symbol}
 end
 
@@ -22,7 +22,7 @@ variables(conn::Connection) = conn.vars
 
 struct Document
     path::AbstractString
-    xmls::Array{EzXML.Document}
+    xmls::Vector
     comps::Array{Component}
     conns::Array{Connection}
 end
