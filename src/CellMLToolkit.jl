@@ -202,4 +202,17 @@ function update_list!(l, sym, val)
     end
 end
 
+using PrecompileTools: @compile_workload, @setup_workload
+
+@setup_workload begin
+    precompile_model_path = joinpath(@__DIR__, "..", "models", "lorenz.cellml.xml")
+    @compile_workload begin
+        model = CellModel(precompile_model_path)
+        getsys(model)
+        list_params(model)
+        list_states(model)
+        ModelingToolkit.ODEProblem(model, (0.0, 1.0))
+    end
+end
+
 end # module
