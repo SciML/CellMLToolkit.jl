@@ -257,7 +257,7 @@ function process_components(doc::Document; simplify = true)
         # the system
         @set! sys.initial_conditions = merge(
             Dict{Any, Any}(initial_conditions(sys)),
-            Dict{Any, Any}(find_list_value(doc, vcat(parameters(sys), unknowns(sys))))
+            Dict{Any, Any}(find_list_value(doc, vcat(parameters(sys), unknowns(sys)), guesses(sys)))
         )
     end
 
@@ -336,10 +336,10 @@ function split_sym(sym)
     return make_var(split(s, "₊")...)
 end
 
-find_sys_p(doc::Document, sys) = find_list_value(doc, parameters(sys))
-find_sys_u0(doc::Document, sys) = find_list_value(doc, unknowns(sys))
+find_sys_p(doc::Document, sys) = find_list_value(doc, parameters(sys), guesses(sys))
+find_sys_u0(doc::Document, sys) = find_list_value(doc, unknowns(sys), guesses(sys))
 
-function find_list_value(doc::Document, names)
+function find_list_value(doc::Document, names, source_map=nothing)
     vars, syms = collect_initiated_values(doc)
     varkeys = Set(keys(vars))
     groups = find_equivalence_groups(doc)
@@ -347,7 +347,8 @@ function find_list_value(doc::Document, names)
     vals = []
 
     for x in names
-        u = split_sym(x)
+        source = isnothing(source_map) ? x : get(source_map, x, x)
+        u = split_sym(source)
         u = haskey(syms, u) ? syms[u] : u
         var = groups[u] ∩ varkeys
         if length(var) == 0
