@@ -11,3 +11,11 @@ using CellMLToolkit, ModelingToolkit, Test
     @test !isempty(CellMLToolkit.list_states(model))
     @test !isempty(CellMLToolkit.list_params(model))
 end
+
+@testset "MTK generated initial-value parameter provenance" begin
+    model_path = joinpath(pkgdir(CellMLToolkit), "models", "ohara_rudy_cipa_v1_2017.cellml.xml")
+    model = CellMLToolkit.CellModel(model_path)
+
+    @test !isempty(CellMLToolkit.list_params(model))
+    @test !isempty(ModelingToolkit.analytically_integrated(CellMLToolkit.getsys(model)))
+end

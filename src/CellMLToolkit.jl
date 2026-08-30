@@ -7,7 +7,7 @@ using SymbolicUtils: SymbolicUtils, operation, unwrap
 using ModelingToolkit: ModelingToolkit, @parameters, @variables, Differential,
     Equation, ODEProblem, System,
     equations, parameters, mtkcompile,
-    substitute, unknowns, initial_conditions
+    substitute, unknowns, initial_conditions, guesses
 using ModelingToolkitBase: isparameter
 using Setfield: @set!
 
