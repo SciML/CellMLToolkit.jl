@@ -339,7 +339,7 @@ end
 find_sys_p(doc::Document, sys) = find_list_value(doc, parameters(sys), guesses(sys))
 find_sys_u0(doc::Document, sys) = find_list_value(doc, unknowns(sys), guesses(sys))
 
-function find_list_value(doc::Document, names, source_map=nothing)
+function find_list_value(doc::Document, names, source_map = nothing)
     vars, syms = collect_initiated_values(doc)
     varkeys = Set(keys(vars))
     groups = find_equivalence_groups(doc)
