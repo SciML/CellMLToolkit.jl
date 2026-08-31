@@ -15,7 +15,8 @@ end
 @testset "MTK generated initial-value parameter provenance" begin
     model_path = joinpath(pkgdir(CellMLToolkit), "models", "ohara_rudy_cipa_v1_2017.cellml.xml")
     model = CellMLToolkit.CellModel(model_path)
+    problem = ModelingToolkit.ODEProblem(model, (0.0, 1.0))
 
     @test !isempty(CellMLToolkit.list_params(model))
-    @test !isempty(ModelingToolkit.analytically_integrated(CellMLToolkit.getsys(model)))
+    @test !isempty(problem.p)
 end
