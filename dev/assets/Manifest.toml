@@ -32,9 +32,9 @@ uuid = "a4c015fc-c6ff-483c-b24f-f7ea428134e9"
 version = "0.0.1"
 
 [[deps.AbstractPlutoDingetjes]]
-git-tree-sha1 = "6c3913f4e9bdf6ba3c08041a446fb1332716cbc2"
+git-tree-sha1 = "e71ee7b4aa06b045259a7d6101e1cb45ad140bce"
 uuid = "6e696c72-6542-2067-7265-42206c756150"
-version = "1.4.0"
+version = "1.4.1"
 
 [[deps.AbstractTrees]]
 git-tree-sha1 = "2d9c9a55f9c93e8887ad391fbae72f8ef55e1177"
@@ -205,7 +205,7 @@ version = "1.12.6"
 
 [[deps.CellMLToolkit]]
 deps = ["EzXML", "MathML", "Memoize", "ModelingToolkit", "ModelingToolkitBase", "PrecompileTools", "Setfield", "SymbolicUtils"]
-path = "/home/runner/_work/CellMLToolkit.jl/CellMLToolkit.jl"
+path = "/home/runner/work/CellMLToolkit.jl/CellMLToolkit.jl"
 uuid = "03cb29e0-1ef4-4721-aa24-cf58a006576f"
 version = "2.19.1"
 
@@ -442,9 +442,9 @@ version = "0.9.5"
 
 [[deps.Documenter]]
 deps = ["ANSIColoredPrinters", "AbstractTrees", "Base64", "CodecZlib", "Dates", "DocStringExtensions", "Downloads", "Git", "IOCapture", "InteractiveUtils", "JSON", "Logging", "Markdown", "MarkdownAST", "Pkg", "PrecompileTools", "REPL", "RegistryInstances", "SHA", "TOML", "Test", "Unicode"]
-git-tree-sha1 = "17d7a103a75db0d3f8c5764d51e478341a905c36"
+git-tree-sha1 = "191e6bef0cf32cac3a3913cd4787d851715254c2"
 uuid = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
-version = "1.18.0"
+version = "1.19.0"
 
 [[deps.DomainSets]]
 deps = ["CompositeTypes", "FunctionMaps", "IntervalSets", "LinearAlgebra", "StaticArrays"]
@@ -1615,9 +1615,9 @@ version = "1.11.1"
 
 [[deps.StaticArrays]]
 deps = ["LinearAlgebra", "PrecompileTools", "Random", "StaticArraysCore"]
-git-tree-sha1 = "fac51faf3bb96e8bc0bf6f9f39ca4955652776bb"
+git-tree-sha1 = "e206cf4850fd7ac4255ffd2b98922f563e18ac53"
 uuid = "90137ffa-7385-5640-81b9-e52037218182"
-version = "1.9.19"
+version = "1.9.20"
 
     [deps.StaticArrays.extensions]
     StaticArraysChainRulesCoreExt = "ChainRulesCore"
@@ -1634,9 +1634,9 @@ version = "1.4.4"
 
 [[deps.Statistics]]
 deps = ["LinearAlgebra"]
-git-tree-sha1 = "389592b8592e5fb48f498ff60dc6acb4a0e62953"
+git-tree-sha1 = "e2b53ce13a53367e96601081e33d34746b571bad"
 uuid = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
-version = "1.11.4"
+version = "1.11.5"
 weakdeps = ["SparseArrays"]
 
     [deps.Statistics.extensions]
@@ -1777,9 +1777,9 @@ version = "1.11.0"
 
 [[deps.TimerOutputs]]
 deps = ["ExprTools", "PrettyTables", "Printf", "Tables"]
-git-tree-sha1 = "e9b4907b22ce6f51ab0effc321a56dac24614b70"
+git-tree-sha1 = "03271b02dd1c8f87281271575448b9cf6326a961"
 uuid = "a759f4b9-e2f1-59dc-863e-4aeb61b1ea8f"
-version = "1.2.0"
+version = "1.2.1"
 
     [deps.TimerOutputs.extensions]
     FlameGraphsExt = "FlameGraphs"
