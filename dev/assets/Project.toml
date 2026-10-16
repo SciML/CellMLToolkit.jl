@@ -4,7 +4,7 @@ Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
 ModelingToolkit = "961ee093-0014-501f-94e3-6117800e7a78"
 
 [sources]
-CellMLToolkit = {path = "/home/runner/work/CellMLToolkit.jl/CellMLToolkit.jl"}
+CellMLToolkit = {path = "/home/runner/_work/CellMLToolkit.jl/CellMLToolkit.jl"}
 
 [compat]
 CellMLToolkit = "2"
