@@ -12,6 +12,9 @@ on:
       - 'docs/**'
   schedule:
     - cron: '48 8 * * 5'
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 jobs:
   tests:
     uses: "SciML/.github/.github/workflows/grouped-tests.yml@v1"
