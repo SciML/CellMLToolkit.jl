@@ -2,7 +2,7 @@
 
 julia_version = "1.13.3"
 manifest_format = "2.1"
-project_hash = "61ee50ed1e7ff8dd74dc60a92022110193f1b01a"
+project_hash = "a07965563eb1e8007963953ffb27f2ca6d1b2696"
 
 [[deps.ADTypes]]
 deps = ["PrecompileTools"]
@@ -221,7 +221,7 @@ version = "1.12.8"
 
 [[deps.CellMLToolkit]]
 deps = ["EzXML", "MathML", "Memoize", "ModelingToolkit", "ModelingToolkitBase", "PrecompileTools", "Setfield", "SymbolicUtils"]
-path = "/home/runner/_work/CellMLToolkit.jl/CellMLToolkit.jl"
+path = "/home/runner/work/CellMLToolkit.jl/CellMLToolkit.jl"
 uuid = "03cb29e0-1ef4-4721-aa24-cf58a006576f"
 version = "2.19.2"
 
@@ -845,10 +845,10 @@ version = "1.8.0"
 
 [[deps.JSON]]
 deps = ["Dates", "Logging", "Parsers", "PrecompileTools", "StructUtils", "UUIDs", "Unicode"]
-git-tree-sha1 = "3a9b0da8237deffb70be5e8d2e9af7601e4a79b0"
+git-tree-sha1 = "69a876face3b7aa9ac03b8dbf0f27d71bc17cf05"
 registries = "General"
 uuid = "682c06a0-de6a-54ab-a142-c8b1cf79cde6"
-version = "1.13.0"
+version = "1.13.1"
 
     [deps.JSON.extensions]
     JSONArrowExt = ["ArrowTypes"]
@@ -1267,10 +1267,10 @@ version = "0.5.20"
 
 [[deps.MutableArithmetics]]
 deps = ["LinearAlgebra", "SparseArrays", "Test"]
-git-tree-sha1 = "0b19d7d469f2986e9b8d3942c7ef8179fca79e1b"
+git-tree-sha1 = "ffd1161361638e5f0bb796a095b0fdc230d6f019"
 registries = "General"
 uuid = "d8a4904e-b15c-11e9-3269-09a3773c0cb0"
-version = "1.9.2"
+version = "1.9.3"
 
 [[deps.NaNMath]]
 deps = ["OpenLibm_jll"]
